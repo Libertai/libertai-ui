@@ -11,48 +11,30 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title>
+        <!-- <q-toolbar-title>
           Quasar App
-        </q-toolbar-title>
+        </q-toolbar-title> -->
+        <q-space />
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div>hey</div>
       </q-toolbar>
     </q-header>
 
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      class="bg-secondary"
+      class="bg-secondary column flex-grow"
     >
       <!-- image link with the logo -->
       <q-item
         clickable
         to="/"
+        class="q-mb-md"
       >
         <img src="~assets/libertai.svg" alt="Libertai">
       </q-item>
-      <q-btn-dropdown color="primary" label="Start new chat" rounded unelevated no-caps class="q-mx-md">
-        <q-list>
-          <q-item clickable v-close-popup @click="onItemClick">
-            <q-item-section>
-              <q-item-label>Photos</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-item clickable v-close-popup @click="onItemClick">
-            <q-item-section>
-              <q-item-label>Videos</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-item clickable v-close-popup @click="onItemClick">
-            <q-item-section>
-              <q-item-label>Articles</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-btn-dropdown>
-      <q-list>
+      <q-btn color="primary" class="q-mx-md" rounded unelevated no-caps to="/new">New Chat</q-btn>
+      <q-list class="col-grow">
         <q-item-label
           header
         >
@@ -61,8 +43,6 @@
 
         {{ chats.chats }}
       </q-list>
-      <!-- spacer in the flex -->
-      <div class="q-pa-md"></div> 
       <!-- socials and support links (follow us, support, disclaimer) -->
       <q-list>
         <q-separator />
