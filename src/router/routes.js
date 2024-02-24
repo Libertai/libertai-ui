@@ -8,7 +8,8 @@ const routes = [
       { path: 'vocal', component: () => import('pages/VocalChat.vue') },
       { path: 'new', component: () => import('pages/NewChat.vue') },
       // chat view with chat id
-      { path: 'chat/:id', component: () => import('pages/Chat.vue')}
+      { path: 'chat/:id', component: () => import('pages/Chat.vue')},
+      { path: 'points', component: () => import('pages/Points.vue')}
     ]
   },
 
