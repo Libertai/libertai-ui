@@ -7,6 +7,8 @@ import { ref, watch } from 'vue';
 import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from 'highlight.js';
+import DOMPurify from 'dompurify';
+console.log(DOMPurify);
 
 const props = defineProps({
     content: {
@@ -16,21 +18,30 @@ const props = defineProps({
 });
 
 const marked = new Marked(
-  markedHighlight({
-    langPrefix: 'hljs language-',
-    highlight(code, lang, info) {
-      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-      return hljs.highlight(code, { language }).value;
-    }
-  })
+    {
+        gfm: true,
+        breaks: true
+    },
+    markedHighlight({
+        langPrefix: 'hljs language-',
+        highlight(code, lang, info) {
+            const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+            return hljs.highlight(code, { language }).value;
+        }
+    })
 );
 
 const renderedContent = ref('');
 
-renderedContent.value = marked.parse(props.content);
+function updateContent(content) {
+    content = DOMPurify.sanitize(content);
+    renderedContent.value = DOMPurify.sanitize(marked.parse(content));
+}
+
+updateContent(props.content);
 
 // we should watch for changes on the content
 watch(() => props.content, (newContent) => {
-    renderedContent.value = marked.parse(newContent);
+    updateContent(newContent);
 });
 </script>
