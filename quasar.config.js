@@ -30,6 +30,7 @@ module.exports = configure(function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
     boot: [
+      'utils',
       'i18n',
       'axios'
     ],
@@ -61,6 +62,12 @@ module.exports = configure(function (/* ctx */) {
       },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
+      extendViteConf (viteConf, { isServer, isClient }) {
+        if (viteConf.build.commonjsOptions == undefined) {
+          viteConf.build.commonjsOptions = {}
+        }
+        viteConf.build.commonjsOptions.transformMixedEsModules = true;
+      },
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,

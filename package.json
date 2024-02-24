@@ -17,6 +17,7 @@
     "@solana/web3.js": "^1.90.0",
     "aleph-js": "^0.5.3",
     "axios": "^1.2.1",
+    "buffer": "^6.0.3",
     "dompurify": "^3.0.9",
     "highlight.js": "^11.9.0",
     "marked": "^12.0.0",
