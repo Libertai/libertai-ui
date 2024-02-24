@@ -45,7 +45,26 @@ export const useChats = defineStore('chats', {
 
         // TODO: verify models, and that they are still in the list.
         this.chats = savedChats;
-    }
+    },
+
+    saveToStorage() {
+        localStorage.setItem("assistant-chats", JSON.stringify(this.chats));
+    },
+
+    getChat(chat_id) {
+      for (let chat of this.chats) {
+        if (chat.id == chat_id)
+          return chat
+      }
+    },
+
+    addChat(chat) {
+      this.chats.push(chat);
+      this.saveToStorage();
+    },
+
+
+    
   },
 })
 

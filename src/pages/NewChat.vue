@@ -1,7 +1,7 @@
 <template>
-    <div class="column align-items-center q-pa-lg" style="min-height: calc(100vh - 50px)">
+    <q-page class="column align-items-center q-pa-lg">
         <q-tabs
-            v-model="selectedPrompt"
+            v-model="selectedRoomId"
             narrow-indicator
             dense
             align="justify"
@@ -11,7 +11,7 @@
             <q-tab
                 v-for="prompt of prompts.prompts"
                 :key="prompt.roomId"
-                :name="prompt">
+                :name="prompt.roomId">
                 <q-avatar size="64px" color="white" class="q-mb-xs">
                     <img :src="prompt.avatar" class="q-pa-xs" />
                 </q-avatar>
@@ -34,7 +34,7 @@
             </q-card>
         </q-expansion-item>
 
-        <q-input filled bottom-slots autogrow v-model="message" label="Write your message here" autofocus class="q-pb-xl">
+        <q-input bottom-slots autogrow rounded standout v-model="message" label="Write your message here" autofocus class="q-pb-xl" bg-color="secondary" label-color="grey" input-class="text-white">
 
             <template v-slot:hint>
                 Disclaimer: This chat bot uses personas for entertainment and informational purposes only. The
@@ -45,18 +45,20 @@
             </template>
 
             <template v-slot:append>
-                <q-btn round dense flat icon="send" @click="sendMessage" />
+                <q-btn round dense flat icon="send" @click="sendMessage" color="white" />
             </template>
         </q-input>
     
-    </div>
+    </q-page>
 </template>
 <script>
 import { calculateNumberOfTokens } from '../utils/chat'
 import { useModels } from 'src/stores/models'
 import { useChats } from 'src/stores/chats'
 import { usePrompts } from 'src/stores/prompts'
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, watch } from 'vue'
+import { v4 as uuidv4 } from 'uuid'
+import { createMessage } from '../utils/chat'
 
 export default defineComponent({
     name: 'NewChat',
@@ -70,6 +72,16 @@ export default defineComponent({
         const advancedShown = ref(false)
         const localValue = ref({})
         const selectedPrompt = ref(prompts.prompts[0])
+        const selectedRoomId = ref(prompts.prompts[0].roomId)
+
+        // now watch for that roomid change
+        watch(
+            () => selectedRoomId.value,
+            (newId) => {
+                setPrompt(newId)
+            }
+        )
+
         const message = ref('')
 
         function sendMessage() {
@@ -77,9 +89,10 @@ export default defineComponent({
                 return
             }
             const chat = {
-                title: title,
-                model: model,
-                prompt: selectedPrompt,
+                id: uuidv4(),
+                title: '',
+                model: models.model,
+                prompt: selectedPrompt.value,
                 messages: []
             }
             // const chat = {
@@ -90,8 +103,17 @@ export default defineComponent({
             //     temperature: 0.72,
             //     maxLength: 100,
             // }
+            console.log(chats)
+            const user = selectedPrompt.value.users[0];
+            const userMessage = createMessage(user._id, user.username, message.value);
+            chat.messages.push(userMessage);
+
             chats.addChat(chat)
             message.value = ''
+        }
+
+        function setPrompt(roomId) {
+            selectedPrompt.value = prompts.prompts.find((prompt) => prompt.roomId === roomId)
         }
 
         return {
@@ -99,8 +121,10 @@ export default defineComponent({
             advancedShown,
             localValue,
             selectedPrompt,
+            selectedRoomId,
             message,
             sendMessage,
+            setPrompt,
             models: models.models,
             prompt: ref(prompts.prompt),
             prompts,

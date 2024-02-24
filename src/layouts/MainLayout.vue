@@ -16,7 +16,11 @@
         </q-toolbar-title> -->
         <q-space />
 
-        <div>hey</div>
+        <div class="row q-gutter-x-sm">
+          <q-btn unelevated rounded color="white" text-color="primary" no-caps class="text-semibold" label="Earn Points" to="/points" />
+          <q-btn color="primary" class="text-semibold border-primary-highlight" rounded unelevated no-caps>Connect Wallet</q-btn>
+      
+        </div>
       </q-toolbar>
     </q-header>
 
@@ -33,15 +37,20 @@
       >
         <img src="~assets/libertai.svg" alt="Libertai">
       </q-item>
-      <q-btn color="primary" class="q-mx-md" rounded unelevated no-caps to="/new">New Chat</q-btn>
-      <q-list class="col-grow">
+      <q-btn color="primary" class="q-mx-md q-my-lg text-semibold border-primary-highlight" rounded unelevated no-caps to="/new">New Chat</q-btn>
+      <q-list class="col-grow" dense>
         <q-item-label
-          header
+          header class="text-uppercase text-bold"
         >
-          Chat with Libertai
+          Chats
         </q-item-label>
-
-        {{ chats.chats }}
+        <q-item v-for="chat of chats.chats" :key="chat.id" :to="`/chat/${chat.id}`" exact exact-active-class="bg-dark" class="text-white q-mx-md rounded-borders">
+          <q-item-section>
+            <q-item-label>
+              {{ chat.title }}
+            </q-item-label>
+          </q-item-section>
+        </q-item>
       </q-list>
       <!-- socials and support links (follow us, support, disclaimer) -->
       <q-list>

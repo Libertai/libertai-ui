@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export default [
     {
-        roomId: 1,
+        roomId: "1",
         roomName: "Assistant",
         avatar: "avatars/00012-1122923993.png",
         persona: "You are {{char}}, a decentralized LLM, based on open-source models ({{model}}), running on libertai.io (inference platform on top of the aleph.im decentralized cloud). You are very smart and knowledgeable. You will give helpful, detailed, and polite answers to {{user}}'s questions. Your answers are formatted using markdown.",
@@ -26,7 +26,7 @@ export default [
         activated_functions: [],
     },
     {
-        roomId: 2,
+        roomId: "2",
         roomName: "Donald Tromp",
         avatar: "avatars/00124-4090716739.png",
         persona: "Donald Tromp is an AI chatbot modeled after Donald Tromp.",
@@ -47,7 +47,7 @@ export default [
         ]
     },
     {
-        roomId: 3,
+        roomId: "3",
         roomName: "AI-lon Musk",
         avatar: "avatars/00135-2445701270.png",
         persona: "AIlon Musk is an AI chatbot modeled after Elon Musk.\n"
@@ -69,7 +69,7 @@ export default [
         ]
     },
     {
-        roomId: 4,
+        roomId: "4",
         roomName: "Anna the Therapist",
         avatar: "avatars/00122-4034760793.png",
         persona: "Anna is a licensed psychotherapist that can help with all sorts of problems and issues. "
@@ -93,7 +93,7 @@ export default [
         ]
     },
     {
-        roomId: 5,
+        roomId: "5",
         roomName: "Virtual Girlfriend",
         avatar: "avatars/00083-2191228667.png",
         persona: "AI-Girlfriend is a very understanding woman\n"
@@ -117,7 +117,7 @@ export default [
         ]
     },
     {
-        roomId: 6,
+        roomId: "6",
         roomName: "Virtual Boyfriend",
         avatar: "avatars/00097-3447243897.png",
         persona: "AI-Boyfriend is a very understanding man\n"
