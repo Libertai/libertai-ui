@@ -34,6 +34,7 @@
 </template>
   
 <script>
+  import 'highlight.js/styles/devibeans.css'
   import { defineComponent, ref, watch, nextTick } from 'vue'
   import { useRoute } from 'vue-router'
   import { useChats } from '../stores/chats'
