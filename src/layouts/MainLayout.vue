@@ -18,8 +18,27 @@
 
         <div class="row q-gutter-x-sm">
           <q-btn unelevated rounded color="white" text-color="primary" no-caps class="text-semibold" label="Earn Points" to="/points" />
-          <q-btn color="primary" class="text-semibold border-primary-highlight" rounded unelevated no-caps>Connect Wallet</q-btn>
-      
+          <!-- model selector -->
+          <q-btn-dropdown
+            :label="models.model.name"
+            color="primary"
+            text-color="white"
+            class="text-semibold border-primary-highlight"
+            rounded
+            unelevated
+            no-caps
+          >
+            <q-list>
+              <q-item clickable v-close-popup v-for="model in models.models" :key="model.id" @click="models.setModel(model)">
+                <q-item-section>
+                  <q-item-label>
+                    {{ model.name }}
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+          <connect-wallet />
         </div>
       </q-toolbar>
     </q-header>
@@ -115,6 +134,7 @@ import { defineComponent, ref } from 'vue'
 import {useChats} from '../stores/chats'
 import {usePrompts} from '../stores/prompts'
 import {useModels} from '../stores/models'
+import ConnectWallet from 'src/components/ConnectWallet.vue'
 
 const linksList = [
   {
@@ -163,8 +183,12 @@ const linksList = [
 
 export default defineComponent({
   name: 'MainLayout',
+  components: {
+    ConnectWallet
+  },
 
   setup () {
+ 
     const leftDrawerOpen = ref(false)
 
     const models = useModels()
