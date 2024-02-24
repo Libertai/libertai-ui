@@ -8,7 +8,6 @@ import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from 'highlight.js';
 import DOMPurify from 'dompurify';
-console.log(DOMPurify);
 
 const props = defineProps({
     content: {

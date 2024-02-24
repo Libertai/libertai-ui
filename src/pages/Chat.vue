@@ -1,30 +1,38 @@
 <template>
-  <q-page class="column align-items-center" ref="page">
-    <q-list class="col-grow">
-      <q-item v-for="message in messages" :key="message.id" class="q-py-lg items-start">
-        <q-item-section avatar>
-          <q-avatar v-if="message.username == user.username">
-            <img src="avatars/00057-2093295138.png" />
-          </q-avatar>
-          <q-avatar v-else>
-            <img :src="chat.prompt.avatar" />
-          </q-avatar>
-        </q-item-section>
-        <q-item-section>
-          <q-item-label class="text-semibold">
-            {{ message.username }}
-          </q-item-label>
-          <q-item-label>
-            <MarkdownRenderer :content="message.content" breaks />
-          </q-item-label>
-        </q-item-section>
-      </q-item>
+  <q-page class="column align-items-center">
+    <div class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)" ref="scrollArea">
+      <q-list class="col-grow">
+        <q-item v-for="message in messages" :key="message.id"
+        :class="`q-py-lg items-start dyn-container ${message.username == user.username ? 'bg-dark': ''}`">
+          <q-item-section avatar>
+            <q-avatar v-if="message.username == user.username">
+              <img src="avatars/00057-2093295138.png" />
+            </q-avatar>
+            <q-avatar v-else>
+              <img :src="chat.prompt.avatar" />
+            </q-avatar>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label class="text-semibold">
+              {{ message.username.replace('user', 'You').replace('assistant', 'Libertai') }}
+            </q-item-label>
+            <q-item-label>
+              <MarkdownRenderer :content="message.content" breaks />
+              <q-spinner-bars
+              color="white"
+              size="2em" v-if="message.unfinished" />
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+      
+      </q-list>
+    </div>
     
-    </q-list>
-
-    <q-input autogrow rounded standout v-model="inputText"
+    <q-input rounded standout v-model="inputText"
       label="Write your message here" autofocus
-      bg-color="secondary" label-color="grey" input-class="text-white" class="q-pa-lg" ref="input">
+      bg-color="secondary" label-color="grey" input-class="text-white" class="q-pa-lg" ref="input"
+      type="textarea" input-style="height: auto;" rows="3"
+      @keydown.enter.prevent="sendMessage" :loading="isLoading">
 
       <template v-slot:append>
           <q-btn round dense flat icon="send" @click="sendMessage" color="white" />
@@ -60,7 +68,7 @@
       const isLoading = ref(false)
       const hasReset = ref(false)
       const input = ref(null);
-      const page = ref(null);
+      const scrollArea = ref(null);
 
       const prompt = ref()
       const user = ref()
@@ -74,7 +82,8 @@
       }
 
       async function scrollBottom() {
-        // page.value.lastElementChild.scrollIntoView({ behavior: "smooth", block: "end" });
+        scrollArea.value.lastElementChild.scrollIntoView({ behavior: "smooth", block: "end" });
+        // scrollArea.value.scrollTop = scrollArea.value.scrollHeight;
       }
 
       async function generatePersonaMessage() {
@@ -138,6 +147,8 @@
         let content = inputText.value
         console.log(content)
 
+        nextTick(scrollBottom)
+
         if (!content.trim())
           return;
 
@@ -149,35 +160,36 @@
         if (content.trim() === "")
           return;
 
-        const userMessage = createMessage(user.value._id, user.value.username, content);
+        const userMessage = createMessage(user.value._id, user.value.username, content)
         console.log(userMessage)
 
-        messages.value.push(userMessage);
-        await generatePersonaMessage();
+        messages.value.push(userMessage)
+        await generatePersonaMessage()
 
-        input.value.nativeEl.focus();
-        input.value.nativeEl.scrollIntoView();
+        input.value.nativeEl.focus()
+        input.value.nativeEl.scrollIntoView()
       }
 
       async function setChat(chatId) {
         chat.value = await chats.getChat(chatId)
-        messages.value = chat.value.messages;
+        messages.value = chat.value.messages
 
         if (chat.value.prompt !== undefined)
-          prompt.value = chat.value.prompt;
+          prompt.value = chat.value.prompt
         else
-          prompt.value = JSON.parse(JSON.stringify(prompts.prompts[0]));
+          prompt.value = JSON.parse(JSON.stringify(prompts.prompts[0]))
 
-        user.value = prompt.value.users[0];
-        persona.value = prompt.value.users[1];
+        user.value = prompt.value.users[0]
+        persona.value = prompt.value.users[1]
 
         if (chat.value.title === '') {
-          await setChatName(chat.value.messages[0].content);
+          await setChatName(chat.value.messages[0].content)
         }
 
         if (chat.value.messages.length == 1) {
-          await generatePersonaMessage();
+          await generatePersonaMessage()
         }
+        nextTick(scrollBottom)
       }
 
       watch(
@@ -194,17 +206,23 @@
       setChat(route.params.id)
 
       return {
-        page,
+        scrollArea,
         chat,
         messages,
         user,
         persona,
-        sendMessage,
+        isLoading,
         input,
         inputText,
+        sendMessage,
         chatId: route.params.id
       }
     }
   })
   </script>
-  
+<style>
+code.hljs {
+  border-radius: 8px;
+  font-size: 0.9em;
+}
+</style>
