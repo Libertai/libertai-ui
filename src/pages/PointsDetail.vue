@@ -52,7 +52,7 @@ import { defineComponent, ref } from 'vue'
 import { useCounterStore } from '../stores/example-store'
 
 export default defineComponent({
-    name: 'IndexPage',
+    name: 'PointsDetail',
     setup() {
         const counter = useCounterStore()
         // const count = ref(0)
