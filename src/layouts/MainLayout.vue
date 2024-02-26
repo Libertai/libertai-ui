@@ -17,7 +17,12 @@
         <q-space />
 
         <div class="row q-gutter-x-sm">
-          <q-btn unelevated rounded color="white" text-color="primary" no-caps class="text-semibold" label="Earn Points" to="/points" />
+          <q-btn unelevated rounded color="white" text-color="primary" no-caps class="text-semibold" label="Earn Points"
+                 to="/points" v-if="!account.active" />
+          <q-btn unelevated rounded color="white" text-color="primary" no-caps class="text-semibold"
+                 :to="{name: 'points-detail', params: {address: account.address}}" v-else>
+            <span :key="account.address">{{ addressPoints.toFixed(0) }} Points</span>
+          </q-btn>
           <!-- model selector -->
           <q-btn-dropdown
             :label="models.model.name"
@@ -38,7 +43,7 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <connect-wallet />
+          <account-button />
         </div>
       </q-toolbar>
     </q-header>
@@ -130,61 +135,18 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, watch, computed } from 'vue'
 import {useChats} from '../stores/chats'
 import {usePrompts} from '../stores/prompts'
 import {useModels} from '../stores/models'
-import ConnectWallet from 'src/components/ConnectWallet.vue'
-
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-]
+import {useAccount} from '../stores/account'
+import { usePoints } from 'src/stores/points'
+import AccountButton from 'src/components/AccountButton.vue'
 
 export default defineComponent({
   name: 'MainLayout',
   components: {
-    ConnectWallet
+    AccountButton
   },
 
   setup () {
@@ -195,13 +157,32 @@ export default defineComponent({
     const chats = useChats()
     const prompts = usePrompts()
 
+    const account = useAccount()
+    const points = usePoints()
+
+    const addressPoints = computed(() => {
+      if (account.active) {
+        return points.getAddressRealtimePoints(account.address)
+      }  else {
+        return 0
+      }
+    })
+
+    // watch for account changes, and update points if not already done
+    watch(account.address, () => {
+      if (account.active && Object.keys(points.points).length === 0) {
+        points.update()
+      }
+    })
 
     return {
-      essentialLinks: linksList,
       chats,
       models,
       prompts,
+      account,
+      points,
       leftDrawerOpen,
+      addressPoints,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       }

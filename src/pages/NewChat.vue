@@ -1,5 +1,5 @@
 <template>
-    <q-page class="column align-items-center q-pa-lg">
+    <q-page class="align-items-center" style="display: flex; flex-direction: column;">
         <q-tabs
             v-model="selectedRoomId"
             narrow-indicator
@@ -7,6 +7,8 @@
             align="justify"
             active-color="white"
             no-caps
+            mobile-arrows
+            class="q-pa-lg"
         >
             <q-tab
                 v-for="prompt of prompts.prompts"
@@ -23,7 +25,8 @@
             v-model="advancedShown"
             :icon="'img:'+selectedPrompt.avatar"
             label="Customize"
-            class="col-grow"
+            style="flex-grow: 1;"
+            class="q-pa-lg"
             >
             <q-card>
                 <q-card-section>
@@ -34,20 +37,17 @@
             </q-card>
         </q-expansion-item>
 
-        <q-input bottom-slots autogrow rounded standout v-model="message" label="Write your message here" autofocus class="q-pb-xl" bg-color="secondary" label-color="grey" input-class="text-white">
-
-            <template v-slot:hint>
-                Disclaimer: This chat bot uses personas for entertainment and informational purposes only. The
+        <div class="q-pb-xl">
+            <message-input
+            @sendMessage="sendMessage"
+            v-model="message"
+            ref="input"
+            hint="Disclaimer: This chat bot uses personas for entertainment and informational purposes only. The
                 chat bot's responses are not a reflection of any real person or organization's views or opinions, and should not
                 be used as a substitute for professional advice. The accuracy and reliability of the chat bot's responses cannot
                 be guaranteed. Users should exercise their own judgment and discretion when interacting with the chat bot and
-                its personas. By using this chat bot, you acknowledge and agree to these terms.
-            </template>
-
-            <template v-slot:append>
-                <q-btn round dense flat icon="send" @click="sendMessage" color="white" />
-            </template>
-        </q-input>
+                its personas. By using this chat bot, you acknowledge and agree to these terms." />
+        </div>
     
     </q-page>
 </template>
@@ -59,13 +59,19 @@ import { usePrompts } from 'src/stores/prompts'
 import { defineComponent, ref, watch } from 'vue'
 import { v4 as uuidv4 } from 'uuid'
 import { createMessage } from '../utils/chat'
+import { useRouter } from 'vue-router'
+import MessageInput from 'src/components/MessageInput.vue'
 
 export default defineComponent({
     name: 'NewChat',
+    components: {
+        MessageInput
+    },
     setup() {
         const models = useModels()
         const chats = useChats()
         const prompts = usePrompts()
+        const router = useRouter()
 
 
         const maxDocumentTokens = models.model.maxTokens - 2048
@@ -110,6 +116,7 @@ export default defineComponent({
 
             chats.addChat(chat)
             message.value = ''
+            router.push({ name: 'chat', params: { id: chat.id } })
         }
 
         function setPrompt(roomId) {

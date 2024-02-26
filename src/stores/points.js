@@ -21,6 +21,7 @@ export const usePoints = defineStore('points', {
     }
   }),
   getters: {
+    
   },
   actions: {
     // any amount of arguments, return a promise or not
@@ -54,6 +55,26 @@ export const usePoints = defineStore('points', {
       }
       // if not, return 0
       return 0
+    },
+
+    getAddressRealtimePendingPointsInfo(address) {
+      const currentTime = Math.floor(Date.now() / 1000); // Get current timestamp in seconds
+      const pendingPoints = this.getAddressPendingPoints(address);
+      const lastTime = this.info.last_time;
+      const pendingTime = this.info.pending_time;
+      const totalDuration = pendingTime - lastTime;
+      const currentDuration = currentTime - lastTime;
+      const hourlyRate = pendingPoints / totalDuration * 3600;
+      const currentPendingPoints = (pendingPoints / totalDuration) * currentDuration;
+      return {
+        hourlyRate: hourlyRate,
+        pending: currentPendingPoints
+      };
+    },
+
+    getAddressRealtimePoints(address) {
+      const pendingInfo = this.getAddressRealtimePendingPointsInfo(address);
+      return this.getAddressPoints(address) + pendingInfo.pending;
     }
   },
 })

@@ -96,7 +96,7 @@ export default defineComponent({
             // Throws if a checksummed address is provided, but a
             // letter is the wrong case
             try {
-                const addr = ethers.getAddress(val)
+                const addr = ethers.utils.getAddress(val)
                 if (addr !== val) {
                     nextTick(() => {
                         address.value = addr

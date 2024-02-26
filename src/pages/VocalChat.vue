@@ -106,25 +106,6 @@ onMounted(() => {
             last_entry = null;
             ask(transcript);
         }
-        // // We send the transcript to the AI assistant
-        // fetch('http://localhost:5000/ask', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({ question: transcript })
-        // })
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         // We add the answer to the entries array
-        //         entries.value.push({
-        //             id: entries.value.length,
-        //             sent: false,
-        //             name: 'AI',
-        //             text: data.answer,
-        //             avatar: 'https://cdn.quasar.dev/img/avatar.png'
-        //         })
-        //     })
     })
     console.log(speech)
     if (speech == true) {

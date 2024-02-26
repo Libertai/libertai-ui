@@ -28,36 +28,34 @@
       </q-list>
     </div>
     
-    <q-input rounded standout v-model="inputText"
-      label="Write your message here" autofocus
-      bg-color="secondary" label-color="grey" input-class="text-white" class="q-pa-lg" ref="input"
-      type="textarea" input-style="height: auto;" rows="3"
-      @keydown.enter.prevent="sendMessage" :loading="isLoading">
-
-      <template v-slot:append>
-          <q-btn round dense flat icon="send" @click="sendMessage" color="white" />
-      </template>
-    </q-input>
+    <message-input
+      :isLoading="isLoading"
+      @sendMessage="sendMessage"
+      v-model="inputText"
+      ref="input" />
   </q-page>
 </template>
   
 <script>
   import 'highlight.js/styles/devibeans.css'
+
   import { defineComponent, ref, watch, nextTick } from 'vue'
   import { useRoute } from 'vue-router'
   import { useChats } from '../stores/chats'
   import { usePrompts } from '../stores/prompts'
 
-  import MarkdownRenderer from '../components/MarkdownRenderer.vue';
-
   import { getChatName, createMessage, generateAnswer } from '../utils/chat'
+
+  import MarkdownRenderer from '../components/MarkdownRenderer.vue';
+  import MessageInput from '../components/MessageInput.vue';
 
   console.log(nextTick)
   
   export default defineComponent({
     name: 'ChatPage',
     components: {
-      MarkdownRenderer
+      MarkdownRenderer,
+      MessageInput
     },
     setup() {
       const route = useRoute()
@@ -139,12 +137,7 @@
           await this.generatePersonaMessage();
       }
 
-      async function sendMessage(event) {
-        if (event.shiftKey) {
-          return;
-        }
-        event.preventDefault()
-        let content = inputText.value
+      async function sendMessage(content) {
         console.log(content)
 
         nextTick(scrollBottom)
@@ -165,9 +158,6 @@
 
         messages.value.push(userMessage)
         await generatePersonaMessage()
-
-        input.value.nativeEl.focus()
-        input.value.nativeEl.scrollIntoView()
       }
 
       async function setChat(chatId) {
@@ -183,7 +173,7 @@
         persona.value = prompt.value.users[1]
 
         if (chat.value.title === '') {
-          await setChatName(chat.value.messages[0].content)
+          setChatName(chat.value.messages[0].content)
         }
 
         if (chat.value.messages.length == 1) {

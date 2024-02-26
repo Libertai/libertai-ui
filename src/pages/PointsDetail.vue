@@ -56,7 +56,7 @@ export default defineComponent({
         const route = useRoute()
         const points = usePoints()
         // got address as an address part from vue router
-        const address = ref(ethers.getAddress(route.params.address))
+        const address = ref(ethers.utils.getAddress(route.params.address))
         let interval = null;
 
         onMounted(async () => {
@@ -76,22 +76,16 @@ export default defineComponent({
         watch(
             () => route.params.address,
             async newAddress => {
-                address.value = ethers.getAddress(newAddress)
+                address.value = ethers.utils.getAddress(newAddress)
             }
         )
 
         const currentPendingPoints = ref(0)
         const hourlyRate = ref(0)
         async function updatePoints () {
-            const currentTime = Math.floor(Date.now() / 1000); // Get current timestamp in seconds
-            const pendingPoints = points.getAddressPendingPoints(address.value);
-            console.log(pendingPoints)
-            const lastTime = points.info.last_time;
-            const pendingTime = points.info.pending_time;
-            const totalDuration = pendingTime - lastTime;
-            const currentDuration = currentTime - lastTime;
-            hourlyRate.value = pendingPoints / totalDuration * 3600;
-            currentPendingPoints.value = (pendingPoints / totalDuration) * currentDuration;
+            const pendingInfo = await points.getAddressRealtimePendingPointsInfo(address.value);
+            hourlyRate.value = pendingInfo.hourlyRate;
+            currentPendingPoints.value = pendingInfo.pending;
         }
 
         const ThreeYearsPoints = computed(() => {
