@@ -3,60 +3,153 @@
         <div class="row q-pa-xl q-col-gutter-md">
             <q-card flat class="col-12 text-center">
                 <q-card-section class="bg-dark-page">
-                    <div class="text-h4 text-bold">Earn Libertai Points</div>
+                    <p class="q-py-md">
+                        <span class="text-white bg-primary q-py-sm q-px-xl rounded">{{ address }}</span>
+                    </p>
+                    <div class="text-h4 text-bold q-pb-sm">Your Libertai Points</div>
+                    <p>Run aleph.im network nodes, stake ALEPH to continue earning Libertai points. New ways will be available soon!</p>
                 </q-card-section>
                 <q-card-section class="q-pt-none bg-dark-page">
-                    <p>Are you ready to dive into a new world of decentralized computing, where your contributions are rewarded with tangible benefits? Look no further than Libertai Points! These points play an essential role within the exciting and innovative Aleph.im ecosystem.</p>
+                    <p class="text-h6 text-bold text-light">Total Points Received</p>
 
-                    <p>How to participate:</p>
+                    <p class="q-py-md">
+                        <span class="text-h4 text-bold text-white bg-light q-py-sm q-px-xl rounded">{{ points.getAddressPoints(address).toFixed(2) }}</span>
+                    </p>
                 </q-card-section>
             </q-card>
             <q-card flat class="col-6 text-center column">
                 <q-card-section class="bg-primary">
-                    <div class="text-h6 text-semibold">Stake ALEPH</div>
-                </q-card-section>
-                <q-card-section class="q-pt-none bg-primary col-grow">
-                    <p>Staking 10K or more Aleph tokens ($ALEPH) - By showing your commitment to the future of decentralized cloud technology, you earn Libertai Points that reflect your trust in the platform.</p>
-                </q-card-section>
-            </q-card>
-            <q-card flat class="col-6 text-center column">
-                <q-card-section class="bg-primary">
-                    <div class="text-h6 text-semibold">aleph.im Core Channel Node Operator</div>
-                </q-card-section>
-                <q-card-section class="q-pt-none bg-primary col-grow">
-                    <p>Running an Aleph.im Core Channel Node - Become a part of the backbone that supports cross-chain interactions and enjoy the perks of being a node operator with Libertai Points as your reward!</p>
+                    <p class="text-h6 text-bold text-white">Pending Points</p>
+                    <p class="q-py-md">
+                        <span class="text-h4 text-bold text-light bg-white q-py-sm q-px-xl rounded">{{ currentPendingPoints.toFixed(2) }}</span>
+                    </p>
+                    <p class="">
+                        You are getting {{ hourlyRate.toFixed(2) }} points per hour.
+                    </p>
+                    
                 </q-card-section>
             </q-card>
             <q-card flat class="col-6 text-center column">
                 <q-card-section class="bg-primary">
-                    <div class="text-h6 text-semibold">aleph.im Resource Node Operator</div>
-                </q-card-section>
-                <q-card-section class="q-pt-none bg-primary col-grow">
-                    <p>Operating an Aleph.im Resource Node - Contribute to data storage, compute capabilities, and decentralized applications by running a resource node and reap the benefits through Libertai Points!</p>
-                </q-card-section>
-            </q-card>
-            <q-card flat class="col-6 text-center column">
-                <q-card-section class="bg-light">
-                    <div class="text-h6 text-semibold">Connect your wallet and Start earning points today!</div>
-                </q-card-section>
-                <q-card-section class="q-pt-none bg-light col-grow">
-                    <p>So, are you ready to join this revolutionary journey and unlock the power of Libertai Points? Let's get started together and shape the future of decentralized cloud technology!</p>
+                    <p class="text-h6 text-bold text-white">36 Month estimated Points*</p>
+                    <p class="q-py-md">
+                        <span class="text-h4 text-bold text-light bg-white q-py-sm q-px-xl rounded">{{ ThreeYearsPoints.toFixed(2) }}</span>
+                    </p>
                 </q-card-section>
             </q-card>
+            <p class="text-grey text-center col-12">
+                * Estimate only, and under current rules, if your participation stays at the same level. <br />
+                The availability of Libertai Points is subject to change without notice. We may suspend, modify, or terminate the program at our sole discretion and without liability. Your participation does not guarantee that you will receive any specific amount of points or tokens.</p>
         </div>
     </q-page>
 </template>
   
 <script>
-import { defineComponent, ref } from 'vue'
-import { useCounterStore } from '../stores/example-store'
+import { defineComponent, ref, watch, onMounted, computed, onBeforeUnmount } from 'vue'
+import { useRoute } from 'vue-router'
+import { usePoints } from '../stores/points'
+import { ethers } from "ethers";
 
 export default defineComponent({
     name: 'PointsDetail',
     setup() {
-        const counter = useCounterStore()
+        const route = useRoute()
+        const points = usePoints()
+        // got address as an address part from vue router
+        const address = ref(ethers.getAddress(route.params.address))
+        let interval = null;
+
+        onMounted(async () => {
+            if (Object.keys(points.points).length === 0) {
+                await points.update()
+                await updatePoints()
+            }
+            interval = setInterval(() => {
+                updatePoints()
+            }, 1000)
+        })
+
+        onBeforeUnmount(() => {
+            clearInterval(interval)
+        })
+        
+        watch(
+            () => route.params.address,
+            async newAddress => {
+                address.value = ethers.getAddress(newAddress)
+            }
+        )
+
+        const currentPendingPoints = ref(0)
+        const hourlyRate = ref(0)
+        async function updatePoints () {
+            const currentTime = Math.floor(Date.now() / 1000); // Get current timestamp in seconds
+            const pendingPoints = points.getAddressPendingPoints(address.value);
+            console.log(pendingPoints)
+            const lastTime = points.info.last_time;
+            const pendingTime = points.info.pending_time;
+            const totalDuration = pendingTime - lastTime;
+            const currentDuration = currentTime - lastTime;
+            hourlyRate.value = pendingPoints / totalDuration * 3600;
+            currentPendingPoints.value = (pendingPoints / totalDuration) * currentDuration;
+        }
+
+        const ThreeYearsPoints = computed(() => {
+            const currentTime = Math.floor(Date.now() / 1000); // Get current timestamp in seconds
+            const pendingPoints = points.getAddressPendingPoints(address.value);
+            const currentPoints = points.getAddressPoints(address.value);
+            const lastTime = points.info.last_time;
+            const pendingTime = points.info.pending_time;
+            const reward_start = points.info.reward_start;
+            const totalDuration = pendingTime - lastTime;
+            const currentDuration = currentTime - lastTime;
+            const currentTimeSinceStart = currentTime - reward_start;
+            const daily_decay = points.info.daily_decay;
+            const initial_ratio = points.info.ratio;
+
+            const current_decay = daily_decay ** (currentTimeSinceStart / 86400);
+            const current_ratio = initial_ratio * current_decay;
+            console.log(current_ratio)
+            // we extrapolate on what would a 10 days distribution be
+            const current_base = ((pendingPoints / totalDuration)*3600*24*10)/current_ratio;
+            console.log(current_base)
+
+
+            const distributions = 365 * 3 / 10;
+            let total = currentPoints;
+            for (let i = 0; i < distributions; i++) {
+                const time = reward_start + i * 10 * 24 * 3600;
+                // if time is less than last time, we pass
+                if (time < lastTime) {
+                    continue;
+                }
+                // code in python:
+                // days_since_start = (reward_time - settings['reward_start_ts']) / 86400
+                // print(f"Processing rewards for {reward_time} ({days_since_start} days since start)")
+                // decay = settings['daily_decay'] ** int((reward_time - settings['reward_start_ts']) / 86400)
+
+                const days_since_start = (time - reward_start) / 86400
+                const decay = daily_decay ** days_since_start;
+                const ratio = initial_ratio * decay;
+                total += current_base * ratio;
+            }
+            return total
+
+            // we have to calculate the amount with a distribution every 10 days, and at each 10 days, we have to calculate the decay
+        
+
+        })
+
+        
+
         // const count = ref(0)
-        return { counter }
+        return { 
+            points,
+            address,
+            currentPendingPoints,
+            hourlyRate,
+            ThreeYearsPoints
+        }
     }
 })
 </script>

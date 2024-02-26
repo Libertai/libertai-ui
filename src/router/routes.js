@@ -9,7 +9,8 @@ const routes = [
       { path: 'new', component: () => import('pages/NewChat.vue') },
       // chat view with chat id
       { path: 'chat/:id', component: () => import('pages/Chat.vue')},
-      { path: 'points', component: () => import('src/pages/PointsInfo.vue')}
+      { path: 'points', component: () => import('src/pages/PointsInfo.vue')},
+      { path: 'points/:address', name: 'points-detail', component: () => import('src/pages/PointsDetail.vue')}
     ]
   },
 
