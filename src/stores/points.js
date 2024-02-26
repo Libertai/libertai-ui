@@ -51,7 +51,10 @@ export const usePoints = defineStore('points', {
     getAddressPendingPoints(address) {
       // check if the address is in the points (it's an object)
       if (address in this.pending_points) {
-        return this.pending_points[address]
+        let points = this.pending_points[address]
+        if (points > 0) {
+          return points
+        }
       }
       // if not, return 0
       return 0
@@ -68,7 +71,7 @@ export const usePoints = defineStore('points', {
       const currentPendingPoints = (pendingPoints / totalDuration) * currentDuration;
       return {
         hourlyRate: hourlyRate,
-        pending: currentPendingPoints
+        pending: Math.max(currentPendingPoints, 0)
       };
     },
 

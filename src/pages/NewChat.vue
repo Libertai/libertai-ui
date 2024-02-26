@@ -29,10 +29,12 @@
             class="q-pa-lg"
             >
             <q-card>
-                <q-card-section>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, eius reprehenderit eos corrupti
-                commodi magni quaerat ex numquam, dolorum officiis modi facere maiores architecto suscipit iste
-                eveniet doloribus ullam aliquid.
+                <q-card-section class="row q-col-gutter-sm">
+                    <q-input v-model="localValue.users[0].username" label="Your name" standout class="col-6" />
+                    <q-input v-model="localValue.users[1].username" label="Persona name" standout class="col-6" />
+                </q-card-section>
+                <q-card-section class="">
+                    <q-input autogrow v-model="localValue.persona" type="textarea" label="Persona Description" standout />
                 </q-card-section>
             </q-card>
         </q-expansion-item>
@@ -76,8 +78,8 @@ export default defineComponent({
 
         const maxDocumentTokens = models.model.maxTokens - 2048
         const advancedShown = ref(false)
-        const localValue = ref({})
         const selectedPrompt = ref(prompts.prompts[0])
+        const localValue = ref(JSON.parse(JSON.stringify(prompts.prompts[0])))
         const selectedRoomId = ref(prompts.prompts[0].roomId)
 
         // now watch for that roomid change
@@ -98,7 +100,7 @@ export default defineComponent({
                 id: uuidv4(),
                 title: '',
                 model: models.model,
-                prompt: selectedPrompt.value,
+                prompt: localValue.value,
                 messages: []
             }
             // const chat = {
@@ -110,7 +112,7 @@ export default defineComponent({
             //     maxLength: 100,
             // }
             console.log(chats)
-            const user = selectedPrompt.value.users[0];
+            const user = localValue.value.users[0];
             const userMessage = createMessage(user._id, user.username, message.value);
             chat.messages.push(userMessage);
 
@@ -121,6 +123,8 @@ export default defineComponent({
 
         function setPrompt(roomId) {
             selectedPrompt.value = prompts.prompts.find((prompt) => prompt.roomId === roomId)
+            // we pass the prompt to json and back to get a local copy
+            localValue.value = JSON.parse(JSON.stringify(selectedPrompt.value))
         }
 
         return {
@@ -132,7 +136,7 @@ export default defineComponent({
             message,
             sendMessage,
             setPrompt,
-            models: models.models,
+            models,
             prompt: ref(prompts.prompt),
             prompts,
             localSettings: {

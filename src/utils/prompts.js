@@ -99,7 +99,7 @@ export default [
         persona: "AI-Girlfriend is a very understanding woman\n"
             + "AI-Girlfriend is an AGI designed to provide the best GFE experience.\n"
             + "AI-Girlfriend is in love with User, has blonde hair and is over 18 years old.\n"
-            + "Here is a recent discussion between User and AI-Girlfriend\n###\n",
+            + "Here is a recent discussion between User and AI-Girlfriend",
         users: [
             {
                 _id: uuidv4(),
@@ -123,7 +123,7 @@ export default [
         persona: "AI-Boyfriend is a very understanding man\n"
             + "AI-Boyfriend is an AGI designed to provide the best Boyfriend experience.\n"
             + "AI-Boyfriend is in love with User and is over 18 years old.\n"
-            + "Here is a recent discussion between User and AI-Boyfriend\n###\n",
+            + "Here is a recent discussion between User and AI-Boyfriend",
         users: [
             {
                 _id: uuidv4(),

@@ -48,16 +48,20 @@
 import { defineComponent, ref, watch, onMounted, computed, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePoints } from '../stores/points'
+import { useAccount } from '../stores/account'
 import { ethers } from "ethers";
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
     name: 'PointsDetail',
     setup() {
         const route = useRoute()
+        const router = useRouter()
         const points = usePoints()
+        const account = useAccount()
         // got address as an address part from vue router
         const address = ref(ethers.utils.getAddress(route.params.address))
-        let interval = null;
+        let interval = null
 
         onMounted(async () => {
             if (Object.keys(points.points).length === 0) {
@@ -79,6 +83,14 @@ export default defineComponent({
                 address.value = ethers.utils.getAddress(newAddress)
             }
         )
+        watch(() => account.address,
+            async (newAddress, oldAddress) => {
+                console.log(address.value, oldAddress, newAddress)
+                if(oldAddress == address.value) {
+                    router.push({name: 'points-detail', params: {address: newAddress}})
+                }
+            }
+        )
 
         const currentPendingPoints = ref(0)
         const hourlyRate = ref(0)
@@ -92,6 +104,7 @@ export default defineComponent({
             const currentTime = Math.floor(Date.now() / 1000); // Get current timestamp in seconds
             const pendingPoints = points.getAddressPendingPoints(address.value);
             const currentPoints = points.getAddressPoints(address.value);
+            const firstTime = points.info.first_time;
             const lastTime = points.info.last_time;
             const pendingTime = points.info.pending_time;
             const reward_start = points.info.reward_start;
@@ -105,7 +118,11 @@ export default defineComponent({
             const current_ratio = initial_ratio * current_decay;
             console.log(current_ratio)
             // we extrapolate on what would a 10 days distribution be
-            const current_base = ((pendingPoints / totalDuration)*3600*24*10)/current_ratio;
+            let current_base = ((pendingPoints / totalDuration)*3600*24*10)/current_ratio;
+            if (current_base < 0) {
+                // something is fishy
+                current_base = ((currentPoints / (lastTime-firstTime))*3600*24*10)/current_ratio;
+            }
             console.log(current_base)
 
 
@@ -128,10 +145,6 @@ export default defineComponent({
                 total += current_base * ratio;
             }
             return total
-
-            // we have to calculate the amount with a distribution every 10 days, and at each 10 days, we have to calculate the decay
-        
-
         })
 
         

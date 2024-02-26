@@ -84,7 +84,7 @@
           href="https://twitter.com/libertai_dai"
           target="_blank">
           <q-item-section avatar>
-            <q-icon name="twitter" />
+            <q-icon name="bi-twitter-x" />
           </q-item-section>
 
           <q-item-section>
@@ -93,7 +93,20 @@
             </q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable>
+        <q-item
+          href="https://t.me/libertai"
+          target="_blank">
+          <q-item-section avatar>
+            <q-icon name="bi-telegram" />
+          </q-item-section>
+
+          <q-item-section>
+            <q-item-label>
+              Chat with us
+            </q-item-label>
+          </q-item-section>
+        </q-item>
+        <!-- <q-item clickable>
           <q-item-section avatar>
             <q-icon name="twitter" />
           </q-item-section>
@@ -103,26 +116,14 @@
               Disclaimer
             </q-item-label>
           </q-item-section>
-        </q-item>
+        </q-item> -->
         <!-- powered by aleph.im -->
         <q-item
           clickable
           href="https://aleph.im" 
           target="_blank"
         >
-          <q-item-section avatar>
-            <img src="~assets/aleph-im-logo.png" alt="aleph.im" style="width: 24px; height: 24px">
-          </q-item-section>
-
-          <q-item-section>
-            <q-item-label>
-              Powered by aleph.im
-            </q-item-label>
-
-            <q-item-label caption>
-              Decentralized Cloud
-            </q-item-label>
-          </q-item-section>
+          <img src="~assets/powered-by.svg" alt="aleph.im">
         </q-item>
       </q-list>
       

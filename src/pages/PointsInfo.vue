@@ -48,8 +48,10 @@
                     <div class="text-h6">Check your points</div>
                 </q-card-section>
                 <q-card-section class="q-pt-none bg-dark-page">
-                    <q-input outlined bottom-slots v-model="address" label="Address" counter maxlength="42" :rules="addressRules">
-                        <template v-slot:before>
+                    <q-input class="q-pa-lg"
+                    bottom-slots v-model="address" label="Address" counter maxlength="42" :rules="addressRules"
+                    autofocus rounded standout>
+                        <template v-slot:prepend>
                         <q-icon name="wallet" />
                         </template>
 
