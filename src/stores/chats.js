@@ -67,6 +67,14 @@ export const useChats = defineStore('chats', {
       this.saveToStorage();
     },
 
+    deleteChat(chat) {
+      const index = this.chats.indexOf(chat);
+      if (index > -1) { // only splice array when item is found
+          this.chats.splice(index, 1); // 2nd parameter means remove one item only
+          this.saveToStorage();
+      }
+    },
+
 
     
   },

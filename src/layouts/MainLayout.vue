@@ -63,7 +63,7 @@
         <img src="~assets/libertai.svg" alt="Libertai">
       </q-item>
       <q-btn color="primary" class="q-mx-md q-my-lg text-semibold border-primary-highlight" rounded unelevated no-caps to="/new">New Chat</q-btn>
-      <q-list style="flex-grow: 1 1;" dense>
+      <q-list style="flex-grow: 1;" dense>
         <q-item-label
           header class="text-uppercase text-bold"
         >
@@ -74,6 +74,14 @@
             <q-item-label>
               {{ chat.title }}
             </q-item-label>
+          </q-item-section>
+
+          <q-item-section side v-if="route.params?.id == chat.id">
+            <q-btn-group flat dense>
+              <q-btn icon="delete" size="sm" class="q-pa-xs" @click="deleteChat(chat.id)">
+                <q-tooltip>Delete chat</q-tooltip>
+              </q-btn>
+            </q-btn-group>
           </q-item-section>
         </q-item>
       </q-list>
@@ -137,12 +145,13 @@
 </template>
 
 <script>
-import { defineComponent, ref, watch, computed } from 'vue'
+import { defineComponent, ref, watch, computed, nextTick } from 'vue'
 import {useChats} from '../stores/chats'
 import {usePrompts} from '../stores/prompts'
 import {useModels} from '../stores/models'
 import {useAccount} from '../stores/account'
 import { usePoints } from 'src/stores/points'
+import { useRouter, useRoute } from 'vue-router'
 import AccountButton from 'src/components/AccountButton.vue'
 
 export default defineComponent({
@@ -162,6 +171,9 @@ export default defineComponent({
     const account = useAccount()
     const points = usePoints()
 
+    const router = useRouter()
+    const route = useRoute()
+
     const addressPoints = computed(() => {
       if (account.active) {
         return points.getAddressRealtimePoints(account.address)
@@ -177,14 +189,25 @@ export default defineComponent({
       }
     })
 
+    function deleteChat(chat_id) {
+      const chat = chats.getChat(chat_id)
+      if (route.params?.id == chat_id) {
+        nextTick(()=>router.push('/new'))
+      }
+      chats.deleteChat(chat)
+    }
+
     return {
       chats,
       models,
       prompts,
       account,
       points,
+      router,
+      route,
       leftDrawerOpen,
       addressPoints,
+      deleteChat,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       }

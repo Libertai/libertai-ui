@@ -40,7 +40,7 @@
   import 'highlight.js/styles/devibeans.css'
 
   import { defineComponent, ref, watch, nextTick } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { useRoute, useRouter } from 'vue-router'
   import { useChats } from '../stores/chats'
   import { usePrompts } from '../stores/prompts'
 
@@ -48,6 +48,7 @@
 
   import MarkdownRenderer from '../components/MarkdownRenderer.vue';
   import MessageInput from '../components/MessageInput.vue';
+import router from '../router'
 
   console.log(nextTick)
   
@@ -59,6 +60,7 @@
     },
     setup() {
       const route = useRoute()
+      const router = useRouter()
       const chat = ref()
       const chats = useChats()
       const prompts = usePrompts()
@@ -162,6 +164,10 @@
 
       async function setChat(chatId) {
         chat.value = await chats.getChat(chatId)
+        if (chat.value === undefined) {
+          await router.push({name: 'new-chat'})
+          return
+        }
         messages.value = chat.value.messages
 
         if (chat.value.prompt !== undefined)
