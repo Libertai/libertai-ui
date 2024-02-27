@@ -51,7 +51,8 @@
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      class="bg-secondary column flex-grow"
+      class="bg-secondary flex-grow"
+      style="display: flex; flex-direction: column;"
     >
       <!-- image link with the logo -->
       <q-item
@@ -62,7 +63,7 @@
         <img src="~assets/libertai.svg" alt="Libertai">
       </q-item>
       <q-btn color="primary" class="q-mx-md q-my-lg text-semibold border-primary-highlight" rounded unelevated no-caps to="/new">New Chat</q-btn>
-      <q-list class="col-grow" dense>
+      <q-list style="flex-grow: 1 1;" dense>
         <q-item-label
           header class="text-uppercase text-bold"
         >
@@ -77,7 +78,7 @@
         </q-item>
       </q-list>
       <!-- socials and support links (follow us, support, disclaimer) -->
-      <q-list>
+      <q-list class="q-pt-md">
         <q-separator />
 
         <q-item
