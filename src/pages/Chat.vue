@@ -38,17 +38,19 @@
   
 <script>
   import 'highlight.js/styles/devibeans.css'
-
+  import { useQuasar } from 'quasar'
   import { defineComponent, ref, watch, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useChats } from '../stores/chats'
   import { usePrompts } from '../stores/prompts'
+  import { useModels } from '../stores/models'
 
   import { getChatName, createMessage, generateAnswer } from '../utils/chat'
 
   import MarkdownRenderer from '../components/MarkdownRenderer.vue';
   import MessageInput from '../components/MessageInput.vue';
-import router from '../router'
+  import router from '../router'
+  import models from 'src/utils/models'
 
   console.log(nextTick)
   
@@ -59,16 +61,18 @@ import router from '../router'
       MessageInput
     },
     setup() {
+      const $q = useQuasar()
       const route = useRoute()
       const router = useRouter()
       const chat = ref()
       const chats = useChats()
       const prompts = usePrompts()
+      const models = useModels()
       const inputText = ref('')
       const isLoading = ref(false)
       const hasReset = ref(false)
-      const input = ref(null);
-      const scrollArea = ref(null);
+      const input = ref(null)
+      const scrollArea = ref(null)
 
       const prompt = ref()
       const user = ref()
@@ -168,6 +172,7 @@ import router from '../router'
           await router.push({name: 'new-chat'})
           return
         }
+        models.setModelByURL(chat.value.model.apiUrl)
         messages.value = chat.value.messages
 
         if (chat.value.prompt !== undefined)
@@ -193,9 +198,16 @@ import router from '../router'
         async newId => {
           await setChat(newId)
           messages.value = chat.value.messages
-          // nextTick(() => {
-          //   messages.value = chat.value.messages
-          // })
+        }
+      )
+
+      watch(
+        () => models.model,
+        async newModel => {
+          if (chat.value.model.apiUrl !== newModel.apiUrl) {
+            chat.value.model = newModel
+            $q.notify(`Changing current chat model to ${newModel.name}`)
+          }
         }
       )
 

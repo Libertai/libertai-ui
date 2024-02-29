@@ -15,6 +15,15 @@ export const useModels = defineStore('models', {
       // you can directly mutate the state
       this.model = model
     },
+    setModelByURL(modelUrl) {
+      console.log("searching for", modelUrl)
+      for (let model of models) {
+        if (model.apiUrl==modelUrl) {
+          console.log("found", model.name, model.apiUrl)
+          this.model = model
+        }
+      }
+    }
   },
 })
 
