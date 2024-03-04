@@ -30,6 +30,10 @@
         </q-item>
       
       </q-list>
+      <div class="text-center" v-if="!isLoading">
+        <q-btn @click="renegerate" color="primary">Re-generate</q-btn>
+      </div>
+      
     </div>
     
     <message-input
@@ -46,7 +50,7 @@
   
 <script>
   import 'highlight.js/styles/devibeans.css'
-  import { useQuasar } from 'quasar'
+  import { is, useQuasar } from 'quasar'
   import { defineComponent, ref, watch, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useChats } from '../stores/chats'
@@ -141,15 +145,25 @@
             // this.messages.push(createMessage(generateAnswer(message, this.model), 'ai'));
             // nextTick(scrollBottom);
         }
-
+      
       async function regenerate() {
-          const messages = chat.value.messages;
-          const lastMessage = messages[messages.length-1];
-          if (lastMessage.username !== this.user.username) {
-              this.deleteMessage(lastMessage, messages);
-              this.current_chat.messages = [...this.current_chat.messages];
+          // we discard the last message if it's from the AI, and regenerate
+          const lastMessage = messages.value[messages.value.length-1];
+          console.log(lastMessage);
+          if (lastMessage.username !== user.value.username) {
+              messages.value.pop();
+              messages.value = [...messages.value];
+              chat.value.messages = [...this.current_chat.messages];
           }
-          await this.generatePersonaMessage();
+          await generatePersonaMessage();
+          // const messages = chat.value.messages;
+          // const lastMessage = messages.value[messages.value.length-1];
+          // if (lastMessage.username !== this.user.username) {
+          //     // deleteMessage(lastMessage, messages);
+          //     // messages.value = [...messages.value];
+          //     chat.value.messages = [...this.current_chat.messages];
+          // }
+          // await this.generatePersonaMessage();
       }
 
       async function sendMessage(content) {
@@ -233,6 +247,7 @@
         inputText,
         sendMessage,
         enableEdit,
+        regenerate,
         chatId: route.params.id
       }
     }
