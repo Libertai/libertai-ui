@@ -12,12 +12,16 @@
               <img :src="chat.prompt.avatar" />
             </q-avatar>
           </q-item-section>
-          <q-item-section>
+          <q-item-section :style="`max-width: calc(960px - 56px);`">
+            <q-popup-edit v-model="message.content" auto-save v-slot="scope" v-if="enableEdit">
+              <strong>{{ message.username }}</strong>
+              <q-input v-model="scope.value" dense autofocus counter autogrow />
+            </q-popup-edit>
             <q-item-label class="text-semibold">
               {{ message.username.replace('user', 'You').replace('assistant', 'Libertai') }}
             </q-item-label>
-            <q-item-label>
-              <MarkdownRenderer :content="message.content" breaks />
+            <q-item-label style="display: block;">
+              <MarkdownRenderer :content="message.content" breaks/>
               <q-spinner-bars
               color="white"
               size="2em" v-if="message.unfinished" />
@@ -33,6 +37,10 @@
       @sendMessage="sendMessage"
       v-model="inputText"
       ref="input" />
+    <q-checkbox v-model="enableEdit" left-label class="q-mr-lg q-mb-md fixed-bottom-right">
+      <q-tooltip anchor="top right" class="bg-primary" self="bottom right">When this is activated, just click on a message to start editing it.</q-tooltip>
+      Enable edits
+    </q-checkbox>
   </q-page>
 </template>
   
@@ -73,6 +81,7 @@
       const hasReset = ref(false)
       const input = ref(null)
       const scrollArea = ref(null)
+      const enableEdit = ref(false)
 
       const prompt = ref()
       const user = ref()
@@ -223,6 +232,7 @@
         input,
         inputText,
         sendMessage,
+        enableEdit,
         chatId: route.params.id
       }
     }
@@ -232,5 +242,16 @@
 code.hljs {
   border-radius: 8px;
   font-size: 0.9em;
+}
+
+.col-grow * {
+  min-width: 0;
+}
+
+pre, code {
+  overflow-x: auto;
+  font-size: 90%;
+  max-width: calc(100vw - 40px - 40px - 16px);
+  min-width: 0;
 }
 </style>
