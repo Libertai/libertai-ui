@@ -69,7 +69,7 @@
         >
           Chats
         </q-item-label>
-        <q-item v-for="chat of chats.chats" :key="chat.id" :to="`/chat/${chat.id}`" exact exact-active-class="bg-dark" class="text-white q-mx-md rounded-borders">
+        <q-item v-for="chat of chats.chats.slice().reverse()" :key="chat.id" :to="`/chat/${chat.id}`" exact exact-active-class="bg-dark" class="text-white q-mx-md rounded-borders">
           <q-item-section>
             <q-item-label>
               {{ chat.title }}
