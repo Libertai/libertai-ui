@@ -2,7 +2,7 @@
   <q-page class="column align-items-center">
     <div class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)" ref="scrollArea">
       <q-list class="col-grow">
-        <q-item v-for="message in messages" :key="message.id"
+        <q-item v-for="(message, message_index) in messages" :key="message.id"
         :class="`q-py-lg items-start dyn-container ${message.username == user.username ? 'bg-dark': ''}`">
           <q-item-section avatar>
             <q-avatar v-if="message.username == user.username">
@@ -27,12 +27,17 @@
               size="2em" v-if="message.unfinished" />
             </q-item-label>
           </q-item-section>
+          <div class="absolute dyn-container" style="right: 0px; bottom: 10px;">
+            <q-btn @click="regenerateMessage()" icon="refresh" dense flat size="sm" v-if="(!isLoading) && (message_index == messages.length-1)">
+              <q-tooltip>Regenerate</q-tooltip>
+            </q-btn>
+            <q-btn @click="copyMessage(message)" icon="content_copy" dense flat size="sm">
+              <q-tooltip>Copy</q-tooltip>
+            </q-btn>
+          </div>
         </q-item>
       
       </q-list>
-      <div class="text-center" v-if="!isLoading">
-        <q-btn @click="renegerate" color="primary">Re-generate</q-btn>
-      </div>
       
     </div>
     
@@ -50,7 +55,7 @@
   
 <script>
   import 'highlight.js/styles/devibeans.css'
-  import { is, useQuasar } from 'quasar'
+  import { is, useQuasar, copyToClipboard } from 'quasar'
   import { defineComponent, ref, watch, nextTick } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useChats } from '../stores/chats'
@@ -122,9 +127,10 @@
                 hasReset.value = false;
                 // this.activePrompt.typingUsers = [persona._id];
 
-                for await (const new_content of generateAnswer(messages.value.slice(0,-1), prompt.value, chat.value.model)) {
-                    console.log(new_content);
-                    currentMessage.content = new_content;
+                for await (const output of generateAnswer(messages.value.slice(0,-1), prompt.value, chat.value.model)) {
+                    console.log(output);
+                    currentMessage.content = output.content;
+                    currentMessage.unfinished = output.unfinished;
                     messages.value = [...messages.value];
                     // nextTick(scrollBottom);
                 }
@@ -135,7 +141,7 @@
                 currentMessage.error_message = error.message;
             }
             isLoading.value = false;
-            currentMessage.unfinished = false;
+            // currentMessage.unfinished = false;
             messages.value = [...messages.value];
             // current_chat.messages = [...current_chat.messages];
             await chats.saveToStorage();
@@ -146,14 +152,14 @@
             // nextTick(scrollBottom);
         }
       
-      async function regenerate() {
+      async function regenerateMessage() {
           // we discard the last message if it's from the AI, and regenerate
           const lastMessage = messages.value[messages.value.length-1];
           console.log(lastMessage);
           if (lastMessage.username !== user.value.username) {
               messages.value.pop();
               messages.value = [...messages.value];
-              chat.value.messages = [...this.current_chat.messages];
+              chat.value.messages = messages.value;
           }
           await generatePersonaMessage();
           // const messages = chat.value.messages;
@@ -216,6 +222,11 @@
         nextTick(scrollBottom)
       }
 
+      async function copyMessage(message) {
+        await copyToClipboard(message.content)
+        $q.notify('Message copied to clipboard')
+      }
+
       watch(
         () => route.params.id,
         async newId => {
@@ -247,7 +258,8 @@
         inputText,
         sendMessage,
         enableEdit,
-        regenerate,
+        regenerateMessage,
+        copyMessage,
         chatId: route.params.id
       }
     }

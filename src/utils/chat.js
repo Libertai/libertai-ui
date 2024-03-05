@@ -196,7 +196,8 @@ export async function* generateAnswer(messages, activePrompt, model) {
                 to_yield += " *[writing ...]*";
             }
         }
-        yield to_yield;
+        yield {content: to_yield,
+               unfinished: isUnfinished};
     }
 }
 
