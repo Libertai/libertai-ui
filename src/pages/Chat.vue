@@ -3,7 +3,7 @@
     <div class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)" ref="scrollArea">
       <q-list class="col-grow">
         <q-item v-for="(message, message_index) in messages" :key="message.id"
-        :class="`q-py-lg items-start dyn-container ${message.username == user.username ? 'bg-dark': ''}`">
+        :class="`q-py-lg items-start dyn-container chat-item ${message.username == user.username ? 'bg-dark': ''}`">
           <q-item-section avatar>
             <q-avatar v-if="message.username == user.username">
               <img src="avatars/00057-2093295138.png" />
@@ -27,7 +27,7 @@
               size="2em" v-if="message.unfinished" />
             </q-item-label>
           </q-item-section>
-          <div class="absolute dyn-container" style="right: 0px; bottom: 10px;">
+          <div class="absolute dyn-container chat-toolbar">
             <q-btn @click="regenerateMessage()" icon="refresh" dense flat size="sm" v-if="(!isLoading) && (message_index == messages.length-1)">
               <q-tooltip>Regenerate</q-tooltip>
             </q-btn>
@@ -280,5 +280,28 @@ pre, code {
   font-size: 90%;
   max-width: calc(100vw - 40px - 40px - 16px);
   min-width: 0;
+}
+
+.chat-item {
+  .chat-toolbar {
+    right: 0px; bottom: 10px;
+  }
+}
+
+/* on desktop, we want to show the toolbar only on hover */
+@media (min-width: 600px) {
+  .chat-item {
+    .chat-toolbar {
+      right: 0px; top: 10px; bottom: auto;
+      opacity: 0;
+      transition: opacity 0.1s;
+    }
+
+    &:hover {
+      .chat-toolbar {
+        opacity: 1;
+      }
+    }
+  }
 }
 </style>
