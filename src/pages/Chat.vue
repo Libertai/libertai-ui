@@ -24,7 +24,11 @@
               <MarkdownRenderer :content="message.content" breaks/>
               <q-spinner-bars
               color="white"
-              size="2em" v-if="message.unfinished" />
+              size="2em" v-if="message.unfinished && isLoading" />
+              <span class="text-warning" v-if="message.in_error">
+                <q-tooltip>Error: {{ message.error_message }}</q-tooltip>
+                <q-icon name="warning" /> There has been an error, please <a @click="regenerateMessage()">retry</a>.
+              </span>
             </q-item-label>
           </q-item-section>
           <div class="absolute dyn-container chat-toolbar">
@@ -297,6 +301,10 @@ pre, code {
 .chat-item {
   .chat-toolbar {
     right: 0px; bottom: 10px;
+  }
+
+  a {
+    color: inherit;
   }
 }
 
