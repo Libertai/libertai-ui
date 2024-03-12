@@ -56,7 +56,7 @@
 <script>
   import 'highlight.js/styles/devibeans.css'
   import { is, useQuasar, copyToClipboard } from 'quasar'
-  import { defineComponent, ref, watch, nextTick } from 'vue'
+  import { defineComponent, ref, watch, nextTick, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import { useChats } from '../stores/chats'
   import { usePrompts } from '../stores/prompts'
@@ -226,6 +226,17 @@
         await copyToClipboard(message.content)
         $q.notify('Message copied to clipboard')
       }
+
+      async function clearCookies() {
+        if (chat.value.model.slot_id !== undefined)
+        {
+            delete chat.value.model.slot_id;
+        }
+        await axios.get("https://curated.aleph.cloud/change-pool", { withCredentials: true });
+        hasReset.value = true;
+      }
+
+      onMounted(() => {nextTick(clearCookies)})
 
       watch(
         () => route.params.id,
