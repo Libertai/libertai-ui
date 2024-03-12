@@ -66,6 +66,7 @@
 
   import MarkdownRenderer from '../components/MarkdownRenderer.vue';
   import MessageInput from '../components/MessageInput.vue';
+  import axios from 'axios';
   import router from '../router'
   import models from 'src/utils/models'
 
@@ -250,7 +251,7 @@
         () => models.model,
         async newModel => {
           if (chat.value.model.apiUrl !== newModel.apiUrl) {
-            chat.value.model = newModel
+            chat.value.model = JSON.parse(JSON.stringify(newModel))
             $q.notify(`Changing current chat model to ${newModel.name}`)
           }
         }

@@ -99,7 +99,7 @@ export default defineComponent({
             const chat = {
                 id: uuidv4(),
                 title: '',
-                model: models.model,
+                model: JSON.parse(JSON.stringify(models.model)), // we copy the model
                 prompt: localValue.value,
                 messages: []
             }
