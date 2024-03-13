@@ -115,6 +115,7 @@ export async function complete(prompt, model, stop_sequences, handle_cache) {
         params = {
             ...params,
             n_predict: model.maxLength,
+            id_slot: slot_id,
             slot_id: slot_id,
             cache_prompt: handle_cache,
             typical_p: 1,
@@ -140,8 +141,14 @@ export async function complete(prompt, model, stop_sequences, handle_cache) {
         console.log(response.data)
         return response.data.results[0].text;
     } else if (model.engine == "llamacpp") {
-        if (handle_cache)
-            model.slot_id = response.data.slot_id;
+        if (handle_cache) {
+            if (response.data.id_slot !== undefined) {
+                model.slot_id = response.data.id_slot;
+            } else if (response.data.slot_id !== undefined) {
+                model.slot_id = response.data.slot_id;
+            }
+        }
+            model.slot_id = response.data.id_slot;
         return response.data.content;
     } else if (model.engine == "openai") {
         return response.data.choices[0].text;
