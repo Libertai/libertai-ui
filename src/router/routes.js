@@ -11,7 +11,9 @@ const routes = [
       // chat view with chat id
       { path: 'chat/:id', name: 'chat', component: () => import('pages/Chat.vue')},
       { path: 'points', component: () => import('src/pages/PointsInfo.vue')},
-      { path: 'points/:address', name: 'points-detail', component: () => import('src/pages/PointsDetail.vue')}
+      { path: 'points/:address', name: 'points-detail', component: () => import('src/pages/PointsDetail.vue')},
+      // knowledge db
+      { path: 'knowledge-db', component: () => import('src/pages/KnowledgeBase.vue')}
     ]
   },
 
