@@ -11,10 +11,14 @@
     <q-page-container>
       <div class="row justify-center q-pa-md">
         <div class="col-lg-8 col-sm-12">
-
-          <!-- KnowledgeDB Table -->
-          <q-table title="Documents" :rows="documents" :columns="columns" row-key="id" selection="single"
-            v-model:selected="selectedDocument" @row-click="onRowClick" />
+          <q-list>
+            <q-item v-for="document in documents" :key="document.id" clickable @click="onRowClick($event, document)">
+              <q-item-section>
+                <q-item-label>{{ document.title }}</q-item-label>
+                <q-item-label caption>{{ document.description }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
 
           <!-- Add/Edit Document Form -->
           <q-dialog v-model="showForm" position="bottom">
@@ -36,8 +40,8 @@
                   @click="onSubmit" />
               </q-card-actions>
             </q-card>-->
+            haha
             <DBUploader label="Auto Uploader" auto-upload url="http://localhost:4444/upload" multiple />
-
           </q-dialog>
         </div>
       </div>
