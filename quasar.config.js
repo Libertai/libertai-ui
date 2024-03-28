@@ -69,6 +69,12 @@ module.exports = configure(function (/* ctx */) {
         }
         viteConf.build.commonjsOptions.transformMixedEsModules = true;
       },
+
+      extendWebpack(cfg) {
+        cfg.experiments = {
+          asyncWebAssembly: true
+        }
+      },
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,

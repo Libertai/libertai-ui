@@ -5,7 +5,7 @@
 <script>
 import { defineComponent } from 'vue'
 import { useChats } from 'stores/chats'
-import { useKnowledgeDBStore } from './stores/knowledgeDB'
+import { useKnowledgeDBStore } from './stores/knowledge-db'
 
 export default defineComponent({
   name: 'App',
@@ -18,3 +18,4 @@ export default defineComponent({
   }
 })
 </script>
+./stores/knowledge-db

@@ -51,7 +51,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { useKnowledgeDBStore } from '../stores/knowledgeDB.js';
+import { useKnowledgeDBStore } from '../stores/knowledge-db.js';
 
 const knowledgeDBStore = useKnowledgeDBStore();
 
@@ -111,4 +111,4 @@ async function onSubmit() {
 function onFileChange(files) {
   editedDocument.value.file = files[0];
 }
-</script>
+</script>../stores/knowledge-db.js/index.js

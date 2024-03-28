@@ -1,6 +1,6 @@
 import { createUploaderComponent } from 'quasar'
 import { computed, ref } from 'vue'
-import { useKnowledgeDBStore } from '../stores/knowledgeDB'
+import { useKnowledgeDBStore } from '../stores/knowledge-db'
 // import * as pdfjsLib from 'pdfjs-dist/webpack';
 // console.log(pdfjsLib)
 const pdfjsLib = window.pdfjsLib;
