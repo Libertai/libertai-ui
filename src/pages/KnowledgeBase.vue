@@ -6,19 +6,29 @@
         <q-toolbar-title>Knowledge Database</q-toolbar-title>
         <q-btn flat round dense icon="add" @click="openForm" />
       </q-toolbar>
+      <q-toolbar class="row justify-between items-center q-px-lg">
+        <q-toolbar-title>Search</q-toolbar-title>
+        <q-btn flat round dense icon="search" @click="searchDefault" />
+      </q-toolbar>
     </q-header>
 
     <q-page-container>
       <div class="row justify-center q-pa-md">
         <div class="col-lg-8 col-sm-12">
           <q-list>
-            <q-item v-for="document in documents" :key="document.id" clickable @click="onRowClick($event, document)">
+            <q-item
+              v-for="document in documents"
+              :key="document.id"
+              clickable
+              @click="onRowClick($event, document)"
+            >
               <q-item-section>
                 <q-item-label>{{ document.title }}</q-item-label>
                 <q-item-label caption>{{ document.description }}</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
+          <!-- Placeholder query -->
 
           <!-- Add/Edit Document Form -->
           <q-dialog v-model="showForm" position="bottom">
@@ -41,7 +51,12 @@
               </q-card-actions>
             </q-card>-->
             haha
-            <DBUploader label="Auto Uploader" auto-upload url="http://localhost:4444/upload" multiple />
+            <DBUploader
+              label="Auto Uploader"
+              auto-upload
+              url="http://localhost:4444/upload"
+              multiple
+            />
           </q-dialog>
         </div>
       </div>
@@ -50,15 +65,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useKnowledgeDBStore } from '../stores/knowledge-db.js';
+import { ref, computed } from "vue";
+import { useKnowledgeDBStore } from "../stores/knowledge-db.js";
 
 const knowledgeDBStore = useKnowledgeDBStore();
 
 // Columns for the table displaying documents
 const columns = [
-  { name: 'title', label: 'Title', field: 'title' },
-  { name: 'description', label: 'Description', field: 'description' },
+  { name: "title", label: "Title", field: "title" },
+  { name: "description", label: "Description", field: "description" },
 ];
 
 // Documents data source
@@ -74,10 +89,12 @@ const showForm = ref(false);
 const submitting = ref(false);
 
 // Edited document object
-const editedDocument = ref({ title: '', description: '' });
+const editedDocument = ref({ title: "", description: "" });
 
 // Form title based on whether we're adding or editing a document
-const formTitle = computed(() => selectedDocument.value ? 'Edit Document' : 'Add Document');
+const formTitle = computed(() =>
+  selectedDocument.value ? "Edit Document" : "Add Document"
+);
 
 // On row click event handler for the table
 function onRowClick(evt, row) {
@@ -89,19 +106,31 @@ function openForm() {
   showForm.value = true;
 }
 
+// Test with a PDF of the communist manifesto
+function searchDefault() {
+  let query = "why is the sky blue?";
+  console.log("Searching: ", query);
+  knowledgeDBStore.search(query).then((results) => {
+    console.log("Results: ", results);
+  });
+}
+
 // Submit the add/edit document form
 async function onSubmit() {
-  console.log("blah")
+  console.log("blah");
   submitting.value = true;
   try {
     if (selectedDocument.value) {
-      await knowledgeDBStore.updateDocument(selectedDocument.value, editedDocument.value);
+      await knowledgeDBStore.updateDocument(
+        selectedDocument.value,
+        editedDocument.value
+      );
     } else {
       await knowledgeDBStore.addDocument(editedDocument.value);
     }
     showForm.value = false;
   } catch (error) {
-    console.error('Error adding or updating document:', error);
+    console.error("Error adding or updating document:", error);
   } finally {
     submitting.value = false;
   }
@@ -111,4 +140,4 @@ async function onSubmit() {
 function onFileChange(files) {
   editedDocument.value.file = files[0];
 }
-</script>../stores/knowledge-db.js/index.js
+</script>
