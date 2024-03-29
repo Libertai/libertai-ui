@@ -136,14 +136,18 @@ export default createUploaderComponent({
           const text = await extractTextFromPdf(url)
           const title = file.name
           await useKnowledgeDB.addDocument(title, text)
+          helpers.updateFileStatus(file, 'uploaded')
         } else if (file.type === 'text/plain') {
           const reader = new FileReader()
           reader.onload = async (event) => {
             const content = event.target.result
             const title = file.name
             await useKnowledgeDB.addDocument(title, content)
+            helpers.updateFileStatus(file, 'uploaded')
           }
           reader.readAsText(file)
+        } else {
+          helpers.updateFileStatus(file, 'failed')
         }
       }
       
