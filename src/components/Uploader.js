@@ -94,7 +94,7 @@ export default createUploaderComponent({
       for (let i = 1; i <= maxPages; i++) {
           const page = await pdf.getPage(i);
           const content = await page.getTextContent();
-          const pageTextContent = content.items.map(item => item.str).join('');
+          const pageTextContent = content.items.map(item => item.str).join('\n\n---\n\n');
           textContent.push(pageTextContent);
       }
       console.log(textContent)
