@@ -66,7 +66,7 @@ export const useKnowledgeDBStore = defineStore(KNOWLEDGE_DB_KEY, {
       // this.saveToStorage();
     },
     // TODO: probably horribly inefficient, but it works for now
-    async search(query, num_results = 5) {
+    async search(query, num_results = 5, max_distance = 20) {
       let query_embedding = await embed(query);
       console.log("Query embedding: ", query_embedding);
       let res = {
@@ -82,6 +82,10 @@ export const useKnowledgeDBStore = defineStore(KNOWLEDGE_DB_KEY, {
         // Get the euclidean distance between the query and the embedding
         let euclidean_distance = distance(query_embedding, embedding.embedding);
         console.log("Distance: ", euclidean_distance);
+        if (euclidean_distance > max_distance) {
+          continue;
+        }
+
         // If we have less than num_results matches, add this one
         if (res.matches.length < num_results) {
           console.log("Adding match");
