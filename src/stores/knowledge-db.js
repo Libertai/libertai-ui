@@ -39,7 +39,7 @@ export const useKnowledgeDBStore = defineStore(KNOWLEDGE_DB_KEY, {
       this.documents.push(document);
 
       // Generate our embeddings
-      let chunks = chunkText(document.content);
+      let chunks = await chunkText(title, document.content);
       console.log("Chunks: ", chunks);
       let promises = [];
       for (let chunk of chunks) {

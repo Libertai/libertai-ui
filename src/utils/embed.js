@@ -1,11 +1,34 @@
 import axios from 'axios';
+import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 
 // Naive chunking implementation
-export function chunkText(text, chunkSize=500, overlapSize=50) {
-  const chunks = [];
-  for (let i = 0; i < text.length; i += chunkSize - overlapSize) {
-    chunks.push(text.slice(i, i + chunkSize));
-  }
+export async function chunkText(documentName, text, chunkSize=500, overlapSize=100) {
+  const splitter = new RecursiveCharacterTextSplitter({
+    chunkSize: chunkSize,
+    chunkOverlap: overlapSize,
+    separators: ["\n\n---\n\n", "\n\n", "\n", " "],
+  });
+
+  // const chunks = [];
+  // for (let i = 0; i < text.length; i += chunkSize - overlapSize) {
+  //   chunks.push(text.slice(i, i + chunkSize));
+  // }
+
+  // this is a list of langchain document
+  const output = await splitter.createDocuments(
+    [text],
+    [],
+    {
+      chunkHeader: `DOCUMENT NAME: ${documentName}\n\n---\n\n`,
+      appendChunkOverlapHeader: true
+    }
+  );
+  console.log(output);
+
+  // python: [item.pageContent for item in output]
+  const chunks = output.map((i) => i.pageContent);
+  console.log(chunks)
+
   return chunks;
 }
 
