@@ -34,7 +34,7 @@ export default [
         ...chatml,
         maxLength: 15,
         maxTokens: 16384,
-        name: "NeuralBeagle (7B, fast)",
+        name: "AlphaMonarch (7B, fast)",
         apiUrl: "https://curated.aleph.cloud/vm/a8b6d895cfe757d4bc5db9ba30675b5031fe3189a99a14f13d5210c473220caf/completion",
         engine: "llamacpp",
         pass_credentials: true
