@@ -41,7 +41,8 @@ export default [
         name: "AlphaMonarch (7B, fast)",
         apiUrl: "https://curated.aleph.cloud/vm/a8b6d895cfe757d4bc5db9ba30675b5031fe3189a99a14f13d5210c473220caf/completion",
         engine: "llamacpp",
-        pass_credentials: true
+        pass_credentials: true,
+        stop_sequences: ["<|im_end|>","<|endoftext|>", "<|", "</|", "<im_end|>","</assistant","</user"]
     },
     {
         ...defaults,
