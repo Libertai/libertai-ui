@@ -1,6 +1,6 @@
-import { createUploaderComponent } from 'quasar'
-import { computed, ref } from 'vue'
-import { useKnowledgeDBStore } from '../stores/knowledge-db'
+import { createUploaderComponent } from 'quasar';
+import { computed, ref } from 'vue';
+import { useKnowledgeDBStore } from '../stores/knowledge-db';
 // import * as pdfjsLib from 'pdfjs-dist/webpack';
 // console.log(pdfjsLib)
 const pdfjsLib = window.pdfjsLib;
@@ -72,32 +72,33 @@ export default createUploaderComponent({
   emits: [
     // ...your custom events name list
   ],
-  injectPlugin ({ props, emit, helpers }) {
-
-    const loading = ref(false );
+  injectPlugin({ props, emit, helpers }) {
+    const loading = ref(false);
 
     async function extractTextFromPdf(pdfUrl) {
-      console.log("called")
+      console.log('called');
       // set loading to true before processing the PDF
-      loading.value = true
-      console.log(pdfUrl)
+      loading.value = true;
+      console.log(pdfUrl);
       let pdf;
       try {
         pdf = await pdfjsLib.getDocument(pdfUrl).promise;
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-      console.log(pdf)
+      console.log(pdf);
       const maxPages = pdf.numPages;
       let textContent = [];
 
       for (let i = 1; i <= maxPages; i++) {
-          const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
-          const pageTextContent = content.items.map(item => item.str).join('\n\n---\n\n');
-          textContent.push(pageTextContent);
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const pageTextContent = content.items
+          .map((item) => item.str)
+          .join('\n\n---\n\n');
+        textContent.push(pageTextContent);
       }
-      console.log(textContent)
+      console.log(textContent);
 
       // set loading to false when the PDF processing is complete
       loading.value = false;
@@ -107,50 +108,50 @@ export default createUploaderComponent({
 
     const isUploading = computed(() => {
       // return <Boolean>
-      return loading.value
-    })
+      return loading.value;
+    });
 
     const isBusy = computed(() => {
       // return <Boolean>
-      return loading.value
-    })
+      return loading.value;
+    });
 
-    function abort () {
+    function abort() {
       // ...
     }
 
-    async function upload (args) {
-      console.log(args)
-      console.log(props, emit, helpers)
-      const files = helpers.queuedFiles.value
-      console.log(files)
+    async function upload(args) {
+      console.log(args);
+      console.log(props, emit, helpers);
+      const files = helpers.queuedFiles.value;
+      console.log(files);
 
-      const useKnowledgeDB = useKnowledgeDBStore()
-      console.log(useKnowledgeDB)
+      const useKnowledgeDB = useKnowledgeDBStore();
+      console.log(useKnowledgeDB);
 
       // now for each file, handle it.
       for (let file of files) {
-        console.log(file)
+        console.log(file);
         if (file.type === 'application/pdf') {
-          const url = URL.createObjectURL(file)
-          const text = await extractTextFromPdf(url)
-          const title = file.name
-          await useKnowledgeDB.addDocument(title, text)
-          helpers.updateFileStatus(file, 'uploaded')
+          const url = URL.createObjectURL(file);
+          const text = await extractTextFromPdf(url);
+          const title = file.name;
+          await useKnowledgeDB.addDocument(title, text);
+          helpers.updateFileStatus(file, 'uploaded');
         } else if (file.type === 'text/plain') {
-          const reader = new FileReader()
+          const reader = new FileReader();
           reader.onload = async (event) => {
-            const content = event.target.result
-            const title = file.name
-            await useKnowledgeDB.addDocument(title, content)
-            helpers.updateFileStatus(file, 'uploaded')
-          }
-          reader.readAsText(file)
+            const content = event.target.result;
+            const title = file.name;
+            await useKnowledgeDB.addDocument(title, content);
+            helpers.updateFileStatus(file, 'uploaded');
+          };
+          reader.readAsText(file);
         } else {
-          helpers.updateFileStatus(file, 'failed')
+          helpers.updateFileStatus(file, 'failed');
         }
       }
-      
+
       // const file = props.files[0]
       // if (file.type === 'application/pdf') {
       //   const reader = new FileReader()
@@ -166,7 +167,7 @@ export default createUploaderComponent({
       isUploading,
       isBusy,
       abort,
-      upload
-    }
-  }
-})
+      upload,
+    };
+  },
+});
