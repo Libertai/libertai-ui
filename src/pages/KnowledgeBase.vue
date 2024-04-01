@@ -65,15 +65,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useKnowledgeDBStore } from 'src/stores/knowledge-db';
+import { ref, computed } from "vue";
+import { useKnowledgeDBStore } from "src/stores/knowledge-db";
 
 const knowledgeDb = useKnowledgeDBStore();
 
 // Columns for the table displaying documents
 const columns = [
-  { name: 'title', label: 'Title', field: 'title' },
-  { name: 'description', label: 'Description', field: 'description' },
+  { name: "title", label: "Title", field: "title" },
+  { name: "description", label: "Description", field: "description" },
 ];
 
 // Documents data source
@@ -89,11 +89,11 @@ const showForm = ref(false);
 const submitting = ref(false);
 
 // Edited document object
-const editedDocument = ref({ title: '', description: '' });
+const editedDocument = ref({ title: "", description: "" });
 
 // Form title based on whether we're adding or editing a document
 const formTitle = computed(() =>
-  selectedDocument.value ? 'Edit Document' : 'Add Document'
+  selectedDocument.value ? "Edit Document" : "Add Document",
 );
 
 // On row click event handler for the table
@@ -108,10 +108,10 @@ function openForm() {
 
 // Test with a PDF of the communist manifesto
 function searchDefault() {
-  let query = 'why is the sky blue?';
-  console.log('Searching: ', query);
-  knowledgeDb.search(query).then((results) => {
-    console.log('Results: ', results);
+  let query = "why is the sky blue?";
+  console.log("Searching: ", query);
+  knowledgeDb.searchDocuments(query).then((results) => {
+    console.log("Results: ", results);
   });
 }
 
@@ -124,14 +124,14 @@ async function onSubmit() {
       //   selectedDocument.value,
       //   editedDocument.value
       // );
-      console.log('TODO: Implement update document');
+      console.log("TODO: Implement update document");
     } else {
       // await knowledgeDBStore.addDocument(editedDocument.value);
       await knowledgeDb.addDocument(editedDocument.value);
     }
     showForm.value = false;
   } catch (error) {
-    console.error('Error adding or updating document:', error);
+    console.error("Error adding or updating document:", error);
   } finally {
     submitting.value = false;
   }

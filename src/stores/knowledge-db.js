@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia';
-import { KnowledgeDb } from 'libertai-js';
+import { defineStore } from "pinia";
+import { KnowledgeDb } from "libertai-js";
 
-export const KNOWLEDGE_DB_PINIA_KEY = 'knowledgeDb-pinia-key';
+export const KNOWLEDGE_DB_PINIA_KEY = "knowledgeDb-pinia-key";
 
 export const useKnowledgeDBStore = defineStore(KNOWLEDGE_DB_PINIA_KEY, {
   state: () => ({
