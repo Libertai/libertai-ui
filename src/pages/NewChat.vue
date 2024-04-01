@@ -74,18 +74,18 @@
   </q-page>
 </template>
 <script>
-import { calculateNumberOfTokens } from '../utils/chat';
-import { useModels } from 'src/stores/models';
-import { useChats } from 'src/stores/chats';
-import { usePrompts } from 'src/stores/prompts';
-import { defineComponent, ref, watch } from 'vue';
-import { v4 as uuidv4 } from 'uuid';
-import { createMessage } from '../utils/chat';
-import { useRouter } from 'vue-router';
-import MessageInput from 'src/components/MessageInput.vue';
+import { calculateNumberOfTokens } from "../utils/chat";
+import { useModels } from "src/stores/models";
+import { useChats } from "src/stores/chats";
+import { usePrompts } from "src/stores/prompts";
+import { defineComponent, ref, watch } from "vue";
+import { v4 as uuidv4 } from "uuid";
+import { createMessage } from "../utils/chat";
+import { useRouter } from "vue-router";
+import MessageInput from "src/components/MessageInput.vue";
 
 export default defineComponent({
-  name: 'NewChat',
+  name: "NewChat",
   components: {
     MessageInput,
   },
@@ -106,10 +106,10 @@ export default defineComponent({
       () => selectedRoomId.value,
       (newId) => {
         setPrompt(newId);
-      }
+      },
     );
 
-    const message = ref('');
+    const message = ref("");
 
     function sendMessage() {
       if (message.value.length === 0) {
@@ -117,7 +117,7 @@ export default defineComponent({
       }
       const chat = {
         id: uuidv4(),
-        title: '',
+        title: "",
         model: JSON.parse(JSON.stringify(models.model)), // we copy the model
         prompt: localValue.value,
         messages: [],
@@ -136,13 +136,13 @@ export default defineComponent({
       chat.messages.push(userMessage);
 
       chats.addChat(chat);
-      message.value = '';
-      router.push({ name: 'chat', params: { id: chat.id } });
+      message.value = "";
+      router.push({ name: "chat", params: { id: chat.id } });
     }
 
     function setPrompt(roomId) {
       selectedPrompt.value = prompts.prompts.find(
-        (prompt) => prompt.roomId === roomId
+        (prompt) => prompt.roomId === roomId,
       );
       // we pass the prompt to json and back to get a local copy
       localValue.value = JSON.parse(JSON.stringify(selectedPrompt.value));
@@ -179,6 +179,8 @@ export default defineComponent({
 
 .scale-in-enter-active,
 .scale-in-leave-active {
-  transition: transform 0.3s, opacity 0.5s;
+  transition:
+    transform 0.3s,
+    opacity 0.5s;
 }
 </style>

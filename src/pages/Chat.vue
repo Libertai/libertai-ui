@@ -98,26 +98,26 @@
 </template>
 
 <script>
-import 'highlight.js/styles/devibeans.css';
-import { is, useQuasar, copyToClipboard } from 'quasar';
-import { defineComponent, ref, watch, nextTick, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useChats } from '../stores/chats';
-import { usePrompts } from '../stores/prompts';
-import { useModels } from '../stores/models';
+import "highlight.js/styles/devibeans.css";
+import { is, useQuasar, copyToClipboard } from "quasar";
+import { defineComponent, ref, watch, nextTick, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useChats } from "../stores/chats";
+import { usePrompts } from "../stores/prompts";
+import { useModels } from "../stores/models";
 
-import { getChatName, createMessage, generateAnswer } from '../utils/chat';
+import { getChatName, createMessage, generateAnswer } from "../utils/chat";
 
-import MarkdownRenderer from '../components/MarkdownRenderer.vue';
-import MessageInput from '../components/MessageInput.vue';
-import axios from 'axios';
-import router from '../router';
-import models from 'src/utils/models';
+import MarkdownRenderer from "../components/MarkdownRenderer.vue";
+import MessageInput from "../components/MessageInput.vue";
+import axios from "axios";
+import router from "../router";
+import models from "src/utils/models";
 
 console.log(nextTick);
 
 export default defineComponent({
-  name: 'ChatPage',
+  name: "ChatPage",
   components: {
     MarkdownRenderer,
     MessageInput,
@@ -130,7 +130,7 @@ export default defineComponent({
     const chats = useChats();
     const prompts = usePrompts();
     const models = useModels();
-    const inputText = ref('');
+    const inputText = ref("");
     const isLoading = ref(false);
     const hasReset = ref(false);
     const input = ref(null);
@@ -150,8 +150,8 @@ export default defineComponent({
 
     async function scrollBottom() {
       scrollArea.value.lastElementChild.scrollIntoView({
-        behavior: 'smooth',
-        block: 'end',
+        behavior: "smooth",
+        block: "end",
       });
       // scrollArea.value.scrollTop = scrollArea.value.scrollHeight;
     }
@@ -162,10 +162,10 @@ export default defineComponent({
       // scrollBottom();
       await chats.saveToStorage();
 
-      inputText.value = '';
+      inputText.value = "";
       // nextTick(scrollBottom);
 
-      currentMessage = createMessage(persona._id, persona.username, '');
+      currentMessage = createMessage(persona._id, persona.username, "");
       currentMessage.unfinished = true;
       messages.value = [...messages.value, currentMessage];
       chat.value.messages = messages.value;
@@ -178,7 +178,7 @@ export default defineComponent({
         for await (const output of generateAnswer(
           messages.value.slice(0, -1),
           prompt.value,
-          chat.value.model
+          chat.value.model,
         )) {
           console.log(output);
           currentMessage.content = output.content;
@@ -187,7 +187,7 @@ export default defineComponent({
           // nextTick(scrollBottom);
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
         currentMessage.in_error = true;
         currentMessage.error_message = error.message;
       }
@@ -230,17 +230,17 @@ export default defineComponent({
 
       if (!content.trim()) return;
 
-      if (content == '/clear') {
+      if (content == "/clear") {
         clearChat();
         return;
       }
 
-      if (content.trim() === '') return;
+      if (content.trim() === "") return;
 
       const userMessage = createMessage(
         user.value._id,
         user.value.username,
-        content
+        content,
       );
       console.log(userMessage);
 
@@ -251,7 +251,7 @@ export default defineComponent({
     async function setChat(chatId) {
       chat.value = await chats.getChat(chatId);
       if (chat.value === undefined) {
-        await router.push({ name: 'new-chat' });
+        await router.push({ name: "new-chat" });
         return;
       }
       models.setModelByURL(chat.value.model.apiUrl);
@@ -263,7 +263,7 @@ export default defineComponent({
       user.value = prompt.value.users[0];
       persona.value = prompt.value.users[1];
 
-      if (chat.value.title === '') {
+      if (chat.value.title === "") {
         setChatName(chat.value.messages[0].content);
       }
 
@@ -275,14 +275,14 @@ export default defineComponent({
 
     async function copyMessage(message) {
       await copyToClipboard(message.content);
-      $q.notify('Message copied to clipboard');
+      $q.notify("Message copied to clipboard");
     }
 
     async function clearCookies() {
       if (chat.value.model.slot_id !== undefined) {
         delete chat.value.model.slot_id;
       }
-      await axios.get('https://curated.aleph.cloud/change-pool', {
+      await axios.get("https://curated.aleph.cloud/change-pool", {
         withCredentials: true,
       });
       hasReset.value = true;
@@ -297,7 +297,7 @@ export default defineComponent({
       async (newId) => {
         await setChat(newId);
         messages.value = chat.value.messages;
-      }
+      },
     );
 
     watch(
@@ -307,7 +307,7 @@ export default defineComponent({
           chat.value.model = JSON.parse(JSON.stringify(newModel));
           $q.notify(`Changing current chat model to ${newModel.name}`);
         }
-      }
+      },
     );
 
     setChat(route.params.id);

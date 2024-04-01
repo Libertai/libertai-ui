@@ -70,15 +70,15 @@ import {
   onMounted,
   computed,
   onBeforeUnmount,
-} from 'vue';
-import { useRoute } from 'vue-router';
-import { usePoints } from '../stores/points';
-import { useAccount } from '../stores/account';
-import { ethers } from 'ethers';
-import { useRouter } from 'vue-router';
+} from "vue";
+import { useRoute } from "vue-router";
+import { usePoints } from "../stores/points";
+import { useAccount } from "../stores/account";
+import { ethers } from "ethers";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
-  name: 'PointsDetail',
+  name: "PointsDetail",
   setup() {
     const route = useRoute();
     const router = useRouter();
@@ -106,7 +106,7 @@ export default defineComponent({
       () => route.params.address,
       async (newAddress) => {
         address.value = ethers.utils.getAddress(newAddress);
-      }
+      },
     );
     watch(
       () => account.address,
@@ -114,18 +114,18 @@ export default defineComponent({
         console.log(address.value, oldAddress, newAddress);
         if (oldAddress == address.value) {
           router.push({
-            name: 'points-detail',
+            name: "points-detail",
             params: { address: newAddress },
           });
         }
-      }
+      },
     );
 
     const currentPendingPoints = ref(0);
     const hourlyRate = ref(0);
     async function updatePoints() {
       const pendingInfo = await points.getAddressRealtimePendingPointsInfo(
-        address.value
+        address.value,
       );
       hourlyRate.value = pendingInfo.hourlyRate;
       currentPendingPoints.value = pendingInfo.pending;

@@ -1,9 +1,9 @@
-import { defineStore } from 'pinia';
+import { defineStore } from "pinia";
 
-import models from '../utils/models.js';
-import { v4 as uuidv4 } from 'uuid';
+import models from "../utils/models.js";
+import { v4 as uuidv4 } from "uuid";
 
-export const useChats = defineStore('chats', {
+export const useChats = defineStore("chats", {
   state: () => ({
     chats: [],
   }),
@@ -16,7 +16,7 @@ export const useChats = defineStore('chats', {
     },
 
     loadFromStorage() {
-      let savedChats = localStorage.getItem('assistant-chats');
+      let savedChats = localStorage.getItem("assistant-chats");
       if (savedChats) {
         savedChats = JSON.parse(savedChats);
         let model_urls = models.map((m) => m.apiUrl);
@@ -50,7 +50,7 @@ export const useChats = defineStore('chats', {
     },
 
     saveToStorage() {
-      localStorage.setItem('assistant-chats', JSON.stringify(this.chats));
+      localStorage.setItem("assistant-chats", JSON.stringify(this.chats));
     },
 
     getChat(chat_id) {

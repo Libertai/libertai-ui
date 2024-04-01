@@ -12,11 +12,11 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue';
-import { useCounterStore } from '../stores/example-store';
+import { defineComponent, ref } from "vue";
+import { useCounterStore } from "../stores/example-store";
 
 export default defineComponent({
-  name: 'IndexPage',
+  name: "IndexPage",
   setup() {
     const counter = useCounterStore();
     // const count = ref(0)

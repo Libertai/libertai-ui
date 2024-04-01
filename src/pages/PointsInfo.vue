@@ -122,18 +122,18 @@
 </template>
 
 <script>
-import { defineComponent, ref, onMounted, nextTick } from 'vue';
-import { useCounterStore } from '../stores/example-store';
-import { usePoints } from '../stores/points';
-import { ethers } from 'ethers';
+import { defineComponent, ref, onMounted, nextTick } from "vue";
+import { useCounterStore } from "../stores/example-store";
+import { usePoints } from "../stores/points";
+import { ethers } from "ethers";
 
 export default defineComponent({
-  name: 'PointsInfo',
+  name: "PointsInfo",
   setup() {
     const counter = useCounterStore();
     const expanded = ref(false);
     const points = usePoints();
-    const address = ref('');
+    const address = ref("");
     onMounted(async () => {
       if (Object.keys(points.points).length === 0) {
         points.update();
@@ -152,7 +152,7 @@ export default defineComponent({
         }
         return true;
       } catch (e) {
-        return 'Invalid address';
+        return "Invalid address";
       }
     }
     // points.points is an object, let's check if it's empty
@@ -166,8 +166,8 @@ export default defineComponent({
       addressVerifier,
       addressRules: [
         addressVerifier,
-        (val) => (val && val.length > 0) || 'Please type something',
-        (val) => (val && val.length > 0) || 'Please type something',
+        (val) => (val && val.length > 0) || "Please type something",
+        (val) => (val && val.length > 0) || "Please type something",
       ],
     };
   },

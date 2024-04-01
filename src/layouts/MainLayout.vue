@@ -174,17 +174,17 @@
 </template>
 
 <script>
-import { defineComponent, ref, watch, computed, nextTick } from 'vue';
-import { useChats } from '../stores/chats';
-import { usePrompts } from '../stores/prompts';
-import { useModels } from '../stores/models';
-import { useAccount } from '../stores/account';
-import { usePoints } from 'src/stores/points';
-import { useRouter, useRoute } from 'vue-router';
-import AccountButton from 'src/components/AccountButton.vue';
+import { defineComponent, ref, watch, computed, nextTick } from "vue";
+import { useChats } from "../stores/chats";
+import { usePrompts } from "../stores/prompts";
+import { useModels } from "../stores/models";
+import { useAccount } from "../stores/account";
+import { usePoints } from "src/stores/points";
+import { useRouter, useRoute } from "vue-router";
+import AccountButton from "src/components/AccountButton.vue";
 
 export default defineComponent({
-  name: 'MainLayout',
+  name: "MainLayout",
   components: {
     AccountButton,
   },
@@ -220,7 +220,7 @@ export default defineComponent({
     function deleteChat(chat_id) {
       const chat = chats.getChat(chat_id);
       if (route.params?.id == chat_id) {
-        nextTick(() => router.push('/new'));
+        nextTick(() => router.push("/new"));
       }
       chats.deleteChat(chat);
     }

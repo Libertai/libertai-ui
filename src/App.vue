@@ -3,13 +3,12 @@
 </template>
 
 <script>
-import { defineComponent, onMounted } from 'vue';
-import { useChats } from 'stores/chats';
-import { useKnowledgeDBStore } from './stores/knowledge-db';
-
+import { defineComponent, onMounted } from "vue";
+import { useChats } from "stores/chats";
+import { useKnowledgeDBStore } from "./stores/knowledge-db";
 
 export default defineComponent({
-  name: 'App',
+  name: "App",
   setup() {
     const chats = useChats();
     chats.loadFromStorage();

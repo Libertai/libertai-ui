@@ -65,19 +65,19 @@
 </template>
 
 <script setup>
-import { ethers } from 'ethers';
-import { ref } from 'vue';
-import { aggregates, ethereum } from 'aleph-js';
-import { markRaw } from 'vue';
-import { useAccount } from '../stores/account';
+import { ethers } from "ethers";
+import { ref } from "vue";
+import { aggregates, ethereum } from "aleph-js";
+import { markRaw } from "vue";
+import { useAccount } from "../stores/account";
 console.log(ethers);
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 const account = useAccount();
-const channel = ref('LIBERTAI');
-const api_server = ref('https://official.aleph.cloud');
+const channel = ref("LIBERTAI");
+const api_server = ref("https://official.aleph.cloud");
 
 async function eth_web3_login() {
   console.log(window.ethereum);
@@ -86,7 +86,7 @@ async function eth_web3_login() {
       // Request account access if needed
       await window.ethereum.enable();
       let provider = new ethers.providers.Web3Provider(
-        window['ethereum'] || window.web3.currentProvider
+        window["ethereum"] || window.web3.currentProvider,
       );
       await account.setProvider(provider);
     } catch (error) {
@@ -94,11 +94,11 @@ async function eth_web3_login() {
       // User denied account access...
     }
   } else {
-    alert('No ethereum provider detected. Please install metamask or similar.');
+    alert("No ethereum provider detected. Please install metamask or similar.");
   }
   console.log(account);
   if (!account.active) {
-    alert('Error getting web3 account');
+    alert("Error getting web3 account");
     return;
   }
 }
@@ -106,9 +106,9 @@ async function eth_web3_login() {
 async function broadcast() {
   let msg = await aggregates.submit(
     account.address,
-    'libertai',
+    "libertai",
     { registered: true },
-    { account: account, channel: channel.value, api_server: api_server.value }
+    { account: account, channel: channel.value, api_server: api_server.value },
   );
 }
 </script>

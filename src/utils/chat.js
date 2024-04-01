@@ -1,9 +1,9 @@
-import { findMatches } from '../utils/knowledge';
-import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
+import { findMatches } from "../utils/knowledge";
+import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 const chat_openers_prompt =
-  'Summarization of chat first sentence for menu items:\n\n' +
+  "Summarization of chat first sentence for menu items:\n\n" +
   '### Input: """Hello, can you please write a short hello world code for me?"""\n### Summary:\nHello world\n\n' +
   '### Input: """What is the color of Henry IV\'s white horse?\nI\'m not really sure"""\n### Summary:\nHenry IV\'s horse color\n\n';
 
@@ -12,16 +12,16 @@ export function calculateNumberOfTokens(line) {
 }
 
 async function preparePrompt(messages, activePrompt, model) {
-  let chatLog = '';
+  let chatLog = "";
   let currentTokens = 0;
   let persona_name = activePrompt.users[1].username;
   let user_name = activePrompt.users[0].username;
   let context_document = activePrompt.context_document;
 
   let basePrompt = `${model.base_prompt}${model.persona_start}${activePrompt.persona}`;
-  basePrompt = basePrompt.replaceAll('{{user}}', user_name);
-  basePrompt = basePrompt.replaceAll('{{char}}', persona_name);
-  basePrompt = basePrompt.replaceAll('{{model}}', model.name);
+  basePrompt = basePrompt.replaceAll("{{user}}", user_name);
+  basePrompt = basePrompt.replaceAll("{{char}}", persona_name);
+  basePrompt = basePrompt.replaceAll("{{model}}", model.name);
 
   if (context_document) {
     basePrompt = `${basePrompt}\n${model.line_separator}\n${model.log_start}${model.user_prepend}CONTEXT DOCUMENT${model.user_append}${context_document}\n`;
@@ -50,7 +50,7 @@ async function preparePrompt(messages, activePrompt, model) {
     // Check for matching knowledge DB entries and add to chat log if not seen before
     const matchedEntries = findMatches(line);
     let infoTokens = 0;
-    let infoText = '';
+    let infoText = "";
     for (const entry of matchedEntries) {
       if (!seenInfo.has(entry)) {
         const formattedEntry = `### INFO: ${entry}`;
@@ -66,7 +66,7 @@ async function preparePrompt(messages, activePrompt, model) {
       currentTokens += lineTokens;
 
       if (infoText) {
-        console.log('adding infotext', infoText);
+        console.log("adding infotext", infoText);
         chatLog = `${infoText}${chatLog}`;
         currentTokens += infoTokens;
       }
@@ -88,7 +88,7 @@ export async function complete(prompt, model, stop_sequences, handle_cache) {
     top_k: model.top_k,
   };
   console.log(model.engine);
-  if (model.engine == 'kobold') {
+  if (model.engine == "kobold") {
     params = {
       ...params,
       n: 1,
@@ -105,7 +105,7 @@ export async function complete(prompt, model, stop_sequences, handle_cache) {
       stop_sequence: stop_sequences,
       use_default_badwordsids: false,
     };
-  } else if (model.engine == 'llamacpp') {
+  } else if (model.engine == "llamacpp") {
     let slot_id = -1;
     if (handle_cache && model.slot_id !== undefined) {
       slot_id = model.slot_id;
@@ -121,7 +121,7 @@ export async function complete(prompt, model, stop_sequences, handle_cache) {
       stop: stop_sequences,
       use_default_badwordsids: false,
     };
-  } else if (model.engine == 'openai') {
+  } else if (model.engine == "openai") {
     params = {
       ...params,
       n: 1,
@@ -134,10 +134,10 @@ export async function complete(prompt, model, stop_sequences, handle_cache) {
   });
 
   // Parse the response
-  if (model.engine == 'kobold') {
+  if (model.engine == "kobold") {
     console.log(response.data);
     return response.data.results[0].text;
-  } else if (model.engine == 'llamacpp') {
+  } else if (model.engine == "llamacpp") {
     if (handle_cache) {
       if (response.data.id_slot !== undefined) {
         model.slot_id = response.data.id_slot;
@@ -147,7 +147,7 @@ export async function complete(prompt, model, stop_sequences, handle_cache) {
     }
     model.slot_id = response.data.id_slot;
     return response.data.content;
-  } else if (model.engine == 'openai') {
+  } else if (model.engine == "openai") {
     return response.data.choices[0].text;
   }
 }
@@ -161,7 +161,7 @@ export async function* generateAnswer(messages, activePrompt, model) {
 
   let isUnfinished = true;
   let tries = 0;
-  let compoundedResult = '';
+  let compoundedResult = "";
   let stop_sequences = [...model.stop_sequences];
   if (stop_sequences.length == 0) {
     stop_sequences = [`${model.user_prepend}${user_name}:`];
@@ -177,7 +177,7 @@ export async function* generateAnswer(messages, activePrompt, model) {
       prompt + compoundedResult,
       model,
       stop_sequences,
-      true
+      true,
     );
     const fullResult = compoundedResult + lastResult;
     let results = fullResult;
@@ -185,10 +185,10 @@ export async function* generateAnswer(messages, activePrompt, model) {
     /// let's refactor this by iterating on stop sequences
     /// results = fullResult.split(`\n${alternative_stop_sequence}`).join("|||||").split(`\n${alternative_stop_sequence_2}`).join("|||||").split(`\n${stop_sequences[0]}`).join("|||||").split("|||||");
     for (let i = 0; i < stop_sequences.length; i++) {
-      results = results.split(`\n${stop_sequences[i]}`).join('|||||');
-      results = results.split(`${stop_sequences[i]}`).join('|||||');
+      results = results.split(`\n${stop_sequences[i]}`).join("|||||");
+      results = results.split(`${stop_sequences[i]}`).join("|||||");
     }
-    results = results.split('|||||');
+    results = results.split("|||||");
 
     const firstMessage = results[0].trimEnd();
     compoundedResult = firstMessage;
@@ -199,7 +199,7 @@ export async function* generateAnswer(messages, activePrompt, model) {
     } else {
       isUnfinished = true;
       if (tries < model.maxTries) {
-        to_yield += ' *[writing ...]*';
+        to_yield += " *[writing ...]*";
       }
     }
     yield { content: to_yield, unfinished: isUnfinished };
@@ -208,13 +208,13 @@ export async function* generateAnswer(messages, activePrompt, model) {
 
 export function createMessage(senderId, username, content) {
   const currentDate = new Date();
-  const dateString = currentDate.toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'long',
+  const dateString = currentDate.toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "long",
   });
-  const timeString = currentDate.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
+  const timeString = currentDate.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
     hour12: true,
   });
   return {
@@ -231,12 +231,12 @@ export function createMessage(senderId, username, content) {
 
 export async function getChatName(prompt, model) {
   const summary_prompt =
-    chat_openers_prompt + `### Input: """${prompt}"""\n` + '### Summary:\n';
+    chat_openers_prompt + `### Input: """${prompt}"""\n` + "### Summary:\n";
 
   const result = (
-    await complete(summary_prompt, model, ['\n', '<|endoftext|>'], false)
+    await complete(summary_prompt, model, ["\n", "<|endoftext|>"], false)
   )
-    .replace('#', '')
+    .replace("#", "")
     .trim();
 
   return result;

@@ -1,12 +1,12 @@
-import { defineStore } from 'pinia';
+import { defineStore } from "pinia";
 
-import models from '../utils/models.js';
-import { aggregates, ethereum } from 'aleph-js';
+import models from "../utils/models.js";
+import { aggregates, ethereum } from "aleph-js";
 
-export const usePoints = defineStore('points', {
+export const usePoints = defineStore("points", {
   state: () => ({
-    points_source: '0xCBFc3EeC41CBBfCAcc50337d712890C47a14ba99',
-    api_server: 'https://official.aleph.cloud',
+    points_source: "0xCBFc3EeC41CBBfCAcc50337d712890C47a14ba99",
+    api_server: "https://official.aleph.cloud",
     points: {},
     pending_points: {},
     info: {
@@ -24,19 +24,19 @@ export const usePoints = defineStore('points', {
   actions: {
     // any amount of arguments, return a promise or not
     async update() {
-      const points = await aggregates.fetch_one(this.points_source, 'points');
-      console.log('points', points);
+      const points = await aggregates.fetch_one(this.points_source, "points");
+      console.log("points", points);
       this.points = points;
 
       const pending_points = await aggregates.fetch_one(
         this.points_source,
-        'pending_points'
+        "pending_points",
       );
-      console.log('pending_points', points);
+      console.log("pending_points", points);
       this.pending_points = pending_points;
 
-      const info = await aggregates.fetch_one(this.points_source, 'info');
-      console.log('info', points);
+      const info = await aggregates.fetch_one(this.points_source, "info");
+      console.log("info", points);
       this.info = info;
     },
 

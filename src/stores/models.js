@@ -1,8 +1,8 @@
-import { defineStore } from 'pinia';
+import { defineStore } from "pinia";
 
-import models from '../utils/models.js';
+import models from "../utils/models.js";
 
-export const useModels = defineStore('models', {
+export const useModels = defineStore("models", {
   state: () => ({
     models: models,
     model: models[0],
@@ -15,10 +15,10 @@ export const useModels = defineStore('models', {
       this.model = model;
     },
     setModelByURL(modelUrl) {
-      console.log('searching for', modelUrl);
+      console.log("searching for", modelUrl);
       for (let model of models) {
         if (model.apiUrl == modelUrl) {
-          console.log('found', model.name, model.apiUrl);
+          console.log("found", model.name, model.apiUrl);
           this.model = model;
         }
       }
