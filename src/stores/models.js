@@ -1,29 +1,27 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
-import models from '../utils/models.js'
+import models from "../utils/models.js";
 
-export const useModels = defineStore('models', {
+export const useModels = defineStore("models", {
   state: () => ({
     models: models,
-    model: models[0]
+    model: models[0],
   }),
-  getters: {
-  },
+  getters: {},
   actions: {
     // any amount of arguments, return a promise or not
     setModel(model) {
       // you can directly mutate the state
-      this.model = model
+      this.model = model;
     },
     setModelByURL(modelUrl) {
-      console.log("searching for", modelUrl)
+      console.log("searching for", modelUrl);
       for (let model of models) {
-        if (model.apiUrl==modelUrl) {
-          console.log("found", model.name, model.apiUrl)
-          this.model = model
+        if (model.apiUrl == modelUrl) {
+          console.log("found", model.name, model.apiUrl);
+          this.model = model;
         }
       }
-    }
+    },
   },
-})
-
+});

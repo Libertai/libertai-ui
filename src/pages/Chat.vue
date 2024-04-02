@@ -1,9 +1,18 @@
 <template>
   <q-page class="column align-items-center">
-    <div class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)" ref="scrollArea">
+    <div
+      class="col-grow overflow-auto"
+      style="max-height: calc(100vh - 190px)"
+      ref="scrollArea"
+    >
       <q-list class="col-grow">
-        <q-item v-for="(message, message_index) in messages" :key="message.id"
-          :class="`q-py-lg items-start dyn-container chat-item ${message.username == user.username ? 'bg-dark' : ''}`">
+        <q-item
+          v-for="(message, message_index) in messages"
+          :key="message.id"
+          :class="`q-py-lg items-start dyn-container chat-item ${
+            message.username == user.username ? 'bg-dark' : ''
+          }`"
+        >
           <q-item-section avatar>
             <q-avatar v-if="message.username == user.username">
               <img src="avatars/00057-2093295138.png" />
@@ -13,90 +22,125 @@
             </q-avatar>
           </q-item-section>
           <q-item-section :style="`max-width: calc(960px - 56px);`">
-            <q-popup-edit v-model="message.content" auto-save v-slot="scope" v-if="enableEdit">
+            <q-popup-edit
+              v-model="message.content"
+              auto-save
+              v-slot="scope"
+              v-if="enableEdit"
+            >
               <strong>{{ message.username }}</strong>
               <q-input v-model="scope.value" dense autofocus counter autogrow />
             </q-popup-edit>
             <q-item-label class="text-semibold">
-              {{ message.username.replace('user', 'You').replace('assistant', 'Libertai') }}
+              {{
+                message.username
+                  .replace("user", "You")
+                  .replace("assistant", "Libertai")
+              }}
             </q-item-label>
-            <q-item-label style="display: block;">
+            <q-item-label style="display: block">
               <MarkdownRenderer :content="message.content" breaks />
-              <q-spinner-bars color="white" size="2em" v-if="message.unfinished && isLoading" />
+              <q-spinner-bars
+                color="white"
+                size="2em"
+                v-if="message.unfinished && isLoading"
+              />
               <span class="text-warning" v-if="message.in_error">
                 <q-tooltip>Error: {{ message.error_message }}</q-tooltip>
-                <q-icon name="warning" /> There has been an error, please <a @click="regenerateMessage()">retry</a>.
+                <q-icon name="warning" /> There has been an error, please
+                <a @click="regenerateMessage()">retry</a>.
               </span>
             </q-item-label>
           </q-item-section>
           <div class="absolute dyn-container chat-toolbar">
-            <q-btn @click="regenerateMessage()" icon="refresh" dense flat size="sm"
-              v-if="(!isLoading) && (message_index == messages.length - 1)">
+            <q-btn
+              @click="regenerateMessage()"
+              icon="refresh"
+              dense
+              flat
+              size="sm"
+              v-if="!isLoading && message_index == messages.length - 1"
+            >
               <q-tooltip>Regenerate</q-tooltip>
             </q-btn>
-            <q-btn @click="copyMessage(message)" icon="content_copy" dense flat size="sm">
+            <q-btn
+              @click="copyMessage(message)"
+              icon="content_copy"
+              dense
+              flat
+              size="sm"
+            >
               <q-tooltip>Copy</q-tooltip>
             </q-btn>
           </div>
         </q-item>
-
       </q-list>
-
     </div>
 
-    <message-input :isLoading="isLoading" @sendMessage="sendMessage" v-model="inputText" ref="input" />
-    <q-checkbox v-model="enableEdit" left-label class="q-mr-lg q-mb-md fixed-bottom-right">
-      <q-tooltip anchor="top right" class="bg-primary" self="bottom right">When this is activated, just click on a
-        message to start editing it.</q-tooltip>
+    <message-input
+      :isLoading="isLoading"
+      @sendMessage="sendMessage"
+      v-model="inputText"
+      ref="input"
+    />
+    <q-checkbox
+      v-model="enableEdit"
+      left-label
+      class="q-mr-lg q-mb-md fixed-bottom-right"
+    >
+      <q-tooltip anchor="top right" class="bg-primary" self="bottom right"
+        >When this is activated, just click on a message to start editing
+        it.</q-tooltip
+      >
       Enable edits
     </q-checkbox>
   </q-page>
 </template>
 
 <script>
-import 'highlight.js/styles/devibeans.css'
-import { is, useQuasar, copyToClipboard } from 'quasar'
-import { defineComponent, ref, watch, nextTick, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useChats } from '../stores/chats'
-import { usePrompts } from '../stores/prompts'
-import { useModels } from '../stores/models'
+import "highlight.js/styles/devibeans.css";
+import { is, useQuasar, copyToClipboard } from "quasar";
+import { defineComponent, ref, watch, nextTick, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useChats } from "../stores/chats";
+import { usePrompts } from "../stores/prompts";
+import { useModels } from "../stores/models";
 
-import { getChatName, createMessage, generateAnswer } from '../utils/chat'
+import { getChatName, createMessage, generateAnswer } from "../utils/chat";
 
-import MarkdownRenderer from '../components/MarkdownRenderer.vue';
-import MessageInput from '../components/MessageInput.vue';
-import axios from 'axios';
-import router from '../router'
-import models from 'src/utils/models'
+import MarkdownRenderer from "../components/MarkdownRenderer.vue";
+import MessageInput from "../components/MessageInput.vue";
+import axios from "axios";
+import router from "../router";
+import models from "src/utils/models";
 
-console.log(nextTick)
+console.log(nextTick);
 
 export default defineComponent({
-  name: 'ChatPage',
+  name: "ChatPage",
   components: {
     MarkdownRenderer,
-    MessageInput
+    MessageInput,
   },
   setup() {
-    const $q = useQuasar()
-    const route = useRoute()
-    const router = useRouter()
-    const chat = ref()
-    const chats = useChats()
-    const prompts = usePrompts()
-    const models = useModels()
-    const inputText = ref('')
-    const isLoading = ref(false)
-    const hasReset = ref(false)
-    const input = ref(null)
-    const scrollArea = ref(null)
-    const enableEdit = ref(false)
+    const $q = useQuasar();
+    const route = useRoute();
+    const router = useRouter();
+    const chat = ref();
+    const chats = useChats();
+    const prompts = usePrompts();
+    const models = useModels();
+    const inputText = ref("");
+    const isLoading = ref(false);
+    const hasReset = ref(false);
+    const input = ref(null);
+    const scrollArea = ref(null);
+    const enableEdit = ref(false);
 
-    const prompt = ref()
-    const user = ref()
-    const persona = ref()
-    const messages = ref([])
+    const prompt = ref();
+    const user = ref();
+    const persona = ref();
+    const messages = ref([]);
 
     async function setChatName(first_sentence) {
       const title = await getChatName(first_sentence, chat.value.model);
@@ -105,7 +149,10 @@ export default defineComponent({
     }
 
     async function scrollBottom() {
-      scrollArea.value.lastElementChild.scrollIntoView({ behavior: "smooth", block: "end" });
+      scrollArea.value.lastElementChild.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
       // scrollArea.value.scrollTop = scrollArea.value.scrollHeight;
     }
 
@@ -115,7 +162,7 @@ export default defineComponent({
       // scrollBottom();
       await chats.saveToStorage();
 
-      inputText.value = '';
+      inputText.value = "";
       // nextTick(scrollBottom);
 
       currentMessage = createMessage(persona._id, persona.username, "");
@@ -128,19 +175,23 @@ export default defineComponent({
         hasReset.value = false;
         // this.activePrompt.typingUsers = [persona._id];
 
-        for await (const output of generateAnswer(messages.value.slice(0, -1), prompt.value, chat.value.model)) {
+        for await (const output of generateAnswer(
+          messages.value.slice(0, -1),
+          prompt.value,
+          chat.value.model,
+        )) {
           console.log(output);
           currentMessage.content = output.content;
           currentMessage.unfinished = output.unfinished;
           messages.value = [...messages.value];
           // nextTick(scrollBottom);
         }
-      }
-      catch (error) {
+      } catch (error) {
         console.error("Error:", error);
         currentMessage.in_error = true;
         currentMessage.error_message = error.message;
       }
+
       isLoading.value = false;
       // currentMessage.unfinished = false;
       messages.value = [...messages.value];
@@ -174,58 +225,58 @@ export default defineComponent({
     }
 
     async function sendMessage(content) {
-      console.log(content)
+      console.log(content);
 
-      nextTick(scrollBottom)
+      nextTick(scrollBottom);
 
-      if (!content.trim())
-        return;
+      if (!content.trim()) return;
 
       if (content == "/clear") {
         clearChat();
         return;
       }
 
-      if (content.trim() === "")
-        return;
+      if (content.trim() === "") return;
 
-      const userMessage = createMessage(user.value._id, user.value.username, content)
-      console.log(userMessage)
+      const userMessage = createMessage(
+        user.value._id,
+        user.value.username,
+        content,
+      );
+      console.log(userMessage);
 
-      messages.value.push(userMessage)
-      await generatePersonaMessage()
+      messages.value.push(userMessage);
+      await generatePersonaMessage();
     }
 
     async function setChat(chatId) {
-      chat.value = await chats.getChat(chatId)
+      chat.value = await chats.getChat(chatId);
       if (chat.value === undefined) {
-        await router.push({ name: 'new-chat' })
-        return
+        await router.push({ name: "new-chat" });
+        return;
       }
-      models.setModelByURL(chat.value.model.apiUrl)
-      messages.value = chat.value.messages
+      models.setModelByURL(chat.value.model.apiUrl);
+      messages.value = chat.value.messages;
 
-      if (chat.value.prompt !== undefined)
-        prompt.value = chat.value.prompt
-      else
-        prompt.value = JSON.parse(JSON.stringify(prompts.prompts[0]))
+      if (chat.value.prompt !== undefined) prompt.value = chat.value.prompt;
+      else prompt.value = JSON.parse(JSON.stringify(prompts.prompts[0]));
 
-      user.value = prompt.value.users[0]
-      persona.value = prompt.value.users[1]
+      user.value = prompt.value.users[0];
+      persona.value = prompt.value.users[1];
 
-      if (chat.value.title === '') {
-        setChatName(chat.value.messages[0].content)
+      if (chat.value.title === "") {
+        setChatName(chat.value.messages[0].content);
       }
 
       if (chat.value.messages.length == 1) {
-        await generatePersonaMessage()
+        await generatePersonaMessage();
       }
-      nextTick(scrollBottom)
+      nextTick(scrollBottom);
     }
 
     async function copyMessage(message) {
-      await copyToClipboard(message.content)
-      $q.notify('Message copied to clipboard')
+      await copyToClipboard(message.content);
+      $q.notify("Message copied to clipboard");
     }
 
     async function clearCookies() {
@@ -233,35 +284,34 @@ export default defineComponent({
         delete chat.value.model.slot_id;
       }
       await axios.get("https://curated.aleph.cloud/change-pool", {
-        withCredentials: true
-      });
-      await axios.get("https://curated.aleph.cloud/change-pool", {
-        withCredentials: true
+        withCredentials: true,
       });
       hasReset.value = true;
     }
 
-    onMounted(() => { nextTick(clearCookies) })
+    onMounted(() => {
+      nextTick(clearCookies);
+    });
 
     watch(
       () => route.params.id,
-      async newId => {
-        await setChat(newId)
-        messages.value = chat.value.messages
-      }
-    )
+      async (newId) => {
+        await setChat(newId);
+        messages.value = chat.value.messages;
+      },
+    );
 
     watch(
       () => models.model,
-      async newModel => {
+      async (newModel) => {
         if (chat.value.model.apiUrl !== newModel.apiUrl) {
-          chat.value.model = JSON.parse(JSON.stringify(newModel))
-          $q.notify(`Changing current chat model to ${newModel.name}`)
+          chat.value.model = JSON.parse(JSON.stringify(newModel));
+          $q.notify(`Changing current chat model to ${newModel.name}`);
         }
-      }
-    )
+      },
+    );
 
-    setChat(route.params.id)
+    setChat(route.params.id);
 
     return {
       scrollArea,
@@ -276,10 +326,10 @@ export default defineComponent({
       enableEdit,
       regenerateMessage,
       copyMessage,
-      chatId: route.params.id
-    }
-  }
-})
+      chatId: route.params.id,
+    };
+  },
+});
 </script>
 <style>
 code.hljs {
