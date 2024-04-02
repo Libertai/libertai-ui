@@ -4302,7 +4302,7 @@ levn@^0.4.1:
 
 "libertai-js@https://github.com/Libertai/libertai-js":
   version "0.0.0"
-  resolved "https://github.com/Libertai/libertai-js#262a072a14ce6c182bfafad418d3b3d0229935d2"
+  resolved "https://github.com/Libertai/libertai-js#3b3d71986bb15dccc1524acc434d2ef3d346cb68"
   dependencies:
     axios "^1.6.8"
     langchain "^0.1.30"
