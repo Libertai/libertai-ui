@@ -120,13 +120,10 @@ async function onSubmit() {
   submitting.value = true;
   try {
     if (selectedDocument.value) {
-      // await knowledgeDBStore.updateDocument(
-      //   selectedDocument.value,
-      //   editedDocument.value
-      // );
+      // TODO: its not clear how to support document updates given that all content is chunked
+      // and stored across multiple embeddings in local storage
       console.log("TODO: Implement update document");
     } else {
-      // await knowledgeDBStore.addDocument(editedDocument.value);
       await knowledgeDb.addDocument(editedDocument.value);
     }
     showForm.value = false;
