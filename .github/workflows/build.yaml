@@ -19,11 +19,11 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.cache/yarn
-          key: ${{ runner.OS }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ~/.cache/npm
+          key: ${{ runner.OS }}-npm-${{ hashFiles('**/npm.lock') }}
           restore-keys: |
-            ${{ runner.OS }}-yarn-
+            ${{ runner.OS }}-npm-
       - name: Install dependencies
-        run: yarn install
+        run: npm install
       - name: Build
-        run: yarn build
+        run: npm run build
