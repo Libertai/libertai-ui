@@ -31,8 +31,6 @@
     "libertai-js": "https://github.com/Libertai/libertai-js",
     "marked": "^12.0.0",
     "marked-highlight": "^2.1.1",
-    "ml-distance": "^4.0.1",
-    "openai": "^4.28.4",
     "pinia": "^2.0.11",
     "quasar": "^2.6.0",
     "stream": "^0.0.2",
