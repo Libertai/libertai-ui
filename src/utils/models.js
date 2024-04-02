@@ -4,7 +4,7 @@ const defaults = {
   maxTokens: 8192,
   temperature: 0.7,
   sampler_order: [6, 0, 1, 3, 4, 2, 5],
-  min_p: 0.05
+  min_p: 0.05,
   top_p: 0.9,
   top_k: 40,
   model_type: "knowledge",
@@ -19,7 +19,6 @@ const defaults = {
   engine: "kobold",
   pass_credentials: true,
 };
-
 
 const chatml = {
   base_prompt:
@@ -45,7 +44,15 @@ export default [
       "https://curated.aleph.cloud/vm/a8b6d895cfe757d4bc5db9ba30675b5031fe3189a99a14f13d5210c473220caf/completion",
     engine: "llamacpp",
     pass_credentials: true,
-    stop_sequences: ["<|im_end|>","<|endoftext|>", "<|", "</|", "<im_end|>","</assistant","</user"]
+    stop_sequences: [
+      "<|im_end|>",
+      "<|endoftext|>",
+      "<|",
+      "</|",
+      "<im_end|>",
+      "</assistant",
+      "</user",
+    ],
   },
   {
     ...defaults,

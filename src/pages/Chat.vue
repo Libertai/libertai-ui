@@ -180,7 +180,6 @@ export default defineComponent({
           prompt.value,
           chat.value.model,
         )) {
-
           console.log(output);
           currentMessage.content = output.content;
           currentMessage.unfinished = output.unfinished;
@@ -268,8 +267,6 @@ export default defineComponent({
       if (chat.value.title === "") {
         setChatName(chat.value.messages[0].content);
       }
-      nextTick(scrollBottom)
-    }
 
       if (chat.value.messages.length == 1) {
         await generatePersonaMessage();
@@ -333,7 +330,6 @@ export default defineComponent({
     };
   },
 });
-
 </script>
 <style>
 code.hljs {
