@@ -20,7 +20,11 @@ export const useKnowledgeDBStore = defineStore(KNOWLEDGE_DB_PINIA_KEY, {
     },
     // TODO: probably horribly inefficient, but it works for now
     async searchDocuments(query) {
-      return await this.knowledgeDb.searchDocuments(query);
+      return await this.knowledgeDb.searchDocuments(
+        query,
+        (k = 5),
+        (max_distannce = 15),
+      );
     },
   },
 });

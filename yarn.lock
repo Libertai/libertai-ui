@@ -4302,7 +4302,7 @@ levn@^0.4.1:
 
 "libertai-js@https://github.com/Libertai/libertai-js":
   version "0.0.0"
-  resolved "https://github.com/Libertai/libertai-js#b1ecb4ea21ef518414df011239de66a8ef9ce273"
+  resolved "https://github.com/Libertai/libertai-js#262a072a14ce6c182bfafad418d3b3d0229935d2"
   dependencies:
     axios "^1.6.8"
     langchain "^0.1.30"
@@ -4876,7 +4876,21 @@ open@^8.4.0:
     is-docker "^2.1.1"
     is-wsl "^2.2.0"
 
-openai@^4.26.0, openai@^4.28.4:
+openai@^4.26.0:
+  version "4.32.0"
+  resolved "https://registry.yarnpkg.com/openai/-/openai-4.32.0.tgz#6feaf9fca691979857594517801c4025b4dcb74d"
+  integrity sha512-TXmBSej7RoQ4GWgKw1Waopx6QRroWlwaLH+PkxCTN45nKNEPFcGUV7VSWQCB/DwWMQVRLSNUAH4BqFYnSCEgkQ==
+  dependencies:
+    "@types/node" "^18.11.18"
+    "@types/node-fetch" "^2.6.4"
+    abort-controller "^3.0.0"
+    agentkeepalive "^4.2.1"
+    form-data-encoder "1.7.2"
+    formdata-node "^4.3.2"
+    node-fetch "^2.6.7"
+    web-streams-polyfill "^3.2.1"
+
+openai@^4.28.4:
   version "4.31.0"
   resolved "https://registry.yarnpkg.com/openai/-/openai-4.31.0.tgz#5d96045c4eb244fa21f0fff0981043a2c9f09e8c"
   integrity sha512-JebkRnRGEGLnJt3+bJ5B7au8nBeZvJjs9baVxDmUZ5+BgafAdy6KDxJGSuyaw/IA+ErqY3jmOH5cDC2mCDJF2w==
