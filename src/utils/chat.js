@@ -86,6 +86,7 @@ export async function complete(prompt, model, stop_sequences, handle_cache) {
     temperature: model.temperature,
     top_p: model.top_p,
     top_k: model.top_k,
+    min_p: model.min_p
   };
   console.log(model.engine);
   if (model.engine == "kobold") {
