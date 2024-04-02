@@ -411,7 +411,7 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@langchain/community@~0.0.41":
+"@langchain/community@^0.0.43", "@langchain/community@~0.0.41":
   version "0.0.43"
   resolved "https://registry.yarnpkg.com/@langchain/community/-/community-0.0.43.tgz#017e2f9b3209b3999482f10df5aec2520731a63c"
   integrity sha512-60TjV3knGGOPHfbJxLpuwARr8oA0r6Txm8wTFvFx+TjRUrloyBUcWSbJIdm62gAwBJDEHmdjjyWOOzU+eewcuA==
@@ -4302,8 +4302,9 @@ levn@^0.4.1:
 
 "libertai-js@https://github.com/Libertai/libertai-js":
   version "0.0.0"
-  resolved "https://github.com/Libertai/libertai-js#f94a28c6e8a8a1b62999332182ddf32e96adbfb9"
+  resolved "https://github.com/Libertai/libertai-js#03176ecc69a9b0f2ddf9367476907eac732b0f8b"
   dependencies:
+    "@langchain/community" "^0.0.43"
     axios "^1.6.8"
     langchain "^0.1.30"
     langsmith "^0.1.14"
