@@ -952,7 +952,7 @@
     "@types/mime" "*"
     "@types/node" "*"
 
-"@types/uuid@^9.0.1":
+"@types/uuid@^9.0.1", "@types/uuid@^9.0.8":
   version "9.0.8"
   resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-9.0.8.tgz#7545ba4fc3c003d6c756f651f3bf163d8f0f29ba"
   integrity sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==
@@ -4302,9 +4302,10 @@ levn@^0.4.1:
 
 "libertai-js@https://github.com/Libertai/libertai-js":
   version "0.0.0"
-  resolved "https://github.com/Libertai/libertai-js#e71856b1fc83516cb60416919acabb311e988a85"
+  resolved "https://github.com/Libertai/libertai-js#7c409d40ed795e9f967560faa32e188412c77a53"
   dependencies:
     "@langchain/community" "^0.0.43"
+    "@types/uuid" "^9.0.8"
     axios "^1.6.8"
     langchain "^0.1.30"
     langsmith "^0.1.14"
