@@ -4,21 +4,23 @@
 
 <script>
 import { defineComponent, onMounted } from "vue";
-import { useChats } from "stores/chats";
-import { useKnowledgeDBStore } from "./stores/knowledge-db";
+import { useModelsStore } from "stores/models-store";
+import { useChatsStore } from "stores/chats-store";
+import { useKnowledgeStore } from "./stores/knowledge-store";
 
 export default defineComponent({
   name: "App",
   setup() {
-    const chats = useChats();
-    chats.loadFromStorage();
-    const knowledge = useKnowledgeDBStore();
+    console.log("App.vue::setup");
+    const modelsStore = useModelsStore();
+    const chatsStore = useChatsStore();
+    const knowledgeStore = useKnowledgeStore();
     onMounted(() => {
-      knowledge.load();
+      // Set the knowledge store and chats store to load when the app is mounted
+      knowledgeStore.load();
+      chatsStore.loadAndUpdate(modelsStore.models);
     });
-
     return {};
   },
 });
 </script>
-./stores/knowledge-db

@@ -19,7 +19,7 @@
   </q-page>
 </template>
 <script setup>
-import { defineComponent, ref, onMounted, nextTick } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import OpenAI from "openai";
 const openai = new OpenAI({
   apiKey: "libertai",

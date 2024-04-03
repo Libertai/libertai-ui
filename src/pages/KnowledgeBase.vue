@@ -51,7 +51,7 @@
               </q-card-actions>
             </q-card>-->
             haha
-            <DBUploader
+            <Uploader
               label="Auto Uploader"
               auto-upload
               url="http://localhost:4444/upload"
@@ -66,9 +66,9 @@
 
 <script setup>
 import { ref, computed } from "vue";
-import { useKnowledgeDBStore } from "src/stores/knowledge-db";
+import { useKnowledgeStore } from "src/stores/knowledge-store";
 
-const knowledgeDb = useKnowledgeDBStore();
+const knowledgeStore = useKnowledgeStore();
 
 // Columns for the table displaying documents
 const columns = [
@@ -77,7 +77,7 @@ const columns = [
 ];
 
 // Documents data source
-const documents = computed(() => knowledgeDb.documents());
+const documents = computed(() => knowledgeStore.documents());
 
 // Selected document
 const selectedDocument = ref(null);
@@ -110,7 +110,7 @@ function openForm() {
 function searchDefault() {
   let query = "why is the sky blue?";
   console.log("Searching: ", query);
-  knowledgeDb.searchDocuments(query).then((results) => {
+  knowledgeStore.searchDocuments(query).then((results) => {
     console.log("Results: ", results);
   });
 }
@@ -124,7 +124,7 @@ async function onSubmit() {
       // and stored across multiple embeddings in local storage
       console.log("TODO: Implement update document");
     } else {
-      await knowledgeDb.addDocument(editedDocument.value);
+      await knowledgeStore.addDocument(editedDocument.value);
     }
     showForm.value = false;
   } catch (error) {

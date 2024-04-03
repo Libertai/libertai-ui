@@ -47,7 +47,7 @@
           </q-btn>
           <!-- model selector -->
           <q-btn-dropdown
-            :label="models.model.name"
+            :label="modelsStore.selectedModel.name"
             color="primary"
             text-color="white"
             class="text-semibold border-primary-highlight"
@@ -59,9 +59,9 @@
               <q-item
                 clickable
                 v-close-popup
-                v-for="model in models.models"
+                v-for="model in modelsStore.models"
                 :key="model.id"
-                @click="models.setModel(model)"
+                @click="modelsStore.setModel(model)"
               >
                 <q-item-section>
                   <q-item-label>
@@ -95,12 +95,13 @@
         to="/new"
         >New Chat</q-btn
       >
+      <!-- list of chats by reference to the chats-store -->
       <q-list style="flex-grow: 1" dense>
         <q-item-label header class="text-uppercase text-bold">
           Chats
         </q-item-label>
         <q-item
-          v-for="chat of chats.chats.slice().reverse()"
+          v-for="chat of partialChatsRef.slice().reverse()"
           :key="chat.id"
           :to="`/chat/${chat.id}`"
           exact
@@ -149,17 +150,6 @@
             <q-item-label> Chat with us </q-item-label>
           </q-item-section>
         </q-item>
-        <!-- <q-item clickable>
-          <q-item-section avatar>
-            <q-icon name="twitter" />
-          </q-item-section>
-
-          <q-item-section>
-            <q-item-label>
-              Disclaimer
-            </q-item-label>
-          </q-item-section>
-        </q-item> -->
         <!-- powered by aleph.im -->
         <q-item clickable href="https://aleph.im" target="_blank">
           <img src="~assets/powered-by.svg" alt="aleph.im" />
@@ -175,12 +165,15 @@
 
 <script>
 import { defineComponent, ref, watch, computed, nextTick } from "vue";
-import { useChats } from "../stores/chats";
-import { usePrompts } from "../stores/prompts";
-import { useModels } from "../stores/models";
+
+// Import State
+import { useChatsStore } from "../stores/chats-store";
+import { useModelsStore } from "../stores/models-store";
 import { useAccount } from "../stores/account";
 import { usePoints } from "src/stores/points";
 import { useRouter, useRoute } from "vue-router";
+
+// IMport Components
 import AccountButton from "src/components/AccountButton.vue";
 
 export default defineComponent({
@@ -192,15 +185,18 @@ export default defineComponent({
   setup() {
     const leftDrawerOpen = ref(false);
 
-    const models = useModels();
-    const chats = useChats();
-    const prompts = usePrompts();
-
+    // Setup Stores
+    const modelsStore = useModelsStore();
+    const chatsStore = useChatsStore();
     const account = useAccount();
     const points = usePoints();
 
     const router = useRouter();
     const route = useRoute();
+
+    // Reference to the chat-store state
+    // TODO: intialize chatsStore.partialChats as null and implement async loading rendering
+    const partialChatsRef = ref(chatsStore.partialChats);
 
     const addressPoints = computed(() => {
       if (account.active) {
@@ -212,23 +208,34 @@ export default defineComponent({
 
     // watch for account changes, and update points if not already done
     watch(account.address, () => {
+      console.log("layouts::MainLayout::watch::account.address");
       if (account.active && Object.keys(points.points).length === 0) {
         points.update();
       }
     });
 
-    function deleteChat(chat_id) {
-      const chat = chats.getChat(chat_id);
+    // Watch for updates to the chats and update our partials
+    watch(chatsStore.partialChats, () => {
+      console.log(
+        "layouts::MainLayout::watch::chatsStore.partialChats: updated value: ",
+        chatsStore.partialChats,
+      );
+      partialChatsRef.value = chatsStore.partialChats;
+    });
+
+    // Delete a chat
+    // NOTE: the underlying state of partialChatsRef is updated as a result of the watch above
+    async function deleteChat(chat_id) {
+      console.log("layouts::MainLayout::deleteChat: ", chat_id);
+      await chatsStore.deleteChat(chat_id);
       if (route.params?.id == chat_id) {
         nextTick(() => router.push("/new"));
       }
-      chats.deleteChat(chat);
     }
 
     return {
-      chats,
-      models,
-      prompts,
+      partialChatsRef,
+      modelsStore,
       account,
       points,
       router,

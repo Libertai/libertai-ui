@@ -140,7 +140,6 @@ export default defineComponent({
       const pendingTime = points.info.pending_time;
       const reward_start = points.info.reward_start;
       const totalDuration = pendingTime - lastTime;
-      const currentDuration = currentTime - lastTime;
       const currentTimeSinceStart = currentTime - reward_start;
       const daily_decay = points.info.daily_decay;
       const initial_ratio = points.info.ratio;

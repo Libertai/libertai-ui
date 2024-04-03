@@ -1,6 +1,6 @@
 import { createUploaderComponent } from "quasar";
 import { computed, ref } from "vue";
-import { useKnowledgeDBStore } from "../stores/knowledge-db";
+import { useKnowledgeStore } from "../stores/knowledge-store";
 // import * as pdfjsLib from 'pdfjs-dist/webpack';
 // console.log(pdfjsLib)
 const pdfjsLib = window.pdfjsLib;
@@ -65,7 +65,7 @@ async extractTextFromPdf(pdfUrl) {
 
 // export a Vue component
 export default createUploaderComponent({
-  name: "DBUploader",
+  name: "Uploader",
   props: {
     // ...your custom props
   },
@@ -126,8 +126,7 @@ export default createUploaderComponent({
       const files = helpers.queuedFiles.value;
       console.log(files);
 
-      const useKnowledgeDB = useKnowledgeDBStore();
-      console.log(useKnowledgeDB);
+      const knowledgeStore = useKnowledgeStore();
 
       // now for each file, handle it.
       for (let file of files) {
@@ -136,14 +135,14 @@ export default createUploaderComponent({
           const url = URL.createObjectURL(file);
           const text = await extractTextFromPdf(url);
           const title = file.name;
-          await useKnowledgeDB.addDocument(title, text);
+          await knowledge.addDocument(title, text);
           helpers.updateFileStatus(file, "uploaded");
         } else if (file.type === "text/plain") {
           const reader = new FileReader();
           reader.onload = async (event) => {
             const content = event.target.result;
             const title = file.name;
-            await useKnowledgeDB.addDocument(title, content);
+            await knowledge.addDocument(title, content);
             helpers.updateFileStatus(file, "uploaded");
           };
           reader.readAsText(file);
@@ -158,7 +157,7 @@ export default createUploaderComponent({
       //   reader.onload = async (event) => {
       //     const content = event.target.result
       //     const title = file.name
-      //     await useKnowledgeDB.addDocument(title, content)
+      //     await useKnowledge.addDocument(title, content)
       //   }
       //   reader.readAsText(file)
       // }
