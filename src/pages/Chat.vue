@@ -283,7 +283,6 @@ export default defineComponent({
     // Regenerate the last message from the AI
     async function regenerateMessage() {
       console.log("pages::Chat.vue::regenerateMessage");
-      console.log("pages::Chat.vue::regenerateMessage");
       // we discard the last message if it's from the AI, and regenerate
       const lastMessage = messagesRef.value[messagesRef.value.length - 1];
       if (lastMessage.role !== usernameRef.value) {

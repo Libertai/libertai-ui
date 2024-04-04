@@ -11,9 +11,6 @@
           @click="toggleLeftDrawer"
         />
 
-        <!-- <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title> -->
         <q-space />
 
         <div class="row q-gutter-x-sm">
@@ -196,8 +193,6 @@ export default defineComponent({
     const route = useRoute();
 
     // Reference to the chat-store state
-    // TODO: intialize chatsStore.partialChats as null and implement async loading rendering
-    //const partialChatsRef = ref(chatsStore.partialChats);
     const { partialChats } = storeToRefs(chatsStore);
 
     const addressPoints = computed(() => {
@@ -217,18 +212,11 @@ export default defineComponent({
       }
     });
 
-    // Watch for updates to the chats and update our partials
-    watch(partialChats, (newVal) => {
-      console.log("layouts::MainLayout::watch::partialChatsRef: ", newVal);
-    });
-
     // Delete a chat
     // NOTE: the underlying state of partialChatsRef is updated as a result of the watch above
     async function deleteChat(chat_id) {
       console.log("layouts::MainLayout::deleteChat: ", chat_id);
       await chatsStore.deleteChat(chat_id);
-      // Update local state
-      // partialChats.value = chatsStore.partialChats;
       if (route.params?.id == chat_id) {
         nextTick(() => router.push("/new"));
       }

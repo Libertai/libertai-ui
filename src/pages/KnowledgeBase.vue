@@ -51,8 +51,8 @@
               </q-card-actions>
             </q-card>-->
             haha
-            <Uploader
-              label="Auto Uploader"
+            <KnowledgeStoreUploader
+              label="Auto KnowledgeStoreUploader"
               auto-upload
               url="http://localhost:4444/upload"
               multiple
