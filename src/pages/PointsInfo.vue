@@ -80,7 +80,6 @@
             bottom-slots
             v-model="address"
             label="Address"
-            counter
             maxlength="42"
             :rules="addressRules"
             autofocus
@@ -123,14 +122,12 @@
 
 <script>
 import { defineComponent, ref, onMounted, nextTick } from "vue";
-import { useCounterStore } from "../stores/example-store";
 import { usePoints } from "../stores/points";
 import { ethers } from "ethers";
 
 export default defineComponent({
   name: "PointsInfo",
   setup() {
-    const counter = useCounterStore();
     const expanded = ref(false);
     const points = usePoints();
     const address = ref("");
@@ -160,7 +157,6 @@ export default defineComponent({
     // const count = ref(0)
     return {
       points,
-      counter,
       expanded,
       address,
       addressVerifier,
