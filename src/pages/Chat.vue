@@ -28,7 +28,7 @@
               v-slot="scope"
               v-if="enableEditRef"
             >
-              <strong>{{ messageRef.role }}</strong>
+              <strong>{{ message.role }}</strong>
               <q-input v-model="scope.value" dense autofocus counter autogrow />
             </q-popup-edit>
             <q-item-label class="text-semibold">
@@ -201,12 +201,16 @@ export default defineComponent({
 
       // Infer what the title should be
       let model = JSON.parse(JSON.stringify(chatRef.value.model));
-      console.log("pages::Chat.vue::setChatName - model", model);
       const title = await inferenceEngine.summarizeSnippet(
         first_sentence,
         model,
       );
+
       console.log("pages::Chat.vue::setChatName - title", title);
+
+      if (!title || title === "") {
+        return;
+      }
 
       // Update the chat title state
       await chatsStore.updateChatTitle(chatId, title);
@@ -223,22 +227,15 @@ export default defineComponent({
 
     // Generate a new response from the AI
     async function generatePersonaMessage() {
-      console.log("pages::Chat.vue::generatePersonaMessage");
+      console.log(
+        "pages::Chat.vue::generatePersonaMessage: messages",
+        messagesRef,
+      );
+
       let chatId = chatRef.value.id;
-      let inputText = inputTextRef.value;
       let messages = messagesRef.value;
       let persona = personaRef.value;
       let model = chatRef.value.model;
-
-      // Wipe the input text
-      inputTextRef.value = "";
-
-      // Append the new message to the chat history and push to local state
-      let newMessage = await chatsStore.appendUserMessage(chatId, inputText);
-      // Add additional properties for rendering
-      newMessage = { ...newMessage, stopped: true, error: null };
-      messagesRef.value = [...messagesRef.value, newMessage];
-      chatRef.value.messages = messagesRef.value;
 
       // Create a new message to encapsulate our response
       let response = {
@@ -272,10 +269,7 @@ export default defineComponent({
         }
 
         // Append the chat to long term storage if successful
-        await chatsStore.appendModelResponse(
-          chatId,
-          response.content,
-        );
+        await chatsStore.appendModelResponse(chatId, response.content);
       } catch (error) {
         console.error("pages::Chat.vue::generatePersonaMessage - error", error);
         response.error = error;
@@ -306,6 +300,11 @@ export default defineComponent({
 
     async function sendMessage(content) {
       console.log("pages::Chat.vue::sendMessage");
+      let chatId = chatRef.value.id;
+      let inputText = inputTextRef.value;
+
+      // Wipe the input text
+      inputTextRef.value = "";
 
       nextTick(scrollBottom);
 
@@ -313,6 +312,10 @@ export default defineComponent({
 
       if (content.trim() === "") return;
 
+      // Append the new message to the chat history and push to local state
+      let newMessage = await chatsStore.appendUserMessage(chatId, inputText);
+      messagesRef.value.push({ ...newMessage, stopped: true, error: null });
+      chatRef.value.messages = messagesRef.value;
       await generatePersonaMessage();
     }
 
@@ -353,12 +356,12 @@ export default defineComponent({
       usernameRef.value = username;
 
       // Set the chat title if it's not set (New Chat should be the default title)
-      if (title === "New Chat") {
+      if (title === "New Chat" || title === "") {
         setChatName(messages[0].content);
       }
 
       // If this is true, then this is a new chat we need to respond to
-      if (messages.length % 2 == 1) {
+      if (messages.length == 1) {
         await generatePersonaMessage();
       }
       nextTick(scrollBottom);

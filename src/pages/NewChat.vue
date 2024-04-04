@@ -156,6 +156,7 @@ export default defineComponent({
       advancedShownRef,
       selectedPersonaRef,
       selectedPersonaIdRef,
+      usernameInputRef,
       messageInputRef,
       sendMessage,
       setPersona,

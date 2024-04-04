@@ -101,7 +101,7 @@
           Chats
         </q-item-label>
         <q-item
-          v-for="chat of partialChatsRef.slice().reverse()"
+          v-for="chat of partialChats.slice().reverse()"
           :key="chat.id"
           :to="`/chat/${chat.id}`"
           exact
@@ -165,6 +165,7 @@
 
 <script>
 import { defineComponent, ref, watch, computed, nextTick } from "vue";
+import { storeToRefs } from "pinia";
 
 // Import State
 import { useChatsStore } from "../stores/chats-store";
@@ -196,7 +197,8 @@ export default defineComponent({
 
     // Reference to the chat-store state
     // TODO: intialize chatsStore.partialChats as null and implement async loading rendering
-    const partialChatsRef = ref(chatsStore.partialChats);
+    //const partialChatsRef = ref(chatsStore.partialChats);
+    const { partialChats } = storeToRefs(chatsStore);
 
     const addressPoints = computed(() => {
       if (account.active) {
@@ -216,12 +218,8 @@ export default defineComponent({
     });
 
     // Watch for updates to the chats and update our partials
-    watch(chatsStore.partialChats, () => {
-      console.log(
-        "layouts::MainLayout::watch::chatsStore.partialChats: updated value: ",
-        chatsStore.partialChats,
-      );
-      partialChatsRef.value = chatsStore.partialChats;
+    watch(partialChats, (newVal) => {
+      console.log("layouts::MainLayout::watch::partialChatsRef: ", newVal);
     });
 
     // Delete a chat
@@ -230,14 +228,14 @@ export default defineComponent({
       console.log("layouts::MainLayout::deleteChat: ", chat_id);
       await chatsStore.deleteChat(chat_id);
       // Update local state
-      partialChatsRef.value = chatsStore.partialChats;
+      // partialChats.value = chatsStore.partialChats;
       if (route.params?.id == chat_id) {
         nextTick(() => router.push("/new"));
       }
     }
 
     return {
-      partialChatsRef,
+      partialChats,
       modelsStore,
       account,
       points,
