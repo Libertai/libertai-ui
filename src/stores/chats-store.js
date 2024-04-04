@@ -39,7 +39,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
               return chat;
             }
             chat.model = model;
-            await this.chatsStore.updateChatModel(chat.id, model);
+            await this.chatsStore.updateChat(chat.id, { model });
           } else {
             // Set default model
             chat.model = models[0];
@@ -87,7 +87,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
         chatId,
         title,
       );
-      await this.chatsStore.updateChatTitle(chatId, title);
+      await this.chatsStore.updateChat(chatId, { title });
       // Update the partial chats
       this.partialChats = this.partialChats.map((chat) => {
         if (chat.id === chatId) {
@@ -103,7 +103,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
         chatId,
         model,
       );
-      await this.chatsStore.updateChatModel(chatId, model);
+      await this.chatsStore.updateChat(chatId, { model });
       // Update the partial chats
       this.partialChats = this.partialChats.map((chat) => {
         if (chat.id === chatId) {

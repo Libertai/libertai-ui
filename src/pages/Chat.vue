@@ -3,7 +3,7 @@
     <div
       class="col-grow overflow-auto"
       style="max-height: calc(100vh - 190px)"
-      ref="scrollArea"
+      ref="scrollAreaRef"
     >
       <q-list class="col-grow">
         <q-item
@@ -26,14 +26,14 @@
               v-model="message.content"
               auto-save
               v-slot="scope"
-              v-if="enableEdit"
+              v-if="enableEditRef"
             >
               <strong>{{ messageRef.role }}</strong>
               <q-input v-model="scope.value" dense autofocus counter autogrow />
             </q-popup-edit>
             <q-item-label class="text-semibold">
               {{
-                message.username
+                message.role
                   .replace("user", "You")
                   .replace("assistant", "Libertai")
               }}
@@ -43,10 +43,10 @@
               <q-spinner-bars
                 color="white"
                 size="2em"
-                v-if="!responseRef.stopped && isLoading"
+                v-if="!message.stopped && isLoadingRef"
               />
-              <span class="text-warning" v-if="responseRef.in_error">
-                <q-tooltip>Error: {{ responseRef.error_message }}</q-tooltip>
+              <span class="text-warning" v-if="!!message.error">
+                <q-tooltip>Error: {{ message.error.message }}</q-tooltip>
                 <q-icon name="warning" /> There has been an error, please
                 <a @click="regenerateMessage()">retry</a>.
               </span>
@@ -59,7 +59,7 @@
               dense
               flat
               size="sm"
-              v-if="!isLoading && message_index == messagesRef.length - 1"
+              v-if="!isLoadingRef && message_index == messagesRef.length - 1"
             >
               <q-tooltip>Regenerate</q-tooltip>
             </q-btn>
@@ -145,12 +145,6 @@ export default defineComponent({
     const personaRef = ref();
     const usernameRef = ref();
     const messagesRef = ref([]);
-    const responseRef = ref({
-      content: "",
-      stopped: true,
-      in_error: false,
-      error_message: "",
-    });
 
     // Instance of an inference engine
     const inferenceEngine = new LlamaCppApiEngine();
@@ -212,6 +206,7 @@ export default defineComponent({
         first_sentence,
         model,
       );
+      console.log("pages::Chat.vue::setChatName - title", title);
 
       // Update the chat title state
       await chatsStore.updateChatTitle(chatId, title);
@@ -231,25 +226,31 @@ export default defineComponent({
       console.log("pages::Chat.vue::generatePersonaMessage");
       let chatId = chatRef.value.id;
       let inputText = inputTextRef.value;
+      let messages = messagesRef.value;
+      let persona = personaRef.value;
+      let model = chatRef.value.model;
 
       // Wipe the input text
       inputTextRef.value = "";
 
       // Append the new message to the chat history and push to local state
       let newMessage = await chatsStore.appendUserMessage(chatId, inputText);
-      messagesRef.value.push(newMessage);
+      // Add additional properties for rendering
+      newMessage = { ...newMessage, stopped: true, error: null };
+      messagesRef.value = [...messagesRef.value, newMessage];
       chatRef.value.messages = messagesRef.value;
 
+      // Create a new message to encapsulate our response
       let response = {
+        role: persona.name,
         content: "",
         stopped: false,
-        in_error: false,
-        error_message: "",
+        error: null,
       };
-      responseRef.value = response;
-      let messages = messagesRef.value;
-      let persona = personaRef.value;
-      let model = chatRef.value.model;
+      // And push it to the local state
+      messagesRef.value = [...messagesRef.value, response];
+      chatRef.value.messages = messagesRef.value;
+
       try {
         // Set loading state
         isLoadingRef.value = true;
@@ -267,31 +268,30 @@ export default defineComponent({
           );
           response.content = output.content;
           response.stopped = output.stopped;
-          responseRef.value = response;
+          messagesRef.value = [...messagesRef.value];
         }
+
+        // Append the chat to long term storage if successful
+        await chatsStore.appendModelResponse(
+          chatId,
+          response.content,
+        );
       } catch (error) {
         console.error("pages::Chat.vue::generatePersonaMessage - error", error);
-        response.in_error = true;
-        response.error_message = error.message;
-        responseRef.value = response;
+        response.error = error;
+      } finally {
+        // Done! update the local state
+        isLoadingRef.value = false;
+        messagesRef.value = [...messagesRef.value];
       }
-
-      // Interpret the response as a new message
-      let newResponse = await chatsStore.appendModelResponse(
-        chatId,
-        response.content,
-      );
-
-      isLoadingRef.value = false;
-      messagesRef.value = [...messages, newResponse];
     }
 
     // Regenerate the last message from the AI
     async function regenerateMessage() {
       console.log("pages::Chat.vue::regenerateMessage");
+      console.log("pages::Chat.vue::regenerateMessage");
       // we discard the last message if it's from the AI, and regenerate
       const lastMessage = messagesRef.value[messagesRef.value.length - 1];
-      console.log(lastMessage);
       if (lastMessage.role !== usernameRef.value) {
         let chatId = chatRef.value.id;
         // Update the local state
@@ -318,16 +318,25 @@ export default defineComponent({
 
     // Set a chat by its ID
     async function setChat(chatId) {
+      console.log("pages::Chat.vue::setChat - chatId", chatId);
       // Load the chat from the store and set it
       chatRef.value = await chatsStore.loadChat(chatId);
-      if (chatRef.value === undefined) {
-        await router.push({ name: "new" });
+      if (!chatRef.value) {
+        console.error("pages::Chat.vue::setChat - chat not found");
+        await router.push({ name: "new-chat" });
         return;
       }
 
       let title = chatRef.value.title;
       let username = chatRef.value.username;
-      let messages = chatRef.value.messages;
+      // Load messages, mapping over with additional properties
+      let messages = chatRef.value.messages.map((message) => {
+        // Set stopped to true
+        message.stopped = true;
+        // Set error to null
+        message.error = null;
+        return message;
+      });
       let persona = chatRef.value.persona;
 
       // Set the selected model for the chat by its URL
@@ -375,7 +384,6 @@ export default defineComponent({
       scrollAreaRef,
       chatRef,
       messagesRef,
-      responseRef,
       usernameRef,
       personaRef,
       isLoadingRef,

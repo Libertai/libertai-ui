@@ -135,14 +135,14 @@ export default createUploaderComponent({
           const url = URL.createObjectURL(file);
           const text = await extractTextFromPdf(url);
           const title = file.name;
-          await knowledge.addDocument(title, text);
+          await knowledgeStore.addDocument(title, text);
           helpers.updateFileStatus(file, "uploaded");
         } else if (file.type === "text/plain") {
           const reader = new FileReader();
           reader.onload = async (event) => {
             const content = event.target.result;
             const title = file.name;
-            await knowledge.addDocument(title, content);
+            await knowledgeStore.addDocument(title, content);
             helpers.updateFileStatus(file, "uploaded");
           };
           reader.readAsText(file);

@@ -206,6 +206,7 @@ export default defineComponent({
       }
     });
 
+    // TODO: this is an invalid use of watch, as we are watching a computed value
     // watch for account changes, and update points if not already done
     watch(account.address, () => {
       console.log("layouts::MainLayout::watch::account.address");
@@ -228,6 +229,8 @@ export default defineComponent({
     async function deleteChat(chat_id) {
       console.log("layouts::MainLayout::deleteChat: ", chat_id);
       await chatsStore.deleteChat(chat_id);
+      // Update local state
+      partialChatsRef.value = chatsStore.partialChats;
       if (route.params?.id == chat_id) {
         nextTick(() => router.push("/new"));
       }

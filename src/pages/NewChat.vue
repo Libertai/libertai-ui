@@ -76,8 +76,6 @@
   </q-page>
 </template>
 <script>
-import { LlamaCppApiEngine } from "libertai-js";
-
 // Import State
 import { useModelsStore } from "src/stores/models-store";
 import { useChatsStore } from "src/stores/chats-store";
