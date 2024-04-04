@@ -1,4 +1,4 @@
-import { createKnowledgeStoreUploaderComponent } from "quasar";
+import { createUploaderComponent } from "quasar";
 import { computed, ref } from "vue";
 import { useKnowledgeStore } from "../stores/knowledge-store";
 // import * as pdfjsLib from 'pdfjs-dist/webpack';
@@ -64,7 +64,7 @@ async extractTextFromPdf(pdfUrl) {
         */
 
 // export a Vue component
-export default createKnowledgeStoreUploaderComponent({
+export default createUploaderComponent({
   name: "KnowledgeStoreUploader",
   props: {
     // ...your custom props
