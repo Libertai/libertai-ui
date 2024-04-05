@@ -62,7 +62,6 @@ export const modelsConfig = [
     ...modelDefaults,
     apiUrl:
       "https://curated.aleph.cloud/vm/16a9f0f870c251719a0c63554cf02b6b8e4c2b4fee9987ddc3341a6507aef68d/completion",
-    maxTokens: 8192,
     chatMl: chatMlDefaults,
   },
 
@@ -72,6 +71,7 @@ export const modelsConfig = [
     ...modelDefaults,
     apiUrl:
       "https://curated.aleph.cloud/vm/055e1267fb63f5961e8aee890cfc3f61387deee79f37ce51a44b21feee57d40b/completion",
+    // Allow a larger prompt length
     maxTokens: 16384,
     chatMl: chatMlDefaults,
   },
@@ -82,6 +82,7 @@ export const modelsConfig = [
     ...modelDefaults,
     apiUrl:
       "https://curated.aleph.cloud/vm/b950fef19b109ef3770c89eb08a03b54016556c171b9a32475c085554b594c94/completion",
+    // Allow a larger prompt length
     maxTokens: 16384,
     chatMl: chatMlDefaults,
   },

@@ -109,6 +109,7 @@ import { LlamaCppApiEngine } from "libertai-js";
 // Local state
 import { useChatsStore } from "../stores/chats-store";
 import { useModelsStore } from "../stores/models-store";
+import { useKnowledgeStore } from "../stores/knowledge-store";
 
 // Components
 import MarkdownRenderer from "../components/MarkdownRenderer.vue";
@@ -131,6 +132,7 @@ export default defineComponent({
     // App state
     const chatsStore = useChatsStore();
     const modelsStore = useModelsStore();
+    const knowledgeStore = useKnowledgeStore();
 
     // Local page state
     const inputTextRef = ref("");
@@ -233,7 +235,7 @@ export default defineComponent({
       );
 
       let chatId = chatRef.value.id;
-      let messages = messagesRef.value;
+      let messages = JSON.parse(JSON.stringify(messagesRef.value));
       let persona = personaRef.value;
       let model = chatRef.value.model;
 
@@ -253,11 +255,47 @@ export default defineComponent({
         isLoadingRef.value = true;
         hasResetRef.value = false;
 
+        // Get the last message to determine if we should search
+        let lastMessage = messages[messages.length - 1];
+        console.log(
+          "pages::Chat.vue::generatePersonaMessage - lastMessage",
+          lastMessage,
+        );
+        if (lastMessage) {
+          let searchResults = await knowledgeStore.searchDocuments(
+            lastMessage.content,
+          );
+          console.log(
+            "pages::Chat.vue::generatePersonaMessage - embedding search results",
+            searchResults,
+          );
+          console.log(
+            "pages::Chat.vue::generatePersonaMessage - searchResults length",
+            searchResults.length,
+          );
+          searchResults.forEach((result) => {
+            console.log(
+              "pages::Chat.vue::generatePersonaMessage - result",
+              result,
+            );
+            messages.push({
+              role: "search-result",
+              content: result.content,
+            });
+          });
+        }
+
+        console.log(
+          "pages::Chat.vue::generatePersonaMessage - completing on messages",
+          messages,
+        );
+
         // Generate a stream of responses from the AI
         for await (const output of inferenceEngine.generateAnswer(
           messages,
           model,
           persona,
+          true,
         )) {
           console.log(
             "pages::Chat.vue::generatePersonaMessage - output",
