@@ -22,7 +22,7 @@
   "dependencies": {
     "@quasar/extras": "^1.16.4",
     "@solana/web3.js": "^1.90.0",
-    "aleph-js": "^0.5.3",
+    "aleph-sdk-ts": "^3.9.2",
     "axios": "^1.2.1",
     "buffer": "^6.0.3",
     "dompurify": "^3.0.9",

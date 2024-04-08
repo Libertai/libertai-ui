@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 
-import models from "../utils/models.js";
-import { aggregates, ethereum } from "aleph-js";
+import { Get } from "aleph-sdk-ts/dist/messages/aggregate";
 
 export const usePoints = defineStore("points", {
   state: () => ({
@@ -24,20 +23,18 @@ export const usePoints = defineStore("points", {
   actions: {
     // any amount of arguments, return a promise or not
     async update() {
-      const points = await aggregates.fetch_one(this.points_source, "points");
-      console.log("points", points);
-      this.points = points;
-
-      const pending_points = await aggregates.fetch_one(
-        this.points_source,
-        "pending_points",
-      );
-      console.log("pending_points", points);
-      this.pending_points = pending_points;
-
-      const info = await aggregates.fetch_one(this.points_source, "info");
-      console.log("info", points);
-      this.info = info;
+      const aggregateGetConfiguration = {
+        APIServer: this.api_server,
+        address: this.points_source,
+        limit: 1,
+      };
+      const pointsData = await Get(aggregateGetConfiguration);
+      this.points = pointsData.points;
+      this.info = pointsData.info;
+      this.pending_points = pointsData.pending_points;
+      console.log("points", this.points);
+      console.log("info", this.info);
+      console.log("pending_points", this.pending_points);
     },
 
     getAddressPoints(address) {
