@@ -32,19 +32,7 @@
       <div
         class="row no-wrap q-pa-md q-pt-none bg-primary border-primary-highlight"
       >
-        <!-- <div class="column">
-                        <div class="text-h6 q-mb-md">Settings</div>
-                        <q-toggle v-model="mobileData" label="Use Mobile Data" />
-                        <q-toggle v-model="bluetooth" label="Bluetooth" />
-                    </div>
-
-                    <q-separator vertical inset class="q-mx-lg" /> -->
-
         <div class="column items-center">
-          <!-- <q-avatar size="72px">
-                        <img src="https://cdn.quasar.dev/img/boy-avatar.png">
-                    </q-avatar> -->
-
           <div class="text-small q-mb-xs">{{ account.address }}</div>
 
           <q-btn
@@ -66,18 +54,10 @@
 
 <script setup>
 import { ethers } from "ethers";
-import { ref } from "vue";
-import { aggregates, ethereum } from "aleph-js";
-import { markRaw } from "vue";
 import { useAccount } from "../stores/account";
 console.log(ethers);
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 const account = useAccount();
-const channel = ref("LIBERTAI");
-const api_server = ref("https://official.aleph.cloud");
 
 async function eth_web3_login() {
   console.log(window.ethereum);
@@ -101,15 +81,6 @@ async function eth_web3_login() {
     alert("Error getting web3 account");
     return;
   }
-}
-
-async function broadcast() {
-  let msg = await aggregates.submit(
-    account.address,
-    "libertai",
-    { registered: true },
-    { account: account, channel: channel.value, api_server: api_server.value },
-  );
 }
 </script>
 
