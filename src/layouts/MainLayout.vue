@@ -2,14 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <q-header class="bg-transparent">
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
 
         <q-space />
 
@@ -38,9 +31,7 @@
             }"
             v-else
           >
-            <span :key="account.address"
-              >{{ addressPoints.toFixed(0) }} Points</span
-            >
+            <span :key="account.address">{{ addressPoints.toFixed(0) }} Points</span>
           </q-btn>
           <!-- model selector -->
           <q-btn-dropdown
@@ -94,9 +85,7 @@
       >
       <!-- list of chats by reference to the chats-store -->
       <q-list style="flex-grow: 1" dense>
-        <q-item-label header class="text-uppercase text-bold">
-          Chats
-        </q-item-label>
+        <q-item-label header class="text-uppercase text-bold"> Chats </q-item-label>
         <q-item
           v-for="chat of chats.slice().reverse()"
           :key="chat.id"
@@ -113,12 +102,7 @@
 
           <q-item-section side v-if="route.params?.id == chat.id">
             <q-btn-group flat dense>
-              <q-btn
-                icon="delete"
-                size="sm"
-                class="q-pa-xs"
-                @click="deleteChat(chat.id)"
-              >
+              <q-btn icon="delete" size="sm" class="q-pa-xs" @click="deleteChat(chat.id)">
                 <q-tooltip>Delete chat</q-tooltip>
               </q-btn>
             </q-btn-group>
@@ -161,21 +145,21 @@
 </template>
 
 <script>
-import { defineComponent, ref, watch, computed, nextTick } from "vue";
-import { storeToRefs } from "pinia";
+import { defineComponent, ref, watch, computed, nextTick } from 'vue';
+import { storeToRefs } from 'pinia';
 
 // Import State
-import { useChatsStore } from "../stores/chats-store";
-import { useModelsStore } from "../stores/models-store";
-import { useAccount } from "../stores/account";
-import { usePoints } from "src/stores/points";
-import { useRouter, useRoute } from "vue-router";
+import { useChatsStore } from '../stores/chats-store';
+import { useModelsStore } from '../stores/models-store';
+import { useAccount } from '../stores/account';
+import { usePoints } from 'src/stores/points';
+import { useRouter, useRoute } from 'vue-router';
 
 // IMport Components
-import AccountButton from "src/components/AccountButton.vue";
+import AccountButton from 'src/components/AccountButton.vue';
 
 export default defineComponent({
-  name: "MainLayout",
+  name: 'MainLayout',
   components: {
     AccountButton,
   },
@@ -206,7 +190,6 @@ export default defineComponent({
     // TODO: this is an invalid use of watch, as we are watching a computed value
     // watch for account changes, and update points if not already done
     watch(account.address, () => {
-      console.log("layouts::MainLayout::watch::account.address");
       if (account.active && Object.keys(points.points).length === 0) {
         points.update();
       }
@@ -214,10 +197,9 @@ export default defineComponent({
 
     // Delete a chat
     async function deleteChat(chat_id) {
-      console.log("layouts::MainLayout::deleteChat: ", chat_id);
       await chatsStore.deleteChat(chat_id);
       if (route.params?.id == chat_id) {
-        nextTick(() => router.push("/new"));
+        nextTick(() => router.push('/new'));
       }
     }
 

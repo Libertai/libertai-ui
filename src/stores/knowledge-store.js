@@ -1,8 +1,8 @@
-import { defineStore } from "pinia";
-import { KnowledgeStore } from "@libertai/libertai-js";
-import { defaultKnowledge } from "../utils/knowledge";
+import { defineStore } from 'pinia';
+import { KnowledgeStore } from '@libertai/libertai-js';
+import { defaultKnowledge } from '../utils/knowledge';
 
-export const KNOWLEDGE_STORE_PINIA_KEY = "knowledge-store-pinia-key";
+export const KNOWLEDGE_STORE_PINIA_KEY = 'knowledge-store-pinia-key';
 
 export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
   state: () => ({
@@ -23,9 +23,7 @@ export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
       let defaultDocumentTitles = defaultKnowledge.map((doc) => doc.title);
       let documentTitles = this.documents().map((doc) => doc.title);
       // Check if default documents are already in the store
-      let missingDocuments = defaultDocumentTitles.filter(
-        (title) => !documentTitles.includes(title),
-      );
+      let missingDocuments = defaultDocumentTitles.filter((title) => !documentTitles.includes(title));
       // Add missing documents
       let addedDocuments = [];
       for (let title of missingDocuments) {

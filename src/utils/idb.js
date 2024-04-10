@@ -1,4 +1,4 @@
-import localforage from "localforage";
+import localforage from 'localforage';
 
 /**
  * Create a new localforage instance with the given name

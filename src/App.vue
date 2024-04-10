@@ -3,12 +3,12 @@
 </template>
 
 <script>
-import { defineComponent, onMounted } from "vue";
-import { useChatsStore } from "stores/chats-store";
-import { useKnowledgeStore } from "./stores/knowledge-store";
+import { defineComponent, onMounted } from 'vue';
+import { useChatsStore } from 'stores/chats-store';
+import { useKnowledgeStore } from './stores/knowledge-store';
 
 export default defineComponent({
-  name: "App",
+  name: 'App',
   setup() {
     const chatsStore = useChatsStore();
     const knowledgeStore = useKnowledgeStore();

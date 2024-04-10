@@ -1,11 +1,11 @@
-import { v4 as uuidv4 } from "uuid";
-import { defineStore } from "pinia";
+import { v4 as uuidv4 } from 'uuid';
+import { defineStore } from 'pinia';
 
-import { defaultModels } from "src/utils/models";
-import * as idb from "src/utils/idb";
+import { defaultModels } from 'src/utils/models';
+import * as idb from 'src/utils/idb';
 
-const CHATS_STORE_NAME = "chats-store";
-const CHATS_STORE_PINIA_KEY = "chats-store-pinia-key";
+const CHATS_STORE_NAME = 'chats-store';
+const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
 
 /**
  * Representation of a single chat:
@@ -67,12 +67,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
      * @returns {Promise<Chat>} - the created chat
      */
     async createChat(title, username, model, persona) {
-      const chat = await this.chatsStore.createChat(
-        title,
-        username,
-        model,
-        persona,
-      );
+      const chat = await this.chatsStore.createChat(title, username, model, persona);
       this.chats.push(chat);
       return chat;
     },
@@ -284,7 +279,7 @@ class ChatsStore {
   async readChat(id) {
     let chat = idb.get(id, this.store);
     if (!chat) {
-      throw new Error("Chat not found");
+      throw new Error('Chat not found');
     }
     return chat;
   }

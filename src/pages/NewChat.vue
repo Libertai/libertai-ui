@@ -1,8 +1,5 @@
 <template>
-  <q-page
-    class="align-items-center"
-    style="display: flex; flex-direction: column"
-  >
+  <q-page class="align-items-center" style="display: flex; flex-direction: column">
     <!-- Persona Selection -->
     <q-tabs
       v-model="selectedPersonaIdRef"
@@ -14,11 +11,7 @@
       mobile-arrows
       class="q-pa-lg"
     >
-      <q-tab
-        v-for="persona of personasStore.personas"
-        :key="persona.id"
-        :name="persona.id"
-      >
+      <q-tab v-for="persona of personasStore.personas" :key="persona.id" :name="persona.id">
         <q-avatar size="64px" color="white" class="q-mb-xs">
           <img :src="persona.avatarUrl" class="q-pa-xs" />
         </q-avatar>
@@ -35,19 +28,8 @@
     >
       <q-card>
         <q-card-section class="row q-col-gutter-sm">
-          <q-input
-            v-model="usernameInputRef"
-            placeholder="user"
-            label="Your name"
-            standout
-            class="col-6"
-          />
-          <q-input
-            v-model="selectedPersonaRef.name"
-            label="Persona name"
-            standout
-            class="col-6"
-          />
+          <q-input v-model="usernameInputRef" placeholder="user" label="Your name" standout class="col-6" />
+          <q-input v-model="selectedPersonaRef.name" label="Persona name" standout class="col-6" />
         </q-card-section>
         <q-card-section class="">
           <q-input
@@ -76,20 +58,20 @@
   </q-page>
 </template>
 <script>
-import { defaultChatTopic } from "src/utils/chat";
+import { defaultChatTopic } from 'src/utils/chat';
 
 // Import State
-import { useModelsStore } from "src/stores/models-store";
-import { useChatsStore } from "src/stores/chats-store";
-import { usePersonasStore } from "src/stores/personas-store";
-import { defineComponent, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useModelsStore } from 'src/stores/models-store';
+import { useChatsStore } from 'src/stores/chats-store';
+import { usePersonasStore } from 'src/stores/personas-store';
+import { defineComponent, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 // Import components
-import MessageInput from "src/components/MessageInput.vue";
+import MessageInput from 'src/components/MessageInput.vue';
 
 export default defineComponent({
-  name: "NewChat",
+  name: 'NewChat',
   components: {
     MessageInput,
   },
@@ -111,9 +93,9 @@ export default defineComponent({
     const selectedPersonaRef = ref(personasStore.personas[0]);
     const selectedPersonaIdRef = ref(personasStore.personas[0].id);
     // Username input state
-    const usernameInputRef = ref("user");
+    const usernameInputRef = ref('user');
     // Message input state
-    const messageInputRef = ref("");
+    const messageInputRef = ref('');
 
     // now watch for that id change
     watch(
@@ -126,7 +108,7 @@ export default defineComponent({
     async function sendMessage() {
       let message = messageInputRef.value;
       if (message.length === 0) {
-        console.warn("page::NewChat::sendMessage: message is empty");
+        console.warn('page::NewChat::sendMessage: message is empty');
         return;
       }
 
@@ -143,15 +125,13 @@ export default defineComponent({
       await chatsStore.appendUserMessage(chat.id, message);
 
       // Set the message to empty
-      messageInputRef.value = "";
+      messageInputRef.value = '';
       // Navigate to the chat page
-      router.push({ name: "chat", params: { id: chat.id } });
+      router.push({ name: 'chat', params: { id: chat.id } });
     }
 
     function setPersona(id) {
-      selectedPersonaRef.value = personasStore.personas.find(
-        (persona) => persona.id === id,
-      );
+      selectedPersonaRef.value = personasStore.personas.find((persona) => persona.id === id);
     }
 
     return {

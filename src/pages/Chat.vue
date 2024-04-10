@@ -1,19 +1,13 @@
 <template>
   <q-page class="column align-items-center">
-    <div
-      class="col-grow overflow-auto"
-      style="max-height: calc(100vh - 190px)"
-      ref="scrollAreaRef"
-    >
+    <div class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)" ref="scrollAreaRef">
       <!-- Display message history -->
       <q-list class="col-grow">
         <!-- Determine styling based on the role of the message (if it's the user or the AI) -->
         <q-item
           v-for="(message, message_index) in messagesRef"
           :key="message.id"
-          :class="`q-py-lg items-start dyn-container chat-item ${
-            message.role == usernameRef ? 'bg-dark' : ''
-          }`"
+          :class="`q-py-lg items-start dyn-container chat-item ${message.role == usernameRef ? 'bg-dark' : ''}`"
         >
           <!-- Display the avatar of the user or the AI -->
           <q-item-section avatar>
@@ -25,8 +19,6 @@
             </q-avatar>
           </q-item-section>
           <!-- Edit message popup -- triggered on click if the edit mode is enabled -->
-          <!-- TODO: Writes to the local state only! -->
-          <!-- TODO: More intuitve styling for indicating how to edit and save -->
           <q-item-section :style="`max-width: calc(960px - 56px);`">
             <q-popup-edit
               v-model="message.content"
@@ -40,26 +32,17 @@
             </q-popup-edit>
             <!-- Display the role of the user or the AI -->
             <q-item-label class="text-semibold">
-              {{
-                message.role
-                  .replace(chatRef.username, "You")
-                  .replace("assistant", "Libertai")
-              }}
+              {{ message.role.replace(chatRef.username, 'You').replace('assistant', 'Libertai') }}
             </q-item-label>
             <!-- Display the content of the message -->
             <q-item-label style="display: block">
               <MarkdownRenderer :content="message.content" breaks />
               <!-- Display the loading spinner if the message is still loading -->
-              <q-spinner-bars
-                color="white"
-                size="2em"
-                v-if="!message.stopped && isLoadingRef"
-              />
+              <q-spinner-bars color="white" size="2em" v-if="!message.stopped && isLoadingRef" />
               <!-- Display the error message if the message errored  on generate -->
               <span class="text-warning" v-if="!!message.error">
                 <q-tooltip>Error: {{ message.error.message }}</q-tooltip>
-                <q-icon name="warning" /> There has been an error, please
-                <a @click="regenerateMessage()">retry</a>.
+                <q-icon name="warning" /> There has been an error, please <a @click="regenerateMessage()">retry</a>.
               </span>
             </q-item-label>
           </q-item-section>
@@ -77,13 +60,7 @@
               <q-tooltip>Regenerate</q-tooltip>
             </q-btn>
             <!-- Allow copying the message to the clipboard -->
-            <q-btn
-              @click="copyMessage(message)"
-              icon="content_copy"
-              dense
-              flat
-              size="sm"
-            >
+            <q-btn @click="copyMessage(message)" icon="content_copy" dense flat size="sm">
               <q-tooltip>Copy</q-tooltip>
             </q-btn>
           </div>
@@ -92,23 +69,12 @@
     </div>
 
     <!-- And finally ...  input for sending messages! -->
-    <!-- TODO: disable input if loading -->
-    <message-input
-      :isLoading="isLoadingRef"
-      @sendMessage="sendMessage"
-      v-model="inputTextRef"
-      ref="inputRef"
-    />
+    <message-input :isLoading="isLoadingRef" @sendMessage="sendMessage" v-model="inputTextRef" ref="inputRef" />
 
     <!-- Enable edit mode -->
-    <q-checkbox
-      v-model="enableEditRef"
-      left-label
-      class="q-mr-lg q-mb-md fixed-bottom-right"
-    >
+    <q-checkbox v-model="enableEditRef" left-label class="q-mr-lg q-mb-md fixed-bottom-right">
       <q-tooltip anchor="top right" class="bg-primary" self="bottom right"
-        >When this is activated, just click on a message to start editing
-        it.</q-tooltip
+        >When this is activated, just click on a message to start editing it.</q-tooltip
       >
       Enable edits
     </q-checkbox>
@@ -116,30 +82,30 @@
 </template>
 
 <script>
-import "highlight.js/styles/devibeans.css";
-import { useQuasar, copyToClipboard } from "quasar";
-import { defineComponent, ref, watch, nextTick, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import 'highlight.js/styles/devibeans.css';
+import { useQuasar, copyToClipboard } from 'quasar';
+import { defineComponent, ref, watch, nextTick, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-import { inferChatTopic, defaultChatTopic } from "src/utils/chat";
+import { inferChatTopic, defaultChatTopic } from 'src/utils/chat';
 
 // LlamaCppApiEngine
-import { LlamaCppApiEngine } from "@libertai/libertai-js";
+import { LlamaCppApiEngine } from '@libertai/libertai-js';
 
 // Local state
-import { useChatsStore } from "../stores/chats-store";
-import { useModelsStore } from "../stores/models-store";
-import { useKnowledgeStore } from "../stores/knowledge-store";
+import { useChatsStore } from '../stores/chats-store';
+import { useModelsStore } from '../stores/models-store';
+import { useKnowledgeStore } from '../stores/knowledge-store';
 
 // Components
-import MarkdownRenderer from "../components/MarkdownRenderer.vue";
-import MessageInput from "../components/MessageInput.vue";
-import axios from "axios";
+import MarkdownRenderer from '../components/MarkdownRenderer.vue';
+import MessageInput from '../components/MessageInput.vue';
+import axios from 'axios';
 
 console.log(nextTick);
 
 export default defineComponent({
-  name: "ChatPage",
+  name: 'ChatPage',
   components: {
     MarkdownRenderer,
     MessageInput,
@@ -155,7 +121,7 @@ export default defineComponent({
     const knowledgeStore = useKnowledgeStore();
 
     // Local page state
-    const inputTextRef = ref("");
+    const inputTextRef = ref('');
     const isLoadingRef = ref(false);
     const hasResetRef = ref(false);
     const inputRef = ref(null);
@@ -221,15 +187,15 @@ export default defineComponent({
         // Update the chat title state
         chatRef.value.title = title;
       } catch (error) {
-        console.error("pages::Chat.vue::setChatName - error", error);
+        console.error('pages::Chat.vue::setChatName - error', error);
       }
     }
 
     // Scroll to the bottom of the chat when new messages are added
     async function scrollBottom() {
       scrollAreaRef.value.lastElementChild.scrollIntoView({
-        behavior: "smooth",
-        block: "end",
+        behavior: 'smooth',
+        block: 'end',
       });
     }
 
@@ -243,7 +209,7 @@ export default defineComponent({
       // Create a new message to encapsulate our response
       let response = {
         role: persona.name,
-        content: "",
+        content: '',
         stopped: false,
         error: null,
       };
@@ -262,16 +228,11 @@ export default defineComponent({
         // NOTE: assuming last message is gauranteed to be non-empty and the user's last message
         // Get the last message from the user
         let lastMessage = messages[messages.length - 1];
-        let searchResults = await knowledgeStore.searchDocuments(
-          lastMessage.content,
-        );
+        let searchResults = await knowledgeStore.searchDocuments(lastMessage.content);
         searchResults.forEach((result) => {
-          console.log(
-            "pages::Chat.vue::generatePersonaMessage - embedding search result",
-            result,
-          );
+          console.log('pages::Chat.vue::generatePersonaMessage - embedding search result', result);
           messages.push({
-            role: "search-result",
+            role: 'search-result',
             content: result.content,
           });
         });
@@ -287,7 +248,7 @@ export default defineComponent({
           let stopped = output.stopped;
           let content = output.content;
           if (!stopped) {
-            content += " *[writing ...]*";
+            content += ' *[writing ...]*';
           }
           // Update the local state include updates
           response.content = content;
@@ -297,7 +258,7 @@ export default defineComponent({
         // A successful response! Append the chat to long term storage.
         await chatsStore.appendModelResponse(chatId, response.content);
       } catch (error) {
-        console.error("pages::Chat.vue::generatePersonaMessage - error", error);
+        console.error('pages::Chat.vue::generatePersonaMessage - error', error);
         response.error = error;
       } finally {
         // Done! update the local state to reflect the end of the process
@@ -325,18 +286,18 @@ export default defineComponent({
     }
 
     async function sendMessage(content) {
-      console.log("pages::Chat.vue::sendMessage");
+      console.log('pages::Chat.vue::sendMessage');
       let chatId = chatRef.value.id;
       let inputText = inputTextRef.value;
 
       // Wipe the input text
-      inputTextRef.value = "";
+      inputTextRef.value = '';
 
       nextTick(scrollBottom);
 
       if (!content.trim()) return;
 
-      if (content.trim() === "") return;
+      if (content.trim() === '') return;
 
       // Append the new message to the chat history and push to local state
       let newMessage = await chatsStore.appendUserMessage(chatId, inputText);
@@ -350,8 +311,8 @@ export default defineComponent({
       // Load the chat from the store and set it
       chatRef.value = await chatsStore.readChat(chatId);
       if (!chatRef.value) {
-        console.error("pages::Chat.vue::setChat - chat not found");
-        await router.push({ name: "new-chat" });
+        console.error('pages::Chat.vue::setChat - chat not found');
+        await router.push({ name: 'new-chat' });
         return;
       }
 
@@ -382,7 +343,7 @@ export default defineComponent({
       usernameRef.value = username;
 
       // Set the chat title if it's not set
-      if (title === defaultChatTopic || title === "") {
+      if (title === defaultChatTopic || title === '') {
         // Set the chat name based on the first message
         setChatName(messages[0].content);
       }
@@ -395,40 +356,29 @@ export default defineComponent({
       nextTick(scrollBottom);
     }
 
-    async function updateChatMessageContent(
-      messageIndex,
-      content,
-      initialContent,
-    ) {
+    async function updateChatMessageContent(messageIndex, content, initialContent) {
       let chatId = chatRef.value.id;
       try {
-        await chatsStore.updateChatMessageContent(
-          chatId,
-          messageIndex,
-          content,
-        );
+        await chatsStore.updateChatMessageContent(chatId, messageIndex, content);
       } catch (error) {
-        console.error(
-          "pages::Chat.vue::updateChatMessageContent - error",
-          error,
-        );
+        console.error('pages::Chat.vue::updateChatMessageContent - error', error);
         // Reset the content to the initial content
         messagesRef.value[messageIndex].content = initialContent;
         // Alert the user
-        $q.notify("Failed to update message content");
+        $q.notify('Failed to update message content');
       }
     }
 
     async function copyMessage(message) {
       await copyToClipboard(message.content);
-      $q.notify("Message copied to clipboard");
+      $q.notify('Message copied to clipboard');
     }
 
     async function clearCookies() {
       // Clear the slots
       inferenceEngine.clearSlots();
       // Clear the cookies from aleph
-      await axios.get("https://curated.aleph.cloud/change-pool", {
+      await axios.get('https://curated.aleph.cloud/change-pool', {
         withCredentials: true,
       });
       // Set the reset flag

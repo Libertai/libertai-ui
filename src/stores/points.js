@@ -1,11 +1,11 @@
-import { defineStore } from "pinia";
+import { defineStore } from 'pinia';
 
-import { Get } from "aleph-sdk-ts/dist/messages/aggregate";
+import { Get } from 'aleph-sdk-ts/dist/messages/aggregate';
 
-export const usePoints = defineStore("points", {
+export const usePoints = defineStore('points', {
   state: () => ({
-    points_source: "0xCBFc3EeC41CBBfCAcc50337d712890C47a14ba99",
-    api_server: "https://official.aleph.cloud",
+    points_source: '0xCBFc3EeC41CBBfCAcc50337d712890C47a14ba99',
+    api_server: 'https://official.aleph.cloud',
     points: {},
     pending_points: {},
     info: {
@@ -32,9 +32,9 @@ export const usePoints = defineStore("points", {
       this.points = pointsData.points;
       this.info = pointsData.info;
       this.pending_points = pointsData.pending_points;
-      console.log("points", this.points);
-      console.log("info", this.info);
-      console.log("pending_points", this.pending_points);
+      console.log('points', this.points);
+      console.log('info', this.info);
+      console.log('pending_points', this.pending_points);
     },
 
     getAddressPoints(address) {
@@ -66,8 +66,7 @@ export const usePoints = defineStore("points", {
       const totalDuration = pendingTime - lastTime;
       const currentDuration = currentTime - lastTime;
       const hourlyRate = (pendingPoints / totalDuration) * 3600;
-      const currentPendingPoints =
-        (pendingPoints / totalDuration) * currentDuration;
+      const currentPendingPoints = (pendingPoints / totalDuration) * currentDuration;
       return {
         hourlyRate: hourlyRate,
         pending: Math.max(currentPendingPoints, 0),

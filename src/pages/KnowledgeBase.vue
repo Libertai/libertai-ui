@@ -16,12 +16,7 @@
       <div class="row justify-center q-pa-md">
         <div class="col-lg-8 col-sm-12">
           <q-list>
-            <q-item
-              v-for="document in documents"
-              :key="document.id"
-              clickable
-              @click="onRowClick($event, document)"
-            >
+            <q-item v-for="document in documents" :key="document.id" clickable @click="onRowClick($event, document)">
               <q-item-section>
                 <q-item-label>{{ document.title }}</q-item-label>
                 <q-item-label caption>{{ document.description }}</q-item-label>
@@ -65,15 +60,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { useKnowledgeStore } from "src/stores/knowledge-store";
+import { ref, computed } from 'vue';
+import { useKnowledgeStore } from 'src/stores/knowledge-store';
 
 const knowledgeStore = useKnowledgeStore();
 
 // Columns for the table displaying documents
 const columns = [
-  { name: "title", label: "Title", field: "title" },
-  { name: "description", label: "Description", field: "description" },
+  { name: 'title', label: 'Title', field: 'title' },
+  { name: 'description', label: 'Description', field: 'description' },
 ];
 
 // Documents data source
@@ -89,12 +84,10 @@ const showForm = ref(false);
 const submitting = ref(false);
 
 // Edited document object
-const editedDocument = ref({ title: "", description: "" });
+const editedDocument = ref({ title: '', description: '' });
 
 // Form title based on whether we're adding or editing a document
-const formTitle = computed(() =>
-  selectedDocument.value ? "Edit Document" : "Add Document",
-);
+const formTitle = computed(() => (selectedDocument.value ? 'Edit Document' : 'Add Document'));
 
 // On row click event handler for the table
 function onRowClick(evt, row) {
@@ -108,10 +101,10 @@ function openForm() {
 
 // Test with a PDF of the communist manifesto
 function searchDefault() {
-  let query = "why is the sky blue?";
-  console.log("Searching: ", query);
+  let query = 'why is the sky blue?';
+  console.log('Searching: ', query);
   knowledgeStore.searchDocuments(query).then((results) => {
-    console.log("Results: ", results);
+    console.log('Results: ', results);
   });
 }
 
@@ -122,13 +115,13 @@ async function onSubmit() {
     if (selectedDocument.value) {
       // TODO: its not clear how to support document updates given that all content is chunked
       // and stored across multiple embeddings in local storage
-      console.log("TODO: Implement update document");
+      console.log('TODO: Implement update document');
     } else {
       await knowledgeStore.addDocument(editedDocument.value);
     }
     showForm.value = false;
   } catch (error) {
-    console.error("Error adding or updating document:", error);
+    console.error('Error adding or updating document:', error);
   } finally {
     submitting.value = false;
   }
