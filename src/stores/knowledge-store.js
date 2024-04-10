@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { KnowledgeStore } from "libertai-js";
+import { KnowledgeStore } from "@libertai/libertai-js";
 import { defaultKnowledge } from "../utils/knowledge";
 
 export const KNOWLEDGE_STORE_PINIA_KEY = "knowledge-store-pinia-key";
@@ -20,10 +20,6 @@ export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
 
     async load() {
       await this.knowledgeStore.load();
-      console.log(
-        "stores::knowledge-store::load | documents = %o",
-        this.documents(),
-      );
       let defaultDocumentTitles = defaultKnowledge.map((doc) => doc.title);
       let documentTitles = this.documents().map((doc) => doc.title);
       // Check if default documents are already in the store
@@ -40,22 +36,10 @@ export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
       return;
     },
     async addDocument(title, content, tags = []) {
-      console.log(
-        "stores::knowledge-store::addDocument | title = %s | tags = %o",
-        title,
-        tags,
-      );
       return await this.knowledgeStore.addDocument(title, content, tags);
     },
     async searchDocuments(query, tags = []) {
-      console.log(
-        "stores::knowledge-store::searchDocuments | query = %s | tags = %o",
-        query,
-        tags,
-      );
-      // For some reason js thinks this array is always empty
-      // lets pull it apart to fix that
-      return await this.knowledgeStore.searchDocuments(query, 5, 20, tags);
+      return await this.knowledgeStore.searchDocuments(query, 3, 18, tags);
     },
   },
 });

@@ -98,7 +98,7 @@
           Chats
         </q-item-label>
         <q-item
-          v-for="chat of partialChats.slice().reverse()"
+          v-for="chat of chats.slice().reverse()"
           :key="chat.id"
           :to="`/chat/${chat.id}`"
           exact
@@ -193,7 +193,7 @@ export default defineComponent({
     const route = useRoute();
 
     // Reference to the chat-store state
-    const { partialChats } = storeToRefs(chatsStore);
+    const { chats } = storeToRefs(chatsStore);
 
     const addressPoints = computed(() => {
       if (account.active) {
@@ -213,7 +213,6 @@ export default defineComponent({
     });
 
     // Delete a chat
-    // NOTE: the underlying state of partialChatsRef is updated as a result of the watch above
     async function deleteChat(chat_id) {
       console.log("layouts::MainLayout::deleteChat: ", chat_id);
       await chatsStore.deleteChat(chat_id);
@@ -223,7 +222,7 @@ export default defineComponent({
     }
 
     return {
-      partialChats,
+      chats,
       modelsStore,
       account,
       points,

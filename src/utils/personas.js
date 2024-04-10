@@ -1,5 +1,5 @@
 // Configuration for base pomprts for different types of chatbots
-export const personasConfig = [
+export const defaultPersonas = [
   {
     id: 0,
     avatarUrl: "./avatars/00012-1122923993.png",

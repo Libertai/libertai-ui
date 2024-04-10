@@ -76,6 +76,8 @@
   </q-page>
 </template>
 <script>
+import { defaultChatTopic } from "src/utils/chat";
+
 // Import State
 import { useModelsStore } from "src/stores/models-store";
 import { useChatsStore } from "src/stores/chats-store";
@@ -98,11 +100,12 @@ export default defineComponent({
 
     const modelsStore = useModelsStore();
     const chatsStore = useChatsStore();
+    // TODO: We probably don't need to use a store for this
     const personasStore = usePersonasStore();
 
     // Our local page state
 
-    // TODO: what does this do?
+    // Control whether the advanced persona customization is shown
     const advancedShownRef = ref(false);
     // Persona selection state -- set to the first persona by default
     const selectedPersonaRef = ref(personasStore.personas[0]);
@@ -122,22 +125,21 @@ export default defineComponent({
 
     async function sendMessage() {
       let message = messageInputRef.value;
-      console.log("page::NewChat::sendMessage");
       if (message.length === 0) {
-        console.log("page::NewChat::sendMessage: message is empty");
+        console.warn("page::NewChat::sendMessage: message is empty");
         return;
       }
 
       // Extract the values out of our relevant refs
-      let title = "New Chat";
+      let title = defaultChatTopic;
       let username = usernameInputRef.value;
+      // NOTE: these are refs to the store, so we need to deep clone them
       let model = JSON.parse(JSON.stringify(modelsStore.selectedModel));
       let persona = JSON.parse(JSON.stringify(selectedPersonaRef.value));
 
-      // Creates the new chat and sets it as the current chat within the store
+      // Creates the new chat
       let chat = await chatsStore.createChat(title, username, model, persona);
-      console.log("page::NewChat::sendMessage: created new chat", chat);
-      // Appends the user message to the chat
+      // Append the first user message to the chat history
       await chatsStore.appendUserMessage(chat.id, message);
 
       // Set the message to empty

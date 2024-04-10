@@ -1,11 +1,11 @@
 import { defineStore } from "pinia";
 
-import { modelsConfig } from "../utils/models.js";
+import { defaultModels } from "../utils/models.js";
 
 export const useModelsStore = defineStore("models", {
   state: () => ({
-    models: modelsConfig,
-    selectedModel: modelsConfig[0],
+    models: defaultModels,
+    selectedModel: defaultModels[0],
   }),
   getters: {},
   actions: {
@@ -16,7 +16,7 @@ export const useModelsStore = defineStore("models", {
     },
     setModelByURL(modelUrl) {
       console.log("searching for", modelUrl);
-      for (let model of modelsConfig)
+      for (let model of defaultModels)
         if (model.apiUrl == modelUrl) {
           console.log("found", model.name, model.apiUrl);
           this.selectedModel = model;

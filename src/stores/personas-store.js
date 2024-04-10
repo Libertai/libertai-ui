@@ -1,11 +1,11 @@
 import { defineStore } from "pinia";
 
-import { personasConfig } from "../utils/personas.js";
+import { defaultPersonas } from "../utils/personas.js";
 
 export const usePersonasStore = defineStore("personas", {
   state: () => ({
-    personas: personasConfig,
-    persona: personasConfig[0],
+    personas: defaultPersonas,
+    persona: defaultPersonas[0],
   }),
   getters: {},
   actions: {
