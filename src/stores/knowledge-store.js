@@ -25,7 +25,6 @@ export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
         docs.push(doc);
       }
       await Promise.all(addedDocuments);
-      console.log('stores::knowledge-store::load', docs);
       this.documents = docs;
       return;
     },
