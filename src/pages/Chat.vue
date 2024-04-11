@@ -462,11 +462,11 @@ export default defineComponent({
 }
 
 /* Adjust the size of the message bar */
-code.hljs .row.items-center.q-mb-md.q-mr-md {
+.row.items-center.q-mb-md.q-mr-md {
   width: calc(100% - 32px);
 }
 
-{
+code.hljs {
   border-radius: 8px;
   font-size: 0.9em;
 }
