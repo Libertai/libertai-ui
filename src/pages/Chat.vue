@@ -68,16 +68,53 @@
       </q-list>
     </div>
 
-    <!-- And finally ...  input for sending messages! -->
-    <message-input :isLoading="isLoadingRef" @sendMessage="sendMessage" v-model="inputTextRef" ref="inputRef" />
+    <div class="row items-center q-mb-md q-mr-md">
+      <!-- "+" icon for uploading files, shown only when knowledge search is enabled -->
+      <q-btn
+        v-if="enableKnowledgeRef"
+        flat
+        round
+        icon="add"
+        class="cursor-pointer q-mr-md"
+        @click="openKnowledgeUploader"
+      />
 
-    <!-- Enable edit mode -->
-    <q-checkbox v-model="enableEditRef" left-label class="q-mr-lg q-mb-md fixed-bottom-right">
-      <q-tooltip anchor="top right" class="bg-primary" self="bottom right"
-        >When this is activated, just click on a message to start editing it.</q-tooltip
-      >
-      Enable edits
-    </q-checkbox>
+      <!-- Input for sending messages -->
+      <message-input
+        :isLoading="isLoadingRef"
+        @sendMessage="sendMessage"
+        v-model="inputTextRef"
+        ref="inputRef"
+        class="col"
+      />
+    </div>
+    <div class="fixed-bottom-right q-mb-md q-mr-md" style="z-index: 10">
+      <div class="q-gutter-x-md" style="display: flex; align-items: center; justify-content: flex-end">
+        <!-- Enable edit mode -->
+        <q-checkbox v-model="enableEditRef" left-label>
+          <q-tooltip anchor="top right" class="bg-primary" self="bottom right">
+            When this is activated, just click on a message to start editing it.
+          </q-tooltip>
+          Enable edits
+        </q-checkbox>
+
+        <!-- Enable knowledge search -->
+        <q-checkbox v-model="enableKnowledgeRef" left-label>
+          <q-tooltip anchor="top right" class="bg-primary" self="bottom right">
+            When this is activated, the AI will search for relevant documents based on your last message.
+          </q-tooltip>
+          Enable knowledge search
+        </q-checkbox>
+      </div>
+    </div>
+    <q-dialog v-model="showKnowledgeUploaderRef" position="bottom">
+      <KnowledgeStoreUploader
+        label="Auto KnowledgeStoreUploader"
+        auto-upload
+        url="http://localhost:4444/upload"
+        multiple
+      />
+    </q-dialog>
   </q-page>
 </template>
 
@@ -127,6 +164,8 @@ export default defineComponent({
     const inputRef = ref(null);
     const scrollAreaRef = ref(null);
     const enableEditRef = ref(false);
+    const showKnowledgeUploaderRef = ref(false);
+    const enableKnowledgeRef = ref(true);
 
     // Chat specific state
     const chatRef = ref();
@@ -223,19 +262,19 @@ export default defineComponent({
         isLoadingRef.value = true;
         hasResetRef.value = false;
 
-        // TODO: this is naive and non-configurable, but ok for now
-
-        // NOTE: assuming last message is gauranteed to be non-empty and the user's last message
-        // Get the last message from the user
-        let lastMessage = messages[messages.length - 1];
-        let searchResults = await knowledgeStore.searchDocuments(lastMessage.content);
-        searchResults.forEach((result) => {
-          console.log('pages::Chat.vue::generatePersonaMessage - embedding search result', result);
-          messages.push({
-            role: 'search-result',
-            content: result.content,
+        if (enableKnowledgeRef.value) {
+          // NOTE: assuming last message is gauranteed to be non-empty and the user's last message
+          // Get the last message from the user
+          let lastMessage = messages[messages.length - 1];
+          let searchResults = await knowledgeStore.searchDocuments(lastMessage.content);
+          searchResults.forEach((result) => {
+            console.log('pages::Chat.vue::generatePersonaMessage - embedding search result', result);
+            messages.push({
+              role: 'search-result',
+              content: result.content,
+            });
           });
-        });
+        }
 
         // Generate a stream of responses from the AI
         for await (const output of inferenceEngine.generateAnswer(
@@ -350,7 +389,7 @@ export default defineComponent({
 
       // Determine if there are messages we need to repsond to
       // NOTE: this is assuming all chats should be initiated by the user
-      if (messages.length == 1) {
+      if (messages.length % 2 === 1) {
         await generatePersonaMessage();
       }
       nextTick(scrollBottom);
@@ -385,6 +424,10 @@ export default defineComponent({
       hasResetRef.value = true;
     }
 
+    function openKnowledgeUploader() {
+      showKnowledgeUploaderRef.value = true;
+    }
+
     return {
       scrollAreaRef,
       chatRef,
@@ -395,7 +438,10 @@ export default defineComponent({
       inputRef,
       inputTextRef,
       sendMessage,
+      showKnowledgeUploaderRef,
+      openKnowledgeUploader,
       enableEditRef,
+      enableKnowledgeRef,
       regenerateMessage,
       updateChatMessageContent,
       copyMessage,
@@ -405,6 +451,15 @@ export default defineComponent({
 });
 </script>
 <style>
+/* Ensure message input expands to fill available space */
+.message-input {
+  width: 100%; /* Adjust as needed to ensure proper sizing */
+}
+
+/* Adjust the size of the message bar */
+.row.items-center.q-mb-md.q-mr-md {
+  width: calc(100% - 20px); /* Adjust the subtraction value based on desired padding/margins */
+}
 code.hljs {
   border-radius: 8px;
   font-size: 0.9em;

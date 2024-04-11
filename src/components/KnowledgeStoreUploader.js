@@ -1,107 +1,64 @@
 import { createUploaderComponent } from 'quasar';
 import { computed, ref } from 'vue';
-import { useKnowledgeStore } from '../stores/knowledge-store';
-// import * as pdfjsLib from 'pdfjs-dist/webpack';
-// console.log(pdfjsLib)
+
+// State
+import { useKnowledgeStore } from 'src/stores/knowledge-store';
+
+// Get PDF.js from the window object
 const pdfjsLib = window.pdfjsLib;
 
-/* pdf upload example code:
-
-async extractTextFromPdf(pdfUrl) {
-            console.log("called")
-            // set loading to true before processing the PDF
-            this.loading = true;
-
-            const pdf = await window.pdfjsLib.getDocument(pdfUrl).promise;
-            console.log(pdf)
-            const maxPages = pdf.numPages;
-            let textContent = [];
-
-            for (let i = 1; i <= maxPages; i++) {
-                const page = await pdf.getPage(i);
-                const content = await page.getTextContent();
-                const pageTextContent = content.items.map(item => item.str).join('');
-                textContent.push(pageTextContent);
-            }
-            console.log("textContent")
-
-            // set loading to false when the PDF processing is complete
-            this.loading = false;
-
-            return textContent.join('\n');
-        },
-
-        async handleFileUpload(event) {
-            console.log(event)
-
-            const file = event.target.files[0];
-            const extension = file.name.split('.').pop();
-
-            if (extension !== 'pdf') {
-                alert('Please select a PDF file');
-                return;
-            }
-
-            const reader = new FileReader();
-
-            reader.onload = async () => {
-                const dataUrl = reader.result;
-
-                // set loading to true before extracting text from the PDF
-                this.loading = true;
-
-                const text = await this.extractTextFromPdf(dataUrl);
-                this.extractedText = text;
-                this.localValue.context_document = text;
-
-                // set loading to false when the text extraction is complete
-                this.loading = false;
-            };
-
-            reader.readAsDataURL(file);
-        },
-
-        */
-
-// export a Vue component
 export default createUploaderComponent({
   name: 'KnowledgeStoreUploader',
-  props: {
-    // ...your custom props
-  },
-  emits: [
-    // ...your custom events name list
-  ],
-  injectPlugin({ props, emit, helpers }) {
+  props: {},
+  emits: [],
+  injectPlugin({ _props, _emit, helpers }) {
     const loading = ref(false);
 
-    async function extractTextFromPdf(pdfUrl) {
-      console.log('called');
-      // set loading to true before processing the PDF
+    // Map of file objects to their status as either 'queued', 'uploading', 'embedding', 'uploaded', or 'failed'
+    const fileStatus = ref({});
+
+    // Upload Logic
+    async function upload(_args) {
+      // Set the loading state
       loading.value = true;
-      console.log(pdfUrl);
-      let pdf;
-      try {
-        pdf = await pdfjsLib.getDocument(pdfUrl).promise;
-      } catch (error) {
-        console.log(error);
-      }
-      console.log(pdf);
-      const maxPages = pdf.numPages;
-      let textContent = [];
+      const files = helpers.queuedFiles.value;
+      console.log(`components::KnowledgeStoreUploader::upload - files: ${files}`);
+      fileStatus.value = {};
+      fileStatus.value = files.reduce((acc, file) => {
+        acc[file.name] = 'queued';
+        return acc;
+      });
 
-      for (let i = 1; i <= maxPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        const pageTextContent = content.items.map((item) => item.str).join('\n\n---\n\n');
-        textContent.push(pageTextContent);
-      }
-      console.log(textContent);
+      // Load our state
+      const knowledgeStore = useKnowledgeStore();
 
-      // set loading to false when the PDF processing is complete
+      let uploads = [];
+      // TODO: workers would be preferred here
+      // Handle Each File in Sequence
+      for (let file of files) {
+        let result = async () => {
+          try {
+            fileStatus.value[file.name] = 'uploading';
+            helpers.updateFileStatus(file, 'uploading');
+            let { title, text } = await processFile(file);
+            fileStatus.value[file.name] = 'embedding';
+            helpers.updateFileStatus(file, 'embedding');
+            await knowledgeStore.addDocument(title, text);
+            fileStatus.value[file.name] = 'uploaded';
+            helpers.updateFileStatus(file, 'uploaded');
+          } catch (error) {
+            console.error(error);
+            fileStatus.value[file.name] = 'failed';
+            helpers.updateFileStatus(file, 'failed');
+            console.error(`components::KnowledgeStoreUploader::upload - error: ${error}`);
+          }
+        };
+        uploads.push(result());
+      }
+      // Resolve all uploads
+      await Promise.all(uploads);
+      // Reset the loading state
       loading.value = false;
-
-      return textContent.join('\n');
     }
 
     const isUploading = computed(() => {
@@ -115,51 +72,61 @@ export default createUploaderComponent({
     });
 
     function abort() {
-      // ...
+      fileStatus.value = {};
     }
 
-    async function upload(args) {
-      console.log(args);
-      console.log(props, emit, helpers);
-      const files = helpers.queuedFiles.value;
-      console.log(files);
-
-      const knowledgeStore = useKnowledgeStore();
-
-      // now for each file, handle it.
-      for (let file of files) {
-        console.log(file);
-        if (file.type === 'application/pdf') {
-          const url = URL.createObjectURL(file);
-          const text = await extractTextFromPdf(url);
-          const title = file.name;
-          await knowledgeStore.addDocument(title, text);
-          helpers.updateFileStatus(file, 'uploaded');
-        } else if (file.type === 'text/plain') {
-          const reader = new FileReader();
+    /**
+     * Extract tile, text from a file
+     * @param {File} file
+     * @returns {Promise<{title: string, text: string}>}
+     */
+    async function processFile(file) {
+      const title = file.name;
+      let text = '';
+      const reader = new FileReader();
+      switch (file.type) {
+        case 'application/pdf':
+          text = await extractTextFromPdfFile(file);
+          break;
+        case 'text/plain':
           reader.onload = async (event) => {
-            const content = event.target.result;
-            const title = file.name;
-            await knowledgeStore.addDocument(title, content);
-            helpers.updateFileStatus(file, 'uploaded');
+            text = event.target.result;
           };
           reader.readAsText(file);
-        } else {
-          helpers.updateFileStatus(file, 'failed');
-        }
+          break;
+        default:
+          throw new Error('Unsupported file type');
       }
-
-      // const file = props.files[0]
-      // if (file.type === 'application/pdf') {
-      //   const reader = new FileReader()
-      //   reader.onload = async (event) => {
-      //     const content = event.target.result
-      //     const title = file.name
-      //     await useKnowledge.addDocument(title, content)
-      //   }
-      //   reader.readAsText(file)
-      // }
+      return { title, text };
     }
+
+    /**
+     * Extract text from a PDF file
+     * @param {File} file
+     * @returns {Promise<string>}
+     */
+    async function extractTextFromPdfFile(file) {
+      const pdfUrl = URL.createObjectURL(file);
+
+      let pdf;
+      try {
+        pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+      } catch (error) {
+        console.error(`components::KnowledgeStoreUploader::extractTextFromPdfFile - error: ${error}`);
+        throw new Error('Failed to extract text from PDF');
+      }
+      const maxPages = pdf.numPages;
+      let textContent = [];
+
+      for (let i = 1; i <= maxPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const pageTextContent = content.items.map((item) => item.str).join(' ');
+        textContent.push(pageTextContent);
+      }
+      return textContent.join('');
+    }
+
     return {
       isUploading,
       isBusy,
