@@ -75,8 +75,9 @@
         flat
         round
         icon="add"
-        class="cursor-pointer q-mr-md"
+        class="cursor-pointer q-mr-sm"
         @click="openKnowledgeUploader"
+        style="margin-left: 16px"
       />
 
       <!-- Input for sending messages -->
@@ -96,14 +97,6 @@
             When this is activated, just click on a message to start editing it.
           </q-tooltip>
           Enable edits
-        </q-checkbox>
-
-        <!-- Enable knowledge search -->
-        <q-checkbox v-model="enableKnowledgeRef" left-label>
-          <q-tooltip anchor="top right" class="bg-primary" self="bottom right">
-            When this is activated, the AI will search for relevant documents based on your last message.
-          </q-tooltip>
-          Enable knowledge search
         </q-checkbox>
       </div>
     </div>
@@ -133,6 +126,7 @@ import { LlamaCppApiEngine } from '@libertai/libertai-js';
 import { useChatsStore } from '../stores/chats-store';
 import { useModelsStore } from '../stores/models-store';
 import { useKnowledgeStore } from '../stores/knowledge-store';
+import { useAccount } from 'src/stores/account';
 
 // Components
 import MarkdownRenderer from '../components/MarkdownRenderer.vue';
@@ -153,6 +147,7 @@ export default defineComponent({
     const router = useRouter();
 
     // App state
+    const account = useAccount();
     const chatsStore = useChatsStore();
     const modelsStore = useModelsStore();
     const knowledgeStore = useKnowledgeStore();
@@ -164,8 +159,8 @@ export default defineComponent({
     const inputRef = ref(null);
     const scrollAreaRef = ref(null);
     const enableEditRef = ref(false);
-    const showKnowledgeUploaderRef = ref(false);
     const enableKnowledgeRef = ref(true);
+    const showKnowledgeUploaderRef = ref(false);
 
     // Chat specific state
     const chatRef = ref();
@@ -192,6 +187,15 @@ export default defineComponent({
       () => route.params.id,
       async (newId) => {
         await setChat(newId);
+      },
+    );
+
+    // Update whether we should show the knowledge uploader based on whether the user is connected
+    watch(
+      () => account.active,
+      (active) => {
+        console.log('pages::Chat.vue::watch - account.active', active);
+        enableKnowledgeRef.value = active;
       },
     );
 
@@ -262,19 +266,17 @@ export default defineComponent({
         isLoadingRef.value = true;
         hasResetRef.value = false;
 
-        if (enableKnowledgeRef.value) {
-          // NOTE: assuming last message is gauranteed to be non-empty and the user's last message
-          // Get the last message from the user
-          let lastMessage = messages[messages.length - 1];
-          let searchResults = await knowledgeStore.searchDocuments(lastMessage.content);
-          searchResults.forEach((result) => {
-            console.log('pages::Chat.vue::generatePersonaMessage - embedding search result', result);
-            messages.push({
-              role: 'search-result',
-              content: result.content,
-            });
+        // NOTE: assuming last message is gauranteed to be non-empty and the user's last message
+        // Get the last message from the user
+        let lastMessage = messages[messages.length - 1];
+        let searchResults = await knowledgeStore.searchDocuments(lastMessage.content);
+        searchResults.forEach((result) => {
+          console.log('pages::Chat.vue::generatePersonaMessage - embedding search result', result);
+          messages.push({
+            role: 'search-result',
+            content: result.content,
           });
-        }
+        });
 
         // Generate a stream of responses from the AI
         for await (const output of inferenceEngine.generateAnswer(
@@ -347,6 +349,9 @@ export default defineComponent({
 
     // Set a chat by its ID
     async function setChat(chatId) {
+      // This is annoying but we need to set whether the user is connected
+      enableKnowledgeRef.value = account.active;
+
       // Load the chat from the store and set it
       chatRef.value = await chatsStore.readChat(chatId);
       if (!chatRef.value) {
@@ -457,10 +462,11 @@ export default defineComponent({
 }
 
 /* Adjust the size of the message bar */
-.row.items-center.q-mb-md.q-mr-md {
-  width: calc(100% - 20px); /* Adjust the subtraction value based on desired padding/margins */
+code.hljs .row.items-center.q-mb-md.q-mr-md {
+  width: calc(100% - 32px);
 }
-code.hljs {
+
+{
   border-radius: 8px;
   font-size: 0.9em;
 }
