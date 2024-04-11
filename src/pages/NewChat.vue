@@ -1,10 +1,8 @@
 <template>
-  <q-page
-    class="align-items-center"
-    style="display: flex; flex-direction: column"
-  >
+  <q-page class="align-items-center" style="display: flex; flex-direction: column">
+    <!-- Persona Selection -->
     <q-tabs
-      v-model="selectedRoomId"
+      v-model="selectedPersonaIdRef"
       narrow-indicator
       dense
       align="justify"
@@ -13,44 +11,30 @@
       mobile-arrows
       class="q-pa-lg"
     >
-      <q-tab
-        v-for="prompt of prompts.prompts"
-        :key="prompt.roomId"
-        :name="prompt.roomId"
-      >
+      <q-tab v-for="persona of personasStore.personas" :key="persona.id" :name="persona.id">
         <q-avatar size="64px" color="white" class="q-mb-xs">
-          <img :src="prompt.avatar" class="q-pa-xs" />
+          <img :src="persona.avatarUrl" class="q-pa-xs" />
         </q-avatar>
-        {{ prompt.roomName }}
+        {{ persona.roomName }}
       </q-tab>
     </q-tabs>
 
     <q-expansion-item
-      v-model="advancedShown"
-      :icon="'img:' + selectedPrompt.avatar"
+      v-model="advancedShownRef"
+      :icon="'img:' + selectedPersonaRef.avatarUrl"
       label="Customize"
       style="flex-grow: 1"
       class="q-pa-lg"
     >
       <q-card>
         <q-card-section class="row q-col-gutter-sm">
-          <q-input
-            v-model="localValue.users[0].username"
-            label="Your name"
-            standout
-            class="col-6"
-          />
-          <q-input
-            v-model="localValue.users[1].username"
-            label="Persona name"
-            standout
-            class="col-6"
-          />
+          <q-input v-model="usernameInputRef" placeholder="user" label="Your name" standout class="col-6" />
+          <q-input v-model="selectedPersonaRef.name" label="Persona name" standout class="col-6" />
         </q-card-section>
         <q-card-section class="">
           <q-input
             autogrow
-            v-model="localValue.persona"
+            v-model="selectedPersonaRef.description"
             type="textarea"
             label="Persona Description"
             standout
@@ -62,7 +46,7 @@
     <div class="q-pb-xl">
       <message-input
         @sendMessage="sendMessage"
-        v-model="message"
+        v-model="messageInputRef"
         ref="input"
         hint="Disclaimer: This chat bot uses personas for entertainment and informational purposes only. The
                 chat bot's responses are not a reflection of any real person or organization's views or opinions, and should not
@@ -74,97 +58,96 @@
   </q-page>
 </template>
 <script>
-import { calculateNumberOfTokens } from "../utils/chat";
-import { useModels } from "src/stores/models";
-import { useChats } from "src/stores/chats";
-import { usePrompts } from "src/stores/prompts";
-import { defineComponent, ref, watch } from "vue";
-import { v4 as uuidv4 } from "uuid";
-import { createMessage } from "../utils/chat";
-import { useRouter } from "vue-router";
-import MessageInput from "src/components/MessageInput.vue";
+import { defaultChatTopic } from 'src/utils/chat';
+
+// Import State
+import { useModelsStore } from 'src/stores/models-store';
+import { useChatsStore } from 'src/stores/chats-store';
+import { usePersonasStore } from 'src/stores/personas-store';
+import { defineComponent, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+
+// Import components
+import MessageInput from 'src/components/MessageInput.vue';
 
 export default defineComponent({
-  name: "NewChat",
+  name: 'NewChat',
   components: {
     MessageInput,
   },
   setup() {
-    const models = useModels();
-    const chats = useChats();
-    const prompts = usePrompts();
     const router = useRouter();
 
-    const maxDocumentTokens = models.model.maxTokens - 2048;
-    const advancedShown = ref(false);
-    const selectedPrompt = ref(prompts.prompts[0]);
-    const localValue = ref(JSON.parse(JSON.stringify(prompts.prompts[0])));
-    const selectedRoomId = ref(prompts.prompts[0].roomId);
+    // Stored State
 
-    // now watch for that roomid change
+    const modelsStore = useModelsStore();
+    const chatsStore = useChatsStore();
+    // TODO: We probably don't need to use a store for this
+    const personasStore = usePersonasStore();
+
+    // Our local page state
+
+    // Control whether the advanced persona customization is shown
+    const advancedShownRef = ref(false);
+    // Persona selection state -- set to the first persona by default
+    const selectedPersonaRef = ref(personasStore.personas[0]);
+    const selectedPersonaIdRef = ref(personasStore.personas[0].id);
+    // Username input state
+    const usernameInputRef = ref('user');
+    // Message input state
+    const messageInputRef = ref('');
+
+    // now watch for that id change
     watch(
-      () => selectedRoomId.value,
+      () => selectedPersonaIdRef.value,
       (newId) => {
-        setPrompt(newId);
+        setPersona(newId);
       },
     );
 
-    const message = ref("");
-
-    function sendMessage() {
-      if (message.value.length === 0) {
+    async function sendMessage() {
+      let message = messageInputRef.value;
+      if (message.length === 0) {
+        console.warn('page::NewChat::sendMessage: message is empty');
         return;
       }
-      const chat = {
-        id: uuidv4(),
-        title: "",
-        model: JSON.parse(JSON.stringify(models.model)), // we copy the model
-        prompt: localValue.value,
-        messages: [],
-      };
-      // const chat = {
-      //     roomId: selectedPrompt.value.roomId,
-      //     message: message.value,
-      //     localValue: localValue.value,
-      //     model: models.model.id,
-      //     temperature: 0.72,
-      //     maxLength: 100,
-      // }
-      console.log(chats);
-      const user = localValue.value.users[0];
-      const userMessage = createMessage(user._id, user.username, message.value);
-      chat.messages.push(userMessage);
 
-      chats.addChat(chat);
-      message.value = "";
-      router.push({ name: "chat", params: { id: chat.id } });
+      // Extract the values out of our relevant refs
+      let title = defaultChatTopic;
+      let username = usernameInputRef.value;
+      // NOTE: these are refs to the store, so we need to deep clone them
+      let model = JSON.parse(JSON.stringify(modelsStore.selectedModel));
+      let persona = JSON.parse(JSON.stringify(selectedPersonaRef.value));
+
+      // Creates the new chat
+      let chat = await chatsStore.createChat(title, username, model, persona);
+      // Append the first user message to the chat history
+      await chatsStore.appendUserMessage(chat.id, message);
+
+      // Set the message to empty
+      messageInputRef.value = '';
+      // Navigate to the chat page
+      router.push({ name: 'chat', params: { id: chat.id } });
     }
 
-    function setPrompt(roomId) {
-      selectedPrompt.value = prompts.prompts.find(
-        (prompt) => prompt.roomId === roomId,
-      );
-      // we pass the prompt to json and back to get a local copy
-      localValue.value = JSON.parse(JSON.stringify(selectedPrompt.value));
+    function setPersona(id) {
+      selectedPersonaRef.value = personasStore.personas.find((persona) => persona.id === id);
     }
 
     return {
-      maxDocumentTokens,
-      advancedShown,
-      localValue,
-      selectedPrompt,
-      selectedRoomId,
-      message,
+      advancedShownRef,
+      selectedPersonaRef,
+      selectedPersonaIdRef,
+      usernameInputRef,
+      messageInputRef,
       sendMessage,
-      setPrompt,
-      models,
-      prompt: ref(prompts.prompt),
-      prompts,
+      setPersona,
+      modelsStore,
+      personasStore,
       localSettings: {
         temperature: 0.72,
         maxLength: 100,
       },
-      calculateNumberOfTokens: calculateNumberOfTokens,
     };
   },
 });

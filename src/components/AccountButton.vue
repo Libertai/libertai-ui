@@ -1,14 +1,6 @@
 <template>
   <div style="display: inline-block">
-    <q-btn
-      round
-      dense
-      flat
-      icon="wallet"
-      @click="show"
-      class="lt-md"
-      color="white"
-    />
+    <q-btn round dense flat icon="wallet" @click="show" class="lt-md" color="white" />
     <q-btn
       @click="eth_web3_login"
       color="primary"
@@ -29,9 +21,7 @@
       :label="`${account.address.slice(0, 5)}...${account.address.slice(-5)}`"
       v-else
     >
-      <div
-        class="row no-wrap q-pa-md q-pt-none bg-primary border-primary-highlight"
-      >
+      <div class="row no-wrap q-pa-md q-pt-none bg-primary border-primary-highlight">
         <div class="column items-center">
           <div class="text-small q-mb-xs">{{ account.address }}</div>
 
@@ -53,8 +43,8 @@
 </template>
 
 <script setup>
-import { ethers } from "ethers";
-import { useAccount } from "../stores/account";
+import { ethers } from 'ethers';
+import { useAccount } from '../stores/account';
 console.log(ethers);
 
 const account = useAccount();
@@ -65,20 +55,18 @@ async function eth_web3_login() {
     try {
       // Request account access if needed
       await window.ethereum.enable();
-      let provider = new ethers.providers.Web3Provider(
-        window["ethereum"] || window.web3.currentProvider,
-      );
+      let provider = new ethers.providers.Web3Provider(window['ethereum'] || window.web3.currentProvider);
       await account.setProvider(provider);
     } catch (error) {
       console.log(error);
       // User denied account access...
     }
   } else {
-    alert("No ethereum provider detected. Please install metamask or similar.");
+    alert('No ethereum provider detected. Please install metamask or similar.');
   }
   console.log(account);
   if (!account.active) {
-    alert("Error getting web3 account");
+    alert('Error getting web3 account');
     return;
   }
 }

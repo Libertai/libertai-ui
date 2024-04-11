@@ -35,11 +35,11 @@ const props = defineProps({
   },
   hint: {
     type: String,
-    default: "",
+    default: '',
   },
 });
 
-const emit = defineEmits(["sendMessage"]);
+const emit = defineEmits(['sendMessage']);
 const model = defineModel();
 const sendMessage = (event) => {
   if (event.shiftKey) {
@@ -50,7 +50,7 @@ const sendMessage = (event) => {
 
   if (!model.value.trim()) return;
   let content = model.value;
-  emit("sendMessage", content);
+  emit('sendMessage', content);
 };
 // return {
 //   model,

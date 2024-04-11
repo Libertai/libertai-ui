@@ -3,22 +3,21 @@
 </template>
 
 <script>
-import { defineComponent, onMounted } from "vue";
-import { useChats } from "stores/chats";
-import { useKnowledgeDBStore } from "./stores/knowledge-db";
+import { defineComponent, onMounted } from 'vue';
+import { useChatsStore } from 'stores/chats-store';
+import { useKnowledgeStore } from './stores/knowledge-store';
 
 export default defineComponent({
-  name: "App",
+  name: 'App',
   setup() {
-    const chats = useChats();
-    chats.loadFromStorage();
-    const knowledge = useKnowledgeDBStore();
+    const chatsStore = useChatsStore();
+    const knowledgeStore = useKnowledgeStore();
     onMounted(() => {
-      knowledge.load();
+      // Set the knowledge store and chats store to load when the app is mounted
+      knowledgeStore.load();
+      chatsStore.load();
     });
-
     return {};
   },
 });
 </script>
-./stores/knowledge-db

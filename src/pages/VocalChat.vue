@@ -19,26 +19,25 @@
   </q-page>
 </template>
 <script setup>
-import { defineComponent, ref, onMounted, nextTick } from "vue";
-import OpenAI from "openai";
+import { ref, onMounted, nextTick } from 'vue';
+import OpenAI from 'openai';
 const openai = new OpenAI({
-  apiKey: "libertai",
+  apiKey: 'libertai',
   dangerouslyAllowBrowser: true,
-  baseURL: "http://46.255.204.205:5110/v1/", // For OpenHermes-2.5
+  baseURL: 'http://46.255.204.205:5110/v1/', // For OpenHermes-2.5
 });
 
 // Initialize the entries array
 const entries = ref([]);
 
-window.SpeechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
+window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
 
 // let's define some functions
 // to tell a message aloud
 async function speak(message) {
   const utterance = new SpeechSynthesisUtterance(message);
-  utterance.lang = "fr-FR";
+  utterance.lang = 'fr-FR';
   recognition.abort();
 
   await new Promise(function (resolve) {
@@ -51,8 +50,8 @@ async function speak(message) {
 // now to call the ai, using openai chat api
 async function ask(question) {
   const chatCompletion = await openai.chat.completions.create({
-    messages: [{ role: "user", content: question }],
-    model: "openhermes-2.5",
+    messages: [{ role: 'user', content: question }],
+    model: 'openhermes-2.5',
     max_tokens: 128,
   });
   console.log(chatCompletion);
@@ -61,10 +60,10 @@ async function ask(question) {
   entries.value.push({
     id: entries.value.length,
     sent: false,
-    name: "AI",
+    name: 'AI',
     text: answer,
     isFinal: true,
-    avatar: "https://cdn.quasar.dev/img/avatar.png",
+    avatar: 'https://cdn.quasar.dev/img/avatar.png',
   });
   await nextTick();
   speak(answer);
@@ -74,14 +73,14 @@ onMounted(() => {
   // We start the speech recognition
   var speech = true;
   recognition.interimResults = true;
-  recognition.lang = "fr-FR";
+  recognition.lang = 'fr-FR';
   var last_entry = null;
-  recognition.addEventListener("result", (e) => {
+  recognition.addEventListener('result', (e) => {
     console.log(e.results);
     const transcript = Array.from(e.results)
       .map((result) => result[0])
       .map((result) => result.transcript)
-      .join("");
+      .join('');
     console.log(transcript);
 
     // We add the transcript to the entries array, only if we weren't working on it yet (final arg)
@@ -91,10 +90,10 @@ onMounted(() => {
       entries.value.push({
         id: last_entry,
         sent: true,
-        name: "You",
+        name: 'You',
         text: transcript,
         isFinal: e.results[0].isFinal,
-        avatar: "https://cdn.quasar.dev/img/avatar.png",
+        avatar: 'https://cdn.quasar.dev/img/avatar.png',
       });
       // last_entry = transcript;
     } else {
@@ -109,7 +108,7 @@ onMounted(() => {
   console.log(speech);
   if (speech == true) {
     recognition.start();
-    recognition.addEventListener("end", recognition.start);
+    recognition.addEventListener('end', recognition.start);
   }
 });
 </script>

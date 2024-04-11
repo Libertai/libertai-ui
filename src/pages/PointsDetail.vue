@@ -4,24 +4,21 @@
       <q-card flat class="col-12 text-center">
         <q-card-section class="bg-dark-page">
           <p class="q-py-md">
-            <span class="text-white bg-primary q-py-sm q-px-xl rounded">{{
-              address
-            }}</span>
+            <span class="text-white bg-primary q-py-sm q-px-xl rounded">{{ address }}</span>
           </p>
           <div class="text-h4 text-bold q-pb-sm">Your Libertai Points</div>
           <p>
-            Run aleph.im network nodes, stake ALEPH to continue earning Libertai
-            points. New ways will be available soon!
+            Run aleph.im network nodes, stake ALEPH to continue earning Libertai points. New ways will be available
+            soon!
           </p>
         </q-card-section>
         <q-card-section class="q-pt-none bg-dark-page">
           <p class="text-h6 text-bold text-light">Total Points Received</p>
 
           <p class="q-py-md">
-            <span
-              class="text-h4 text-bold text-white bg-light q-py-sm q-px-xl rounded"
-              >{{ points.getAddressPoints(address).toFixed(2) }}</span
-            >
+            <span class="text-h4 text-bold text-white bg-light q-py-sm q-px-xl rounded">{{
+              points.getAddressPoints(address).toFixed(2)
+            }}</span>
           </p>
         </q-card-section>
       </q-card>
@@ -29,56 +26,43 @@
         <q-card-section class="bg-primary">
           <p class="text-h6 text-bold text-white">Pending Points</p>
           <p class="q-py-md">
-            <span
-              class="text-h4 text-bold text-light bg-white q-py-sm q-px-xl rounded"
-              >{{ currentPendingPoints.toFixed(2) }}</span
-            >
+            <span class="text-h4 text-bold text-light bg-white q-py-sm q-px-xl rounded">{{
+              currentPendingPoints.toFixed(2)
+            }}</span>
           </p>
-          <p class="">
-            You are getting {{ hourlyRate.toFixed(2) }} points per hour.
-          </p>
+          <p class="">You are getting {{ hourlyRate.toFixed(2) }} points per hour.</p>
         </q-card-section>
       </q-card>
       <q-card flat class="col-6 text-center column">
         <q-card-section class="bg-primary">
           <p class="text-h6 text-bold text-white">36 Month estimated Points*</p>
           <p class="q-py-md">
-            <span
-              class="text-h4 text-bold text-light bg-white q-py-sm q-px-xl rounded"
-              >{{ ThreeYearsPoints.toFixed(2) }}</span
-            >
+            <span class="text-h4 text-bold text-light bg-white q-py-sm q-px-xl rounded">{{
+              ThreeYearsPoints.toFixed(2)
+            }}</span>
           </p>
         </q-card-section>
       </q-card>
       <p class="text-grey text-center col-12">
-        * Estimate only, and under current rules, if your participation stays at
-        the same level. <br />
-        The availability of Libertai Points is subject to change without notice.
-        We may suspend, modify, or terminate the program at our sole discretion
-        and without liability. Your participation does not guarantee that you
-        will receive any specific amount of points or tokens.
+        * Estimate only, and under current rules, if your participation stays at the same level. <br />
+        The availability of Libertai Points is subject to change without notice. We may suspend, modify, or terminate
+        the program at our sole discretion and without liability. Your participation does not guarantee that you will
+        receive any specific amount of points or tokens.
       </p>
     </div>
   </q-page>
 </template>
 
 <script>
-import {
-  defineComponent,
-  ref,
-  watch,
-  onMounted,
-  computed,
-  onBeforeUnmount,
-} from "vue";
-import { useRoute } from "vue-router";
-import { usePoints } from "../stores/points";
-import { useAccount } from "../stores/account";
-import { ethers } from "ethers";
-import { useRouter } from "vue-router";
+import { defineComponent, ref, watch, onMounted, computed, onBeforeUnmount } from 'vue';
+import { useRoute } from 'vue-router';
+import { usePoints } from '../stores/points';
+import { useAccount } from '../stores/account';
+import { ethers } from 'ethers';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
-  name: "PointsDetail",
+  name: 'PointsDetail',
   setup() {
     const route = useRoute();
     const router = useRouter();
@@ -114,7 +98,7 @@ export default defineComponent({
         console.log(address.value, oldAddress, newAddress);
         if (oldAddress == address.value) {
           router.push({
-            name: "points-detail",
+            name: 'points-detail',
             params: { address: newAddress },
           });
         }
@@ -124,9 +108,7 @@ export default defineComponent({
     const currentPendingPoints = ref(0);
     const hourlyRate = ref(0);
     async function updatePoints() {
-      const pendingInfo = await points.getAddressRealtimePendingPointsInfo(
-        address.value,
-      );
+      const pendingInfo = await points.getAddressRealtimePendingPointsInfo(address.value);
       hourlyRate.value = pendingInfo.hourlyRate;
       currentPendingPoints.value = pendingInfo.pending;
     }
@@ -140,7 +122,6 @@ export default defineComponent({
       const pendingTime = points.info.pending_time;
       const reward_start = points.info.reward_start;
       const totalDuration = pendingTime - lastTime;
-      const currentDuration = currentTime - lastTime;
       const currentTimeSinceStart = currentTime - reward_start;
       const daily_decay = points.info.daily_decay;
       const initial_ratio = points.info.ratio;
@@ -149,13 +130,10 @@ export default defineComponent({
       const current_ratio = initial_ratio * current_decay;
       console.log(current_ratio);
       // we extrapolate on what would a 10 days distribution be
-      let current_base =
-        ((pendingPoints / totalDuration) * 3600 * 24 * 10) / current_ratio;
+      let current_base = ((pendingPoints / totalDuration) * 3600 * 24 * 10) / current_ratio;
       if (current_base < 0) {
         // something is fishy
-        current_base =
-          ((currentPoints / (lastTime - firstTime)) * 3600 * 24 * 10) /
-          current_ratio;
+        current_base = ((currentPoints / (lastTime - firstTime)) * 3600 * 24 * 10) / current_ratio;
       }
       console.log(current_base);
 

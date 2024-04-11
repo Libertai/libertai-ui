@@ -55,8 +55,8 @@ module.exports = {
   rules: {
     "prefer-promise-reject-errors": "off",
 
-    "no-unused-vars": "warn",
     "no-undef": "warn",
+    "no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
 
     // allow debugger during development only
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
