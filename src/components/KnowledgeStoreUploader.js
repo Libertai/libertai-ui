@@ -76,28 +76,37 @@ export default createUploaderComponent({
     }
 
     /**
-     * Extract tile, text from a file
-     * @param {File} file
-     * @returns {Promise<{title: string, text: string}>}
+     * Extract title and text content from a file.
+     * Supports PDF and plain text files.
+     * @param {File} file - The file to process.
+     * @returns {Promise<{ title: string; text: string }>} - The extracted title and text content.
      */
     async function processFile(file) {
       const title = file.name;
-      let text = '';
-      const reader = new FileReader();
-      switch (file.type) {
-        case 'application/pdf':
-          text = await extractTextFromPdfFile(file);
-          break;
-        case 'text/plain':
-          reader.onload = async (event) => {
-            text = event.target.result;
-          };
-          reader.readAsText(file);
-          break;
-        default:
-          throw new Error('Unsupported file type');
+      let extractedText = '';
+
+      try {
+        switch (file.type) {
+          case 'application/pdf':
+            extractedText = await extractTextFromPdfFile(file);
+            break;
+          case 'text/plain':
+            extractedText = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = (event) => resolve(event.target.result);
+              reader.onerror = (error) => reject(error);
+              reader.readAsText(file);
+            });
+            break;
+          default:
+            throw new Error(`Unsupported file type: ${file.type}`);
+        }
+      } catch (error) {
+        console.error('Error processing file:', error);
+        throw error;
       }
-      return { title, text };
+
+      return { title, text: extractedText };
     }
 
     /**
