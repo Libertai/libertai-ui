@@ -6,22 +6,16 @@ export const KNOWLEDGE_STORE_PINIA_KEY = 'knowledge-store-pinia-key';
 
 export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
   state: () => ({
+    documents: [],
     knowledgeStore: new KnowledgeStore(),
   }),
   actions: {
-    documents() {
-      // Return all documents as a list
-      let docs = [];
-      for (const [_key, value] of this.knowledgeStore.documents) {
-        docs.push(value);
-      }
-      return docs;
-    },
-
     async load() {
       await this.knowledgeStore.load();
+      await this.knowledgeStore.prune();
       let defaultDocumentTitles = defaultKnowledge.map((doc) => doc.title);
-      let documentTitles = this.documents().map((doc) => doc.title);
+      const docs = Array.from(this.knowledgeStore.documents.values());
+      let documentTitles = docs.map((doc) => doc.title);
       // Check if default documents are already in the store
       let missingDocuments = defaultDocumentTitles.filter((title) => !documentTitles.includes(title));
       // Add missing documents
@@ -29,15 +23,22 @@ export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
       for (let title of missingDocuments) {
         let doc = defaultKnowledge.find((doc) => doc.title === title);
         addedDocuments.push(this.addDocument(doc.title, doc.content, doc.tags));
+        docs.push(doc);
       }
       await Promise.all(addedDocuments);
+      this.documents = docs;
       return;
     },
     async addDocument(title, content, tags = []) {
-      return await this.knowledgeStore.addDocument(title, content, tags);
+      let doc = await this.knowledgeStore.addDocument(title, content, tags);
+      this.documents.push(doc);
+    },
+    async removeDocument(documentId) {
+      await this.knowledgeStore.removeDocument(documentId);
+      this.documents = this.documents.filter((doc) => doc.id !== documentId);
     },
     async searchDocuments(query, tags = []) {
-      return await this.knowledgeStore.searchDocuments(query, 3, 18, tags);
+      return await this.knowledgeStore.searchDocuments(query, 3, 20, tags);
     },
   },
 });

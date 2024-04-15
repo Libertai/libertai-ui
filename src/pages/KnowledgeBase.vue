@@ -4,11 +4,6 @@
       <q-toolbar class="row justify-between items-center q-px-lg">
         <q-btn flat round dense @click="$router.push('/')" icon="home" />
         <q-toolbar-title>Knowledge Database</q-toolbar-title>
-        <q-btn flat round dense icon="add" @click="openForm" />
-      </q-toolbar>
-      <q-toolbar class="row justify-between items-center q-px-lg">
-        <q-toolbar-title>Search</q-toolbar-title>
-        <q-btn flat round dense icon="search" @click="searchDefault" />
       </q-toolbar>
     </q-header>
 
@@ -19,116 +14,74 @@
             <q-item v-for="document in documents" :key="document.id" clickable @click="onRowClick($event, document)">
               <q-item-section>
                 <q-item-label>{{ document.title }}</q-item-label>
-                <q-item-label caption>{{ document.description }}</q-item-label>
+              </q-item-section>
+              <!-- If the doucment is selected, show the deletion icon -->
+              <q-item-section side v-if="selectedDocumentId === document.id">
+                <q-btn-group flat dense>
+                  <q-btn icon="delete" @click="removeSelectedDocument(document.id)" />
+                  <q-tooltip>Remove Document</q-tooltip>
+                </q-btn-group>
               </q-item-section>
             </q-item>
           </q-list>
-          <!-- Placeholder query -->
-
-          <!-- Add/Edit Document Form -->
-          <q-dialog v-model="showForm" position="bottom">
-            <!--<q-card>
-              <q-card-section class="text-h6">{{ formTitle }}</q-card-section>
-              <q-card-section>
-                <q-form @submit.prevent="onSubmit" ref="addEditDocumentForm">
-                  <q-input v-model="editedDocument.title" label="Title"
-                    :rules="[val => val && val.length > 0 || 'Please enter a title']" />
-
-                  <q-input v-model="editedDocument.description" type="textarea" label="Description" />
-
-                  <q-file accept=".pdf,.docx,.txt" @update:modelValue="onFileChange" />
-                </q-form>
-              </q-card-section>
-              <q-card-actions align="right">
-                <q-btn flat label="Cancel" color="primary" v-close-popup />
-                <q-btn :disable="submitting" type="submit" color="primary" :label="formTitle" @click.stop
-                  @click="onSubmit" />
-              </q-card-actions>
-            </q-card>-->
-            haha
-            <KnowledgeStoreUploader
-              label="Auto KnowledgeStoreUploader"
-              auto-upload
-              url="http://localhost:4444/upload"
-              multiple
-            />
-          </q-dialog>
         </div>
       </div>
     </q-page-container>
   </q-layout>
 </template>
 
-<script setup>
-import { ref, computed } from 'vue';
+<script>
+import { ref, computed, defineComponent } from 'vue';
+import { storeToRefs } from 'pinia';
+
 import { useKnowledgeStore } from 'src/stores/knowledge-store';
 
-const knowledgeStore = useKnowledgeStore();
+export default defineComponent({
+  name: 'KnowledgeBasePage',
+  setup() {
+    const knowledgeStore = useKnowledgeStore();
 
-// Columns for the table displaying documents
-const columns = [
-  { name: 'title', label: 'Title', field: 'title' },
-  { name: 'description', label: 'Description', field: 'description' },
-];
+    // Columns for the table displaying documents
+    const columns = [
+      { name: 'id', label: 'ID', field: 'id' },
+      { name: 'title', label: 'Title', field: 'title' },
+    ];
 
-// Documents data source
-const documents = computed(() => knowledgeStore.documents());
+    // Documents data source
+    const { documents } = storeToRefs(knowledgeStore);
 
-// Selected document
-const selectedDocument = ref(null);
+    // Selected document
+    const selectedDocument = ref(null);
+    const selectedDocumentId = ref(null);
 
-// Show form for adding or editing a document
-const showForm = ref(false);
+    // Edited document object
+    const editedDocument = ref({ title: '', description: '' });
 
-// Submitting status for the form
-const submitting = ref(false);
+    // Form title based on whether we're adding or editing a document
+    const formTitle = computed(() => (selectedDocument.value ? 'Edit Document' : 'Add Document'));
 
-// Edited document object
-const editedDocument = ref({ title: '', description: '' });
-
-// Form title based on whether we're adding or editing a document
-const formTitle = computed(() => (selectedDocument.value ? 'Edit Document' : 'Add Document'));
-
-// On row click event handler for the table
-function onRowClick(evt, row) {
-  selectedDocument.value = row;
-}
-
-// Open the add/edit document form
-function openForm() {
-  showForm.value = true;
-}
-
-// Test with a PDF of the communist manifesto
-function searchDefault() {
-  let query = 'why is the sky blue?';
-  console.log('Searching: ', query);
-  knowledgeStore.searchDocuments(query).then((results) => {
-    console.log('Results: ', results);
-  });
-}
-
-// Submit the add/edit document form
-async function onSubmit() {
-  submitting.value = true;
-  try {
-    if (selectedDocument.value) {
-      // TODO: its not clear how to support document updates given that all content is chunked
-      // and stored across multiple embeddings in local storage
-      console.log('TODO: Implement update document');
-    } else {
-      await knowledgeStore.addDocument(editedDocument.value);
+    // On row click event handler for the table
+    function onRowClick(evt, row) {
+      console.log('Row clicked', row);
+      selectedDocumentId.value = row.id;
     }
-    showForm.value = false;
-  } catch (error) {
-    console.error('Error adding or updating document:', error);
-  } finally {
-    submitting.value = false;
-  }
-}
 
-// Handle file changes for the document file input field
-function onFileChange(files) {
-  editedDocument.value.file = files[0];
-}
+    async function removeSelectedDocument() {
+      if (selectedDocumentId.value) {
+        await knowledgeStore.removeDocument(selectedDocumentId.value);
+        selectedDocumentId.value = null;
+      }
+    }
+
+    return {
+      columns,
+      documents,
+      selectedDocumentId,
+      editedDocument,
+      formTitle,
+      onRowClick,
+      removeSelectedDocument,
+    };
+  },
+});
 </script>

@@ -52,9 +52,4 @@ const sendMessage = (event) => {
   let content = model.value;
   emit('sendMessage', content);
 };
-// return {
-//   model,
-//   isLoading,
-//   sendMessage
-// }
 </script>
