@@ -12,6 +12,7 @@ export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
   actions: {
     async load() {
       await this.knowledgeStore.load();
+      await this.knowledgeStore.prune();
       let defaultDocumentTitles = defaultKnowledge.map((doc) => doc.title);
       const docs = Array.from(this.knowledgeStore.documents.values());
       let documentTitles = docs.map((doc) => doc.title);
