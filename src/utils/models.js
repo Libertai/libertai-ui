@@ -1,6 +1,7 @@
 export const promptFormatDefaults = {
   userPrepend: '<|im_start|>',
   userAppend: '\n',
+  logStart: '',
   lineSeparator: '\n',
   stopSequence: '<|im_end|>',
   additionalStopSequences: ['<|endoftext|>', '<|', '</|', '</assistant', '</user', '<im_end|>'],
@@ -21,6 +22,31 @@ export const modelDefaults = {
  * Default Models Configuration
  */
 export const defaultModels = [
+  // Llama 3 Instruct (70B, genius, slow)
+  {
+    name: 'Llama 3 Instruct (70B, genius, slow)',
+    ...modelDefaults,
+    // Set our apiUrl
+    apiUrl:
+      'https://curated.aleph.cloud/vm/055e1267fb63f5961e8aee890cfc3f61387deee79f37ce51a44b21feee57d40b/completion',
+    // Allow a larger prompt length
+    maxTokens: 16384,
+    // Set a minimum probability
+    minP: 0.1,
+    // Set a slightly higher top probability
+    topP: 0.95,
+    // Set a slightly higher temperature
+    temperature: 0.8,
+    // Set custom chatML settings
+    promptFormat: {
+      userPrepend: '<|start_header_id|>',
+      userAppend: '<|end_header_id|>',
+      logStart: '',
+      lineSeparator: '\n',
+      stopSequence: '<|eot_id|>',
+      additionalStopSequences: ['<|eot_id|>', '<|endoftext|>', '<|'],
+    },
+  },
   // AlphaMonarch
   {
     name: 'AlphaMonarch (7B, fast)',
