@@ -286,8 +286,8 @@ export default defineComponent({
           persona,
           // Set the target to the user
           username,
-          // set to true to disale logging
-          true,
+          // set to false to disable logging
+          false,
         )) {
           let stopped = output.stopped;
           let content = output.content;
