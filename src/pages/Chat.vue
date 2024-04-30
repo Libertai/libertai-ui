@@ -247,6 +247,7 @@ export default defineComponent({
       let chatId = chatRef.value.id;
       let messages = JSON.parse(JSON.stringify(messagesRef.value));
       let persona = personaRef.value;
+      let username = usernameRef.value;
       let model = chatRef.value.model;
 
       // Create a new message to encapsulate our response
@@ -283,7 +284,9 @@ export default defineComponent({
           messages,
           model,
           persona,
-          // set to false to disale logging
+          // Set the target to the user
+          username,
+          // set to true to disale logging
           true,
         )) {
           let stopped = output.stopped;

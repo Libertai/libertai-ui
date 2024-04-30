@@ -20,7 +20,7 @@
     "build": "quasar build"
   },
   "dependencies": {
-    "@libertai/libertai-js": "0.0.3",
+    "@libertai/libertai-js": "0.0.4",
     "@quasar/extras": "^1.16.4",
     "@solana/web3.js": "^1.90.0",
     "aleph-sdk-ts": "^3.9.2",
