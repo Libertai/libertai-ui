@@ -315,44 +315,46 @@ export default defineComponent({
         });
 
         // Expand all the messages to inline any compatible attachments
-        const exapndedMessages = messages.map((message) => {
-          let ret = [];
-          // Push any attachments ahead of the message
-          if (message.attachments) {
-            message.attachments.forEach((attachment) => {
-              if (attachment.content) {
-                ret.push({
-                  role: 'attachment',
-                  content: `[${attachment.title}](${attachment.content})`,
-                });
-              } else if (attachment.documentId) {
-                ret.push({
-                  role: 'attachment',
-                  content: `[${attachment.title}](document-id-${attachment.documentId})`,
-                })
-              }
-            });
-          }
-
-          // Push what search results we found based on the message
-          // TODO: this should prabably be a more generic tool-call or llm-chain-link
-          // TODO: this should probably link back to the document id
-          // TODO: I should probably write these below messages in the log
-          //  Really these search results should get attached to the message that
-          //   lead to them being queried
-          if (message.searchResults) {
-            console.log('pages::Chat.vue::generatePersonaMessage - embedding search results', message.searchResults);
-            message.searchResults.forEach((result) => {
-              ret.push({
-                role: 'search-result',
-                content: result.content,
+        const exapndedMessages = messages
+          .map((message) => {
+            let ret = [];
+            // Push any attachments ahead of the message
+            if (message.attachments) {
+              message.attachments.forEach((attachment) => {
+                if (attachment.content) {
+                  ret.push({
+                    role: 'attachment',
+                    content: `[${attachment.title}](${attachment.content})`,
+                  });
+                } else if (attachment.documentId) {
+                  ret.push({
+                    role: 'attachment',
+                    content: `[${attachment.title}](document-id-${attachment.documentId})`,
+                  });
+                }
               });
-            });
-          }
-          // Push the message itself
-          ret.push(message);
-          return ret;
-        }).flat();
+            }
+
+            // Push what search results we found based on the message
+            // TODO: this should prabably be a more generic tool-call or llm-chain-link
+            // TODO: this should probably link back to the document id
+            // TODO: I should probably write these below messages in the log
+            //  Really these search results should get attached to the message that
+            //   lead to them being queried
+            if (message.searchResults) {
+              console.log('pages::Chat.vue::generatePersonaMessage - embedding search results', message.searchResults);
+              message.searchResults.forEach((result) => {
+                ret.push({
+                  role: 'search-result',
+                  content: result.content,
+                });
+              });
+            }
+            // Push the message itself
+            ret.push(message);
+            return ret;
+          })
+          .flat();
 
         // Append the search results to the messages
         const allMessages = [...exapndedMessages, ...searchResultMessages];
