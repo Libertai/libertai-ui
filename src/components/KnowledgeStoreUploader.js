@@ -9,15 +9,25 @@ const pdfjsLib = window.pdfjsLib;
 
 export default createUploaderComponent({
   name: 'KnowledgeStoreUploader',
-  props: {},
-  emits: [],
-  injectPlugin({ _props, _emit, helpers }) {
+  props: {
+    chatRef: {
+      type: Object,
+      required: true,
+    },
+  },
+  emits: [
+    'attachment-added',
+  ],
+  injectPlugin({ props, emit, helpers }) {
     const loading = ref(false);
+    const chatId = props.chatRef.id;
 
     // Map of file objects to their status as either 'queued', 'uploading', 'embedding', 'uploaded', or 'failed'
     const fileStatus = ref({});
 
     // Upload Logic
+    // TODO: we should be feeding the chat id through here, not through props
+    //  We're gonna need a way to add more custom tags to the documents
     async function upload(_args) {
       // Set the loading state
       loading.value = true;
@@ -40,12 +50,15 @@ export default createUploaderComponent({
           try {
             fileStatus.value[file.name] = 'uploading';
             helpers.updateFileStatus(file, 'uploading');
-            let { title, text } = await processFile(file);
+            let { title, text, type } = await processFile(file);
             fileStatus.value[file.name] = 'embedding';
             helpers.updateFileStatus(file, 'embedding');
-            await knowledgeStore.addDocument(title, text);
+            // For now this doesn't support additional tags
+            let { id } = await knowledgeStore.addDocument(title, text, chatId ? [chatId] : []);
+            let documentId = id;
             fileStatus.value[file.name] = 'uploaded';
             helpers.updateFileStatus(file, 'uploaded');
+            emit('attachment-added', { title, documentId, type });
           } catch (error) {
             console.error(error);
             fileStatus.value[file.name] = 'failed';
@@ -84,6 +97,7 @@ export default createUploaderComponent({
     async function processFile(file) {
       const title = file.name;
       let extractedText = '';
+      let type = file.type;
 
       try {
         switch (file.type) {
@@ -91,6 +105,14 @@ export default createUploaderComponent({
             extractedText = await extractTextFromPdfFile(file);
             break;
           case 'text/plain':
+            extractedText = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = (event) => resolve(event.target.result);
+              reader.onerror = (error) => reject(error);
+              reader.readAsText(file);
+            });
+            break;
+          case 'text/markdown':
             extractedText = await new Promise((resolve, reject) => {
               const reader = new FileReader();
               reader.onload = (event) => resolve(event.target.result);
@@ -106,7 +128,7 @@ export default createUploaderComponent({
         throw error;
       }
 
-      return { title, text: extractedText };
+      return { title, text: extractedText, type };
     }
 
     /**

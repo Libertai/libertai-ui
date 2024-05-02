@@ -15,11 +15,28 @@ const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
  *  title: string;
  *  username: string;
  *
- *  // From @libertai/libertai-js
- *  model: Model;
- *  persona: Persona;
- *  messages: Message[];
+ *    // From @libertai/libertai-js
+ *    model: Model;
+ *    persona: Persona;
+ *    // Note: we will populate these with additional data,
+*     // by inlinging attachments, etc.
+ *    messages: Message[];
  *  }
+ */
+
+// TODO: for now all attachments are stored in the knowledge base
+//  but we might want to be able to inline them in the chat if small enough
+/**
+ * Representation of an attachment:
+ * interface Attachment {
+ *   // File type
+ *   type: string;  // eg 'application/pdf', 'text/plain', etc.
+ *   // Document id within the embedding store
+ *   documentId: string;
+ *   // File name
+ *   name: string;
+ *   // TODO: inlinging strategy
+ * }
  */
 
 export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
@@ -141,10 +158,11 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
      * @async
      * @param {string} chatId - the id of the chat
      * @param {string} message - the content of the message
+    * @param {[]} attachments - the attachments of the message
      * @returns {Promise<Message>} - the created message
      */
-    async appendUserMessage(chatId, message) {
-      return await this.chatsStore.appendUserMessage(chatId, message);
+    async appendUserMessage(chatId, message, attachments) {
+      return await this.chatsStore.appendUserMessage(chatId, message, attachments);
     },
 
     /**
@@ -317,15 +335,17 @@ class ChatsStore {
    * @async
    * @param {string} chatId - the id of the chat
    * @param {string} messageContent - the content of the message
+   * @param {[]} attachments - the attachments of the message
    * @returns {Promise<Message>} - the created message
    * @throws {Error} - if the chat is not found
    */
-  async appendUserMessage(chatId, messageContent) {
+  async appendUserMessage(chatId, messageContent, attachments) {
     const chat = await this.readChat(chatId);
     const message = {
       role: chat.username,
       content: messageContent,
       timestamp: new Date(),
+      attachments,
     };
     chat.messages.push(message);
     await idb.put(chatId, chat, this.store);

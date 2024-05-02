@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { KnowledgeStore } from '@libertai/libertai-js';
 import { defaultKnowledge } from '../utils/knowledge';
 
+export const DEFAULT_KNOWLEDGE_TAG = 'default';
 export const KNOWLEDGE_STORE_PINIA_KEY = 'knowledge-store-pinia-key';
 
 export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
@@ -22,7 +23,7 @@ export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
       let addedDocuments = [];
       for (let title of missingDocuments) {
         let doc = defaultKnowledge.find((doc) => doc.title === title);
-        addedDocuments.push(this.addDocument(doc.title, doc.content, doc.tags));
+        addedDocuments.push(this.addDocument(doc.title, doc.content, doc.tags.push(DEFAULT_KNOWLEDGE_TAG)));
         docs.push(doc);
       }
       await Promise.all(addedDocuments);
@@ -32,12 +33,21 @@ export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
     async addDocument(title, content, tags = []) {
       let doc = await this.knowledgeStore.addDocument(title, content, tags);
       this.documents.push(doc);
+      return doc;
     },
     async removeDocument(documentId) {
       await this.knowledgeStore.removeDocument(documentId);
       this.documents = this.documents.filter((doc) => doc.id !== documentId);
     },
     async searchDocuments(query, tags = []) {
+      // If tags aren't empty, add the default tag
+      //  Otherwise, if tags is empty, we'll just search
+      //   with no filters, and the default tag will be included
+      if (tags.length > 0) {
+        tags.push(DEFAULT_KNOWLEDGE_TAG);
+      }
+
+      // TODO: this should prolly be none
       return await this.knowledgeStore.searchDocuments(query, 3, 20, tags);
     },
   },
