@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { defineStore } from 'pinia';
 
 import { defaultModels } from 'src/utils/models';
+import { chatTag } from 'src/utils/chat';
 import * as idb from 'src/utils/idb';
 
 const CHATS_STORE_NAME = 'chats-store';
@@ -14,30 +15,41 @@ const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
  *  id: string;
  *  title: string;
  *  username: string;
+ *  tags: string[];
  *
- *    // From @libertai/libertai-js
- *    model: Model;
- *    persona: Persona;
- *    // Note: we will populate these with additional data,
-*     // by inlinging attachments, etc.
- *    messages: Message[];
- *  }
+ *  // From @libertai/libertai-js
+ *  model: Model;
+ *  persona: Persona;
+ *  // Note: we will populate these with additional data,
+ *  // by inlinging attachments, search-results, etc.
+ *  messages: Message[];
+ * }
  */
 
-// TODO: for now all attachments are stored in the knowledge base
-//  but we might want to be able to inline them in the chat if small enough
 /**
  * Representation of an attachment:
  * interface Attachment {
  *   // File type
  *   type: string;  // eg 'application/pdf', 'text/plain', etc.
- *   // Document id within the embedding store
- *   documentId: string;
  *   // File name
  *   name: string;
- *   // TODO: inlinging strategy
+ *   // Document id within the embedding store, if stored there
+ *   documentId: string?;
+ *   // The content of the attachment, if stored inlined
+ *   content: string?;
  * }
  */
+
+// TODO: Search results are not yet implemented
+/**
+* Representation of a search result:
+* interface SearchResult {
+*  // embedding document id
+*  documentId: string;
+*  // embdedding conent
+*  content: string;
+* }
+*/
 
 export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
   state: () => ({
@@ -84,7 +96,9 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
      * @returns {Promise<Chat>} - the created chat
      */
     async createChat(title, username, model, persona) {
-      const chat = await this.chatsStore.createChat(title, username, model, persona);
+      const chat = await this.chatsStore.createChat(title, username, [], model, persona);
+      const tag = chatTag(chat.id);
+      await this.chatsStore.pushChatTag(chat.id, tag);
       this.chats.push(chat);
       return chat;
     },
@@ -158,7 +172,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
      * @async
      * @param {string} chatId - the id of the chat
      * @param {string} message - the content of the message
-    * @param {[]} attachments - the attachments of the message
+     * @param {[]} attachments - the attachments of the message
      * @returns {Promise<Message>} - the created message
      */
     async appendUserMessage(chatId, message, attachments) {
@@ -172,8 +186,8 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
      * @param {string} response - the content of the response
      * @returns {Promise<Message>} - the created message
      */
-    async appendModelResponse(chatId, response) {
-      return await this.chatsStore.appendModelResponse(chatId, response);
+    async appendModelResponse(chatId, response, searchResults) {
+      return await this.chatsStore.appendModelResponse(chatId, response, searchResults);
     },
 
     /**
@@ -252,15 +266,17 @@ class ChatsStore {
    * @async
    * @param {string} title - the title of the chat
    * @param {string} username - the username of the user
+   * @param {string[]} tags - the tags of the chat
    * @param {Model} model - the model to use for the chat
    * @param {Persona} persona - the persona to use for the chat
    * @returns {Promise<Chat>} - the created chat
    */
-  async createChat(title, username, model, persona) {
+  async createChat(title, username, tags, model, persona) {
     const id = uuidv4();
     const chat = {
       id,
       title,
+      tags,
       username,
       model,
       persona,
@@ -300,6 +316,23 @@ class ChatsStore {
       throw new Error('Chat not found');
     }
     return chat;
+  }
+
+  /**
+   * Push a tag to a chat
+   * @async
+   * @param {string} chatId - the id of the chat
+   * @param {string} tag - the tag to push
+   * @returns {Promise<void>}
+   * @throws {Error} - if the tag is already in the chat
+   */
+  async pushChatTag(chatId, tag) {
+    const chat = await this.readChat(chatId);
+    if (chat.tags.includes(tag)) {
+      throw new Error('Tag already in chat');
+    }
+    chat.tags.push(tag);
+    await idb.put(chatId, chat, this.store);
   }
 
   /**
@@ -360,12 +393,13 @@ class ChatsStore {
    * @returns {Promise<Message>} - the created message
    * @throws {Error} - if the chat is not found
    */
-  async appendModelResponse(chatId, responseContent) {
+  async appendModelResponse(chatId, responseContent, searchResults) {
     const chat = await this.readChat(chatId);
     const message = {
       role: chat.persona.name,
       content: responseContent,
       timestamp: new Date(),
+      searchResults,
     };
     chat.messages.push(message);
     await idb.put(chatId, chat, this.store);

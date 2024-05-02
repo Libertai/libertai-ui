@@ -137,20 +137,20 @@ import { useQuasar, copyToClipboard } from 'quasar';
 import { defineComponent, ref, watch, nextTick, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-import { inferChatTopic, defaultChatTopic, chatTag } from 'src/utils/chat';
+import { inferChatTopic, defaultChatTopic } from 'src/utils/chat';
 
 // LlamaCppApiEngine
 import { LlamaCppApiEngine } from '@libertai/libertai-js';
 
 // Local state
-import { useChatsStore } from '../stores/chats-store';
-import { useModelsStore } from '../stores/models-store';
-import { useKnowledgeStore } from '../stores/knowledge-store';
+import { useChatsStore } from 'src/stores/chats-store';
+import { useModelsStore } from 'src/stores/models-store';
+import { useKnowledgeStore } from 'src/stores/knowledge-store';
 import { useAccount } from 'src/stores/account';
 
 // Components
-import MarkdownRenderer from '../components/MarkdownRenderer.vue';
-import MessageInput from '../components/MessageInput.vue';
+import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
+import MessageInput from 'src/components/MessageInput.vue';
 import axios from 'axios';
 
 console.log(nextTick);
@@ -278,7 +278,7 @@ export default defineComponent({
     // Generate a new response from the AI
     async function generatePersonaMessage() {
       let chatId = chatRef.value.id;
-      let chatTagStr = chatTag(chatId);
+      let chatTags = chatRef.value.tags;
       let messages = JSON.parse(JSON.stringify(messagesRef.value));
       let persona = personaRef.value;
       let username = usernameRef.value;
@@ -304,25 +304,68 @@ export default defineComponent({
         // NOTE: assuming last message is gauranteed to be non-empty and the user's last message
         // Get the last message from the user
         let lastMessage = messages[messages.length - 1];
-        // TODO: we should probably create chat-level tags to let user's customize search
-        let searchResults = await knowledgeStore.searchDocuments(lastMessage.content, [chatTagStr]);
+        let searchResultMessages = [];
+        let searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
         searchResults.forEach((result) => {
           console.log('pages::Chat.vue::generatePersonaMessage - embedding search result', result);
-          messages.push({
+          searchResultMessages.push({
             role: 'search-result',
             content: result.content,
           });
         });
 
+        // Expand all the messages to inline any compatible attachments
+        const exapndedMessages = messages.map((message) => {
+          let ret = [];
+          // Push any attachments ahead of the message
+          if (message.attachments) {
+            message.attachments.forEach((attachment) => {
+              if (attachment.content) {
+                ret.push({
+                  role: 'attachment',
+                  content: `[${attachment.title}](${attachment.content})`,
+                });
+              } else if (attachment.documentId) {
+                ret.push({
+                  role: 'attachment',
+                  content: `[${attachment.title}](document-id-${attachment.documentId})`,
+                })
+              }
+            });
+          }
+
+          // Push what search results we found based on the message
+          // TODO: this should prabably be a more generic tool-call or llm-chain-link
+          // TODO: this should probably link back to the document id
+          // TODO: I should probably write these below messages in the log
+          //  Really these search results should get attached to the message that
+          //   lead to them being queried
+          if (message.searchResults) {
+            console.log('pages::Chat.vue::generatePersonaMessage - embedding search results', message.searchResults);
+            message.searchResults.forEach((result) => {
+              ret.push({
+                role: 'search-result',
+                content: result.content,
+              });
+            });
+          }
+          // Push the message itself
+          ret.push(message);
+          return ret;
+        }).flat();
+
+        // Append the search results to the messages
+        const allMessages = [...exapndedMessages, ...searchResultMessages];
+
         // Generate a stream of responses from the AI
         for await (const output of inferenceEngine.generateAnswer(
-          messages,
+          allMessages,
           model,
           persona,
           // Set the target to the user
           username,
           // set to false to disable logging
-          false,
+          true,
         )) {
           let stopped = output.stopped;
           let content = output.content;
@@ -335,7 +378,7 @@ export default defineComponent({
           messagesRef.value = [...messagesRef.value];
         }
         // A successful response! Append the chat to long term storage.
-        await chatsStore.appendModelResponse(chatId, response.content);
+        await chatsStore.appendModelResponse(chatId, response.content, searchResults);
       } catch (error) {
         console.error('pages::Chat.vue::generatePersonaMessage - error', error);
         response.error = error;

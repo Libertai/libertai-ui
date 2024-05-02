@@ -1,6 +1,8 @@
 import { createUploaderComponent } from 'quasar';
 import { computed, ref } from 'vue';
 
+import { chatTag } from 'src/utils/chat';
+
 // State
 import { useKnowledgeStore } from 'src/stores/knowledge-store';
 
@@ -15,9 +17,7 @@ export default createUploaderComponent({
       required: true,
     },
   },
-  emits: [
-    'attachment-added',
-  ],
+  emits: ['attachment-added'],
   injectPlugin({ props, emit, helpers }) {
     const loading = ref(false);
     const chatId = props.chatRef.id;
@@ -51,10 +51,21 @@ export default createUploaderComponent({
             fileStatus.value[file.name] = 'uploading';
             helpers.updateFileStatus(file, 'uploading');
             let { title, text, type } = await processFile(file);
+            // Check how big the file is
+            // If the text is less than 4 KiB, then just inline it
+            if (text.length < 4 * 1024) {
+              fileStatus.value[file.name] = 'uploaded';
+              helpers.updateFileStatus(file, 'uploaded');
+              // If you don't embed the doucment, make sure to set the content
+              emit('attachment-added', { title, type, content: text });
+              return;
+            }
+
+            // Embed the document
             fileStatus.value[file.name] = 'embedding';
             helpers.updateFileStatus(file, 'embedding');
-            // For now this doesn't support additional tags
-            let { id } = await knowledgeStore.addDocument(title, text, chatId ? [chatId] : []);
+            let tag = chatTag(chatId);
+            let { id } = await knowledgeStore.addDocument(title, text, [tag]);
             let documentId = id;
             fileStatus.value[file.name] = 'uploaded';
             helpers.updateFileStatus(file, 'uploaded');
