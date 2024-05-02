@@ -307,7 +307,6 @@ export default defineComponent({
         let searchResultMessages = [];
         let searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
         searchResults.forEach((result) => {
-          console.log('pages::Chat.vue::generatePersonaMessage - embedding search result', result);
           searchResultMessages.push({
             role: 'search-result',
             content: result.content,
@@ -342,7 +341,6 @@ export default defineComponent({
             //  Really these search results should get attached to the message that
             //   lead to them being queried
             if (message.searchResults) {
-              console.log('pages::Chat.vue::generatePersonaMessage - embedding search results', message.searchResults);
               message.searchResults.forEach((result) => {
                 ret.push({
                   role: 'search-result',
@@ -367,7 +365,7 @@ export default defineComponent({
           // Set the target to the user
           username,
           // set to false to disable logging
-          true,
+          false,
         )) {
           let stopped = output.stopped;
           let content = output.content;
