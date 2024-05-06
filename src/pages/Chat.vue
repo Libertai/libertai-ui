@@ -34,6 +34,16 @@
             <q-item-label class="text-semibold">
               {{ message.role.replace(chatRef.username, 'You').replace('assistant', 'Libertai') }}
             </q-item-label>
+            <!-- Display any attachments -->
+            <q-item-label v-if="message.attachments && message.attachments.length > 0">
+              <q-chip
+                v-for="attachment in message.attachments"
+                :key="attachment.id"
+                class="q-mr-xs bg-primary text-white"
+              >
+                {{ attachment.title }}
+              </q-chip>
+            </q-item-label>
             <!-- Display the content of the message -->
             <q-item-label style="display: block">
               <MarkdownRenderer :content="message.content" breaks />
@@ -80,7 +90,14 @@
         style="margin-left: 16px"
       />
 
-      <!-- Input for sending messages -->
+      <q-chip
+        v-for="attachment in attachmentsRef"
+        :key="attachment.id"
+        removable
+        @remove="removeAttachment(attachment)"
+      >
+        {{ attachment.title }}
+      </q-chip>
       <message-input
         :isLoading="isLoadingRef"
         @sendMessage="sendMessage"
@@ -100,8 +117,11 @@
         </q-checkbox>
       </div>
     </div>
+    <!-- This should really not pass the ref, but it's a quick fix for now -->
     <q-dialog v-model="showKnowledgeUploaderRef" position="bottom">
       <KnowledgeStoreUploader
+        @attachment-added="addAttachment"
+        :chatRef="chatRef"
         label="Auto KnowledgeStoreUploader"
         auto-upload
         url="http://localhost:4444/upload"
@@ -123,14 +143,14 @@ import { inferChatTopic, defaultChatTopic } from 'src/utils/chat';
 import { LlamaCppApiEngine } from '@libertai/libertai-js';
 
 // Local state
-import { useChatsStore } from '../stores/chats-store';
-import { useModelsStore } from '../stores/models-store';
-import { useKnowledgeStore } from '../stores/knowledge-store';
+import { useChatsStore } from 'src/stores/chats-store';
+import { useModelsStore } from 'src/stores/models-store';
+import { useKnowledgeStore } from 'src/stores/knowledge-store';
 import { useAccount } from 'src/stores/account';
 
 // Components
-import MarkdownRenderer from '../components/MarkdownRenderer.vue';
-import MessageInput from '../components/MessageInput.vue';
+import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
+import MessageInput from 'src/components/MessageInput.vue';
 import axios from 'axios';
 
 console.log(nextTick);
@@ -161,6 +181,7 @@ export default defineComponent({
     const enableEditRef = ref(false);
     const enableKnowledgeRef = ref(true);
     const showKnowledgeUploaderRef = ref(false);
+    const attachmentsRef = ref([]);
 
     // Chat specific state
     const chatRef = ref();
@@ -220,6 +241,18 @@ export default defineComponent({
 
     /* Helper functions */
 
+    function addAttachment(attachmentEvent) {
+      let attachment = JSON.parse(JSON.stringify(attachmentEvent));
+      attachmentsRef.value.push(attachment);
+    }
+
+    async function removeAttachment(attachment) {
+      // Remove the attachment from the knowledge store
+      await knowledgeStore.removeDocument(attachment.documentId);
+      let index = attachmentsRef.value.indexOf(attachment);
+      attachmentsRef.value.splice(index, 1);
+    }
+
     // Set the name of the chat based on the first sentence
     async function setChatName(first_sentence) {
       // Get our chat id
@@ -245,6 +278,7 @@ export default defineComponent({
     // Generate a new response from the AI
     async function generatePersonaMessage() {
       let chatId = chatRef.value.id;
+      let chatTags = chatRef.value.tags;
       let messages = JSON.parse(JSON.stringify(messagesRef.value));
       let persona = personaRef.value;
       let username = usernameRef.value;
@@ -270,18 +304,62 @@ export default defineComponent({
         // NOTE: assuming last message is gauranteed to be non-empty and the user's last message
         // Get the last message from the user
         let lastMessage = messages[messages.length - 1];
-        let searchResults = await knowledgeStore.searchDocuments(lastMessage.content);
+        let searchResultMessages = [];
+        let searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
         searchResults.forEach((result) => {
-          console.log('pages::Chat.vue::generatePersonaMessage - embedding search result', result);
-          messages.push({
+          searchResultMessages.push({
             role: 'search-result',
             content: result.content,
           });
         });
 
+        // Expand all the messages to inline any compatible attachments
+        const exapndedMessages = messages
+          .map((message) => {
+            let ret = [];
+            // Push any attachments ahead of the message
+            if (message.attachments) {
+              message.attachments.forEach((attachment) => {
+                if (attachment.content) {
+                  ret.push({
+                    role: 'attachment',
+                    content: `[${attachment.title}](${attachment.content})`,
+                  });
+                } else if (attachment.documentId) {
+                  ret.push({
+                    role: 'attachment',
+                    content: `[${attachment.title}](document-id-${attachment.documentId})`,
+                  });
+                }
+              });
+            }
+
+            // Push what search results we found based on the message
+            // TODO: this should prabably be a more generic tool-call or llm-chain-link
+            // TODO: this should probably link back to the document id
+            // TODO: I should probably write these below messages in the log
+            //  Really these search results should get attached to the message that
+            //   lead to them being queried
+            if (message.searchResults) {
+              message.searchResults.forEach((result) => {
+                ret.push({
+                  role: 'search-result',
+                  content: result.content,
+                });
+              });
+            }
+            // Push the message itself
+            ret.push(message);
+            return ret;
+          })
+          .flat();
+
+        // Append the search results to the messages
+        const allMessages = [...exapndedMessages, ...searchResultMessages];
+
         // Generate a stream of responses from the AI
         for await (const output of inferenceEngine.generateAnswer(
-          messages,
+          allMessages,
           model,
           persona,
           // Set the target to the user
@@ -300,7 +378,7 @@ export default defineComponent({
           messagesRef.value = [...messagesRef.value];
         }
         // A successful response! Append the chat to long term storage.
-        await chatsStore.appendModelResponse(chatId, response.content);
+        await chatsStore.appendModelResponse(chatId, response.content, searchResults);
       } catch (error) {
         console.error('pages::Chat.vue::generatePersonaMessage - error', error);
         response.error = error;
@@ -333,9 +411,12 @@ export default defineComponent({
       console.log('pages::Chat.vue::sendMessage');
       let chatId = chatRef.value.id;
       let inputText = inputTextRef.value;
+      const attachments = JSON.parse(JSON.stringify(attachmentsRef.value));
 
       // Wipe the input text
       inputTextRef.value = '';
+      // Wipe the attachments
+      attachmentsRef.value = [];
 
       nextTick(scrollBottom);
 
@@ -344,7 +425,7 @@ export default defineComponent({
       if (content.trim() === '') return;
 
       // Append the new message to the chat history and push to local state
-      let newMessage = await chatsStore.appendUserMessage(chatId, inputText);
+      let newMessage = await chatsStore.appendUserMessage(chatId, inputText, attachments);
       messagesRef.value.push({ ...newMessage, stopped: true, error: null });
       chatRef.value.messages = messagesRef.value;
       await generatePersonaMessage();
@@ -445,6 +526,9 @@ export default defineComponent({
       isLoadingRef,
       inputRef,
       inputTextRef,
+      attachmentsRef,
+      addAttachment,
+      removeAttachment,
       sendMessage,
       showKnowledgeUploaderRef,
       openKnowledgeUploader,

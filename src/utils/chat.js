@@ -2,6 +2,10 @@ import { LlamaCppApiEngine } from '@libertai/libertai-js';
 
 import { modelDefaults, promptFormatDefaults } from './models';
 
+export function chatTag(id) {
+  return `chat-id-${id}`;
+}
+
 export const defaultChatTopic = 'New Chat';
 
 const chatTopicPromptFormat = {
