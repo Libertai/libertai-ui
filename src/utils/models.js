@@ -22,7 +22,6 @@ export const modelDefaults = {
  * Default Models Configuration
  */
 export const defaultModels = [
-
   // Mixtral
   {
     name: 'Nous Hermes 2 Pro (Llama 3 8B, fast)',
@@ -68,7 +67,7 @@ export const defaultModels = [
       'https://curated.aleph.cloud/vm/16a9f0f870c251719a0c63554cf02b6b8e4c2b4fee9987ddc3341a6507aef68d/completion',
     promptFormat: promptFormatDefaults,
   },
-  
+
   // Llama 3 Instruct (70B, genius, slow)
   {
     name: 'Llama 3 Instruct (70B, genius, slow)',

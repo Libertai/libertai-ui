@@ -23,6 +23,7 @@ const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
  *  // Note: we will populate these with additional data,
  *  // by inlinging attachments, search-results, etc.
  *  messages: Message[];
+ *  createdAt: Date;
  * }
  */
 
@@ -281,6 +282,7 @@ class ChatsStore {
       model,
       persona,
       messages: [],
+      createdAt: new Date(),
     };
     return await idb.put(chat.id, chat, this.store);
   }
@@ -297,9 +299,13 @@ class ChatsStore {
       const partialChat = {
         id: chat.id,
         title: chat.title,
+        createdAt: chat.createdAt,
       };
+      //
       result.push(partialChat);
     });
+    // Sort the chats by creation date (descending)
+    result.sort((a, b) => a.createdAt - b.createdAt);
     return result;
   }
 

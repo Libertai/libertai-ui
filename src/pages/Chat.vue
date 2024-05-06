@@ -376,6 +376,8 @@ export default defineComponent({
           response.content = content;
           response.stopped = stopped;
           messagesRef.value = [...messagesRef.value];
+          // Scroll to the bottom of the chat
+          nextTick(scrollBottom);
         }
         // A successful response! Append the chat to long term storage.
         await chatsStore.appendModelResponse(chatId, response.content, searchResults);
@@ -428,6 +430,11 @@ export default defineComponent({
       let newMessage = await chatsStore.appendUserMessage(chatId, inputText, attachments);
       messagesRef.value.push({ ...newMessage, stopped: true, error: null });
       chatRef.value.messages = messagesRef.value;
+
+      // Scroll to the bottom of the chat
+      nextTick(scrollBottom);
+
+      // Generate a response from the AI
       await generatePersonaMessage();
     }
 
