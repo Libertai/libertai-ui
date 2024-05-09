@@ -76,6 +76,92 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
     },
 
     /**
+     * Import a chat from a JSON object
+     * @async
+     * @param {Object} chat - the chat object
+     * @returns {Promise<void>}
+     * @throws {Error} - if the chat is invalid
+     */
+    async importChat(chat) {
+      if (!chat.id || !chat.title || !chat.username || !chat.model || !chat.persona || !chat.messages) {
+        throw new Error('Invalid chat');
+      }
+
+      // Check if thd chat already exists
+      const existingChat = await this.chatsStore.readChat(chat.id);
+      if (existingChat) {
+        throw new Error('Chat already exists');
+      }
+
+      // Check if created at is a valid date. If not set it to now.
+      if (chat.createdAt && !Date.parse(chat.createdAt)) {
+        chat.createdAt = new Date();
+      }
+
+      // Assert the id is a uuid
+      if (!uuidv4.validate(chat.id)) {
+        throw new Error('Invalid chat id');
+      }
+
+      // Assert title is a string
+      if (typeof chat.title !== 'string') {
+        throw new Error('Invalid chat title');
+      }
+
+      // Assert username is a string
+      if (typeof chat.username !== 'string') {
+        throw new Error('Invalid chat username');
+      }
+
+      // Assert model is a Model
+      if (!chat.model.apiUrl || !chat.model.name || !chat.model.promptFormat) {
+        throw new Error('Invalid chat model');
+      }
+
+      // Assert the persona is a Persona
+      if (!chat.persona.name || !chat.persona.avatarUrl || !chat.persona.description) {
+        throw new Error('Invalid chat persona');
+      }
+
+      // Read the messages from the chat
+      const messages = chat.messages;
+
+      // Assert messages is an array
+      if (!Array.isArray(messages)) {
+        throw new Error('Invalid chat messages');
+      }
+
+      // Map over the messages and assert each is a Message
+      for (const message of messages) {
+        // Assert role is a string
+        if (typeof message.role !== 'string') {
+          throw new Error('Invalid message role');
+        }
+        // Assert content is a string
+        if (typeof message.content !== 'string') {
+          throw new Error('Invalid message content');
+        }
+
+        // TODO: stronger validation of messages attachments and searchResults
+      }
+
+      await idb.put(chat.id, chat, this.chatsStore.store);
+      this.chats.push({ id: chat.id, title: chat.title, createdAt: chat.createdAt });
+    },
+
+    /**
+     * Export a chat to a JSON object
+     * @async
+     * @param {string} id - the id of the chat
+     * @returns {Promise<Object>} - the chat object
+     * @throws {Error} - if the chat is not found
+     */
+    async exportChat(id) {
+      const chat = await this.chatsStore.readChat(id);
+      return chat;
+    },
+
+    /**
      * Read a chat by its id
      * @async
      * @param {string} id - the id of the chat

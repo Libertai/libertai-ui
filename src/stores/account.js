@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ethers } from 'ethers';
+import { NewAccount } from 'aleph-sdk-ts/dist/accounts/ethereum';
 
 export const useAccount = defineStore('account', {
   state: () => ({
@@ -23,6 +24,14 @@ export const useAccount = defineStore('account', {
     },
   },
   actions: {
+    async getAccount() {
+      if (!this.active) {
+        throw new Error('No active provider');
+      }
+      // TODO: replace with the actual account
+      // return await GetAccountFromProvider(this.provider);
+      return NewAccount().account;
+    },
     // any amount of arguments, return a promise or not
     async setProvider(provider) {
       // you can directly mutate the state

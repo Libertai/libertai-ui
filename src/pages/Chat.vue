@@ -105,6 +105,17 @@
         ref="inputRef"
         class="col"
       />
+      <!-- Share the chat link -->
+      <q-btn
+        v-if="enableShareRef"
+        flat
+        round
+        :icon="currentShareIcon"
+        class="cursor-pointer q-mr-sm"
+        @click="share"
+        style="margin-left: 16px"
+      >
+      </q-btn>
     </div>
     <div class="fixed-bottom-right q-mb-md q-mr-md" style="z-index: 10">
       <div class="q-gutter-x-md" style="display: flex; align-items: center; justify-content: flex-end">
@@ -128,6 +139,15 @@
         multiple
       />
     </q-dialog>
+    <!-- Display the modal with the share link -->
+    <q-dialog v-model="showShareLink">
+      <q-card>
+        <q-card-section>
+          <q-input v-model="shareLink" readonly dense color="primary" style="max-width: 100%" class="q-mb-md" />
+          <q-btn @click="copyShareLink" label="Copy" />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -138,6 +158,7 @@ import { defineComponent, ref, watch, nextTick, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { inferChatTopic, defaultChatTopic } from 'src/utils/chat';
+import { addJsonToAleph } from 'src/utils/share';
 
 // LlamaCppApiEngine
 import { LlamaCppApiEngine } from '@libertai/libertai-js';
@@ -179,9 +200,13 @@ export default defineComponent({
     const inputRef = ref(null);
     const scrollAreaRef = ref(null);
     const enableEditRef = ref(false);
-    const enableKnowledgeRef = ref(true);
+    const enableKnowledgeRef = ref(account.active);
+    const enableShareRef = ref(account.active);
     const showKnowledgeUploaderRef = ref(false);
     const attachmentsRef = ref([]);
+    const showShareLink = ref(false);
+    const shareLink = ref('');
+    const currentShareIcon = ref('share');
 
     // Chat specific state
     const chatRef = ref();
@@ -217,6 +242,7 @@ export default defineComponent({
       (active) => {
         console.log('pages::Chat.vue::watch - account.active', active);
         enableKnowledgeRef.value = active;
+        enableShareRef.value = active;
       },
     );
 
@@ -240,6 +266,35 @@ export default defineComponent({
     );
 
     /* Helper functions */
+
+    async function share() {
+      try {
+        currentShareIcon.value = 'loading';
+        const link = await generateShareLink();
+        shareLink.value = link;
+        showShareLink.value = true;
+      } catch (error) {
+        console.error('pages::Chat.vue::share - error', error);
+        $q.notify('Failed to share chat');
+      } finally {
+        currentShareIcon.value = 'share';
+      }
+    }
+
+    async function generateShareLink() {
+      const chatId = chatRef.value.id;
+      const alephAccount = await account.getAccount();
+
+      const chatJson = await chatsStore.exportChat(chatId);
+      const ipfsHash = await addJsonToAleph(chatJson, alephAccount);
+      // Share url links to our share page
+      return `${window.location.origin}/#/share/${ipfsHash}`;
+    }
+
+    async function copyShareLink() {
+      await copyToClipboard(shareLink.value);
+      $q.notify('Link copied to clipboard');
+    }
 
     function addAttachment(attachmentEvent) {
       let attachment = JSON.parse(JSON.stringify(attachmentEvent));
@@ -525,6 +580,12 @@ export default defineComponent({
     }
 
     return {
+      share,
+      copyShareLink,
+      currentShareIcon,
+      showShareLink,
+      enableShareRef,
+      shareLink,
       scrollAreaRef,
       chatRef,
       messagesRef,

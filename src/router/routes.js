@@ -16,6 +16,11 @@ const routes = [
         name: 'chat',
         component: () => import('pages/Chat.vue'),
       },
+      {
+        path: 'share/:item_hash',
+        name: 'share',
+        component: () => import('pages/SharedChat.vue'),
+      },
       { path: 'points', component: () => import('src/pages/PointsInfo.vue') },
       {
         path: 'points/:address',
