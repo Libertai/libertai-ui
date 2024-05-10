@@ -90,17 +90,13 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       // Check if thd chat already exists
       const existingChat = await this.chatsStore.readChat(chat.id);
       if (existingChat) {
-        throw new Error('Chat already exists');
+        console.log('Chat already exists');
+        chat.id = uuidv4();
       }
 
       // Check if created at is a valid date. If not set it to now.
       if (chat.createdAt && !Date.parse(chat.createdAt)) {
         chat.createdAt = new Date();
-      }
-
-      // Assert the id is a uuid
-      if (!uuidv4.validate(chat.id)) {
-        throw new Error('Invalid chat id');
       }
 
       // Assert title is a string

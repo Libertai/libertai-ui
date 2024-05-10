@@ -1,31 +1,28 @@
 import { Publish, Get } from 'aleph-sdk-ts/dist/messages/store';
 
+const API_SERVER = 'https://api2.aleph.im';
 const CHANNEL = 'libertai';
+const STORAGE_ENGINE = 'ipfs';
 
 export async function addJsonToAleph(json, account) {
   // Creat a file object from the json
   const blob = new Blob([JSON.stringify(json)], { type: 'text/plain' });
 
-  console.log('blob', blob);
-
   const storeMessage = await Publish({
+    APIServer: API_SERVER,
     channel: CHANNEL,
+    storageEngine: STORAGE_ENGINE,
     account,
     fileObject: blob,
   });
-
-  console.log('store_message', storeMessage);
 
   return storeMessage.content.item_hash;
 }
 
 export async function getJsonFromAleph(itemHash) {
-  let data = await Get({ fileHash: itemHash });
-  console.log('data', data);
-  const decoder = new TextDecoder();
-  const jsonString = decoder.decode(data.content);
-  console.log('jsonString', jsonString);
-  const json = JSON.parse(jsonString);
-  console.log('json', json);
-  return json;
+  let data = await Get({
+    APIServer: API_SERVER,
+    fileHash: itemHash,
+  });
+  return JSON.parse(Buffer.from(data).toString('utf-8'));
 }
