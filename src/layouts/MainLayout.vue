@@ -10,10 +10,9 @@
           <q-btn
             unelevated
             rounded
-            color="white"
-            text-color="primary"
+            text-color="white"
             no-caps
-            class="text-semibold"
+            class="btn-gradient"
             label="Earn Points"
             to="/points"
             v-if="!account.active"
@@ -21,10 +20,9 @@
           <q-btn
             unelevated
             rounded
-            color="white"
-            text-color="primary"
+            text-color="white"
+            class="btn-gradient"
             no-caps
-            class="text-semibold"
             :to="{
               name: 'points-detail',
               params: { address: account.address },
@@ -38,10 +36,11 @@
             :label="modelsStore.selectedModel.name"
             color="primary"
             text-color="white"
-            class="text-semibold border-primary-highlight"
+            class="border-primary-highlight"
             rounded
             unelevated
             no-caps
+            icon="img:src/assets/engine.svg"
           >
             <q-list>
               <q-item
@@ -67,7 +66,7 @@
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      class="bg-secondary flex-grow"
+      class="bg-white flex-grow"
       style="display: flex; flex-direction: column"
     >
       <!-- image link with the logo -->

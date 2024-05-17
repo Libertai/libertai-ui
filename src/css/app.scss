@@ -83,3 +83,16 @@
 .rounded {
   border-radius: 100px;
 }
+
+header {
+    border-bottom: 1px solid #D9D9D9;
+}
+
+aside {
+    border-right: 1px solid #D9D9D9;
+}
+
+
+.btn-gradient {
+    background-image: linear-gradient(to right top, #644DF9 10%,  #FCCBFF 100%);
+}

@@ -8,6 +8,8 @@
       rounded
       unelevated
       @click="eth_web3_login"
+      no-caps
+      icon="img:src/assets/wallet.svg"
     >
       Connect Wallet
     </q-btn>
