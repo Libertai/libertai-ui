@@ -1,40 +1,40 @@
 <template>
   <div style="display: inline-block">
-    <q-btn round dense flat icon="wallet" @click="show" class="lt-md" color="white" />
+    <q-btn class="lt-md" color="white" dense flat icon="wallet" round @click="show" />
     <q-btn
-      @click="eth_web3_login"
-      color="primary"
+      v-if="!account.active"
       class="text-semibold border-primary-highlight gt-sm"
+      color="primary"
+      no-caps
       rounded
       unelevated
-      no-caps
-      v-if="!account.active"
+      @click="eth_web3_login"
     >
       Connect Wallet
     </q-btn>
     <q-btn-dropdown
-      color="primary"
+      v-else
+      :label="`${account.address.slice(0, 5)}...${account.address.slice(-5)}`"
       class="text-semibold border-primary-highlight gt-sm"
+      color="primary"
+      no-caps
       rounded
       unelevated
-      no-caps
-      :label="`${account.address.slice(0, 5)}...${account.address.slice(-5)}`"
-      v-else
     >
       <div class="row no-wrap q-pa-md q-pt-none bg-primary border-primary-highlight">
         <div class="column items-center">
           <div class="text-small q-mb-xs">{{ account.address }}</div>
 
           <q-btn
-            color="secondary"
-            class="text-semibold border-primary-highlight gt-sm"
-            rounded
-            unelevated
-            no-caps
-            label="Disconnect"
-            size="sm"
-            @click="account.disconnect"
             v-close-popup
+            class="text-semibold border-primary-highlight gt-sm"
+            color="secondary"
+            label="Disconnect"
+            no-caps
+            rounded
+            size="sm"
+            unelevated
+            @click="account.disconnect"
           />
         </div>
       </div>
@@ -75,51 +75,3 @@ async function eth_web3_login() {
   await points.update();
 }
 </script>
-
-<style scoped>
-.modal {
-  position: fixed;
-  /* Stay in place */
-  z-index: 100;
-  /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%;
-  /* Full width */
-  height: 100%;
-  /* Full height */
-  overflow: auto;
-  /* Enable scroll if needed */
-  background-color: rgb(0, 0, 0);
-  /* Fallback color */
-  background-color: rgba(0, 0, 0, 0.4);
-  /* Black w/ opacity */
-}
-
-/* Modal Content/Box */
-.modal-content {
-  color: #000;
-  background-color: #fefefe;
-  margin: 15% auto;
-  /* 15% from the top and centered */
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-  /* Could be more or less, depending on screen size */
-}
-
-/* The Close Button */
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-</style>
