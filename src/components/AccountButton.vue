@@ -1,6 +1,5 @@
 <template>
   <div style="display: inline-block">
-    <q-btn class="lt-md" color="white" dense flat icon="wallet" round @click="show" />
     <q-btn
       v-if="!account.active"
       class="text-semibold border-primary-highlight gt-sm"
