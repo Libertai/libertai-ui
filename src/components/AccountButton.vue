@@ -45,11 +45,14 @@
 <script setup>
 import { ethers } from 'ethers';
 import { useAccount } from '../stores/account';
+import { usePoints } from 'stores/points';
+
 console.log(ethers);
 
 const account = useAccount();
 
 async function eth_web3_login() {
+  const points = usePoints();
   console.log(window.ethereum);
   if (window.ethereum) {
     try {
@@ -69,6 +72,7 @@ async function eth_web3_login() {
     alert('Error getting web3 account');
     return;
   }
+  await points.update();
 }
 </script>
 
