@@ -1,24 +1,27 @@
 <template>
   <q-input
-    rounded
-    standout
+    outlined
     v-model="model"
-    label="Write your message here"
+    placeholder="Write your message here"
     autofocus
     bg-color="secondary"
     label-color="grey"
-    input-class="text-white"
+    input-class="text-light"
     class="q-pa-lg"
     ref="input"
     type="textarea"
     autogrow
-    input-style="max-height: 4.5em"
+    input-style="max-height: 10em"
     @keydown.enter="sendMessage"
     :loading="isLoading"
     :bottom-slots="props.hint !== ''"
   >
+    <template v-slot:prepend>
+      <q-btn round dense flat icon="img:icons/attachment.svg" @click="sendMessage" color="" />
+    </template>
     <template v-slot:append>
-      <q-btn round dense flat icon="send" @click="sendMessage" color="white" />
+      <q-btn round dense flat icon="img:icons/mic.svg" @click="sendMessage" color="" />
+      <q-btn round dense flat icon="img:icons/send.svg" @click="sendMessage" color="" />
     </template>
 
     <template v-slot:hint>

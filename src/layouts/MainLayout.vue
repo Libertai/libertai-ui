@@ -70,28 +70,28 @@
       style="display: flex; flex-direction: column"
     >
       <!-- image link with the logo -->
-      <q-item clickable to="/" class="q-mb-md">
+      <q-item clickable to="/" class="q-mb-md text-left">
         <img src="~assets/libertai.svg" alt="Libertai" />
       </q-item>
       <q-btn
         color="primary"
-        class="q-mx-md q-my-lg text-semibold border-primary-highlight"
-        rounded
+        class="q-mx-md q-my-lg q-py-lg rounded-borders"
+        align="left"
         unelevated
         no-caps
         to="/new"
-        >New Chat</q-btn
+        >+ New Chat</q-btn
       >
       <!-- list of chats by reference to the chats-store -->
       <q-list style="flex-grow: 1" dense>
         <q-item-label header class="text-uppercase text-bold"> Chats </q-item-label>
-        <q-item
+        <q-item bordered
           v-for="chat of chats.slice().reverse()"
           :key="chat.id"
           :to="`/chat/${chat.id}`"
           exact
-          exact-active-class="bg-dark"
-          class="text-white q-mx-md rounded-borders"
+          exact-active-class="bg-secondary"
+          class="q-mx-md rounded-borders q-py-lg border-1px"
         >
           <q-item-section>
             <q-item-label>
@@ -101,7 +101,7 @@
 
           <q-item-section side v-if="route.params?.id == chat.id">
             <q-btn-group flat dense>
-              <q-btn icon="delete" size="sm" class="q-pa-xs" @click="deleteChat(chat.id)">
+              <q-btn icon="img:icons/delete.svg" size="sm" class="q-pa-xs" @click="deleteChat(chat.id)">
                 <q-tooltip>Delete chat</q-tooltip>
               </q-btn>
             </q-btn-group>

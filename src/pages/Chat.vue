@@ -1,5 +1,5 @@
 <template>
-  <q-page class="column align-items-center">
+  <q-page class="column align-items-center q-mx-xl">
     <div class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)" ref="scrollAreaRef">
       <!-- Display message history -->
       <q-list class="col-grow">
@@ -7,7 +7,7 @@
         <q-item
           v-for="(message, message_index) in messagesRef"
           :key="message.id"
-          :class="`q-py-lg items-start dyn-container chat-item ${message.role == usernameRef ? 'bg-dark' : ''}`"
+          :class="`q-py-lg q-mx-xl items-start dyn-container chat-item rounded-borders ${message.role == usernameRef ? 'bg-white' : 'bg-secondary'}`"
         >
           <!-- Display the avatar of the user or the AI -->
           <q-item-section avatar>
@@ -15,7 +15,7 @@
               <img src="avatars/00057-2093295138.png" />
             </q-avatar>
             <q-avatar v-else>
-              <img :src="chatRef.persona.avatarUrl" />
+              <img src="avatars/libert_ai_avatar.svg" />
             </q-avatar>
           </q-item-section>
           <!-- Edit message popup -- triggered on click if the edit mode is enabled -->
