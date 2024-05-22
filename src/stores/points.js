@@ -75,7 +75,11 @@ export const usePoints = defineStore('points', {
 
     getAddressRealtimePoints(address) {
       const pendingInfo = this.getAddressRealtimePendingPointsInfo(address);
-      return this.getAddressPoints(address) + pendingInfo.pending;
+      const addressPoints = this.getAddressPoints(address);
+      if (Number.isNaN(pendingInfo.pending)) {
+        return addressPoints;
+      }
+      return addressPoints + pendingInfo.pending;
     },
   },
 });
