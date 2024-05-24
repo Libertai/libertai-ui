@@ -49,10 +49,22 @@
     U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* TEXT */
 .text-semibold {
   font-weight: 600;
 }
 
+.text-light {
+  color: #644df9;
+}
+
+.text-purple700, .text-purple-700 {
+    font-family: 'Mulish';
+    color: $purple700;
+}
+.font-mulish {
+    font-family: 'Mulish';
+}
 .border-primary-highlight {
   border: 1px solid #644df9;
 }
@@ -76,23 +88,47 @@
 .bg-light {
   background-color: #644df9;
 }
-.text-light {
-  color: #644df9;
+
+.bg-purple-50 {
+  background-color: $purple50;
 }
 
 .rounded {
   border-radius: 100px;
 }
 
-header {
-    border-bottom: 1px solid #D9D9D9;
-}
-
 aside {
     border-right: 1px solid #D9D9D9;
+    & .item-history {
+        border: 1px solid #D9D9D9;
+    }
 }
 
 
 .btn-gradient {
     background-image: linear-gradient(to right top, #644DF9 10%,  #FCCBFF 100%);
+}
+
+.item-active {
+    border: 1px solid $primary !important;
+}
+
+input {
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+}
+
+/* fix broken avatar radius */
+.q-avatar__content, {
+    border-radius: 50%;
+}
+.rounded-img img {
+    border-radius: 50%;
+}
+.avatar {
+    border-radius: 50%;
+}
+
+.personas-dropdown {
+    border: 2px solid $secondary;
 }

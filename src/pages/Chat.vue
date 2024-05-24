@@ -15,11 +15,14 @@
               <img src="avatars/00057-2093295138.png" />
             </q-avatar>
             <q-avatar v-else>
-              <img src="avatars/libert_ai_avatar.svg" />
+              <img :src="personaRef.avatarUrl" />
             </q-avatar>
           </q-item-section>
           <!-- Edit message popup -- triggered on click if the edit mode is enabled -->
-          <q-item-section :style="`max-width: calc(960px - 56px);`">
+          <q-item-section
+            :style="`max-width: calc(960px - 56px);`"
+            :ref="'message-'+message_index"
+            >
             <q-popup-edit
               v-model="message.content"
               auto-save
@@ -70,8 +73,11 @@
               <q-tooltip>Regenerate</q-tooltip>
             </q-btn>
             <!-- Allow copying the message to the clipboard -->
-            <q-btn @click="copyMessage(message)" icon="content_copy" dense flat size="sm">
+            <q-btn @click="copyMessage(message)" icon="img:icons/svg/copy2.svg" dense flat size="sm">
               <q-tooltip>Copy</q-tooltip>
+            </q-btn>
+            <q-btn @click="editMessage('message-'+message_index)" icon="img:icons/svg/edit.svg" dense flat size="sm">
+              <q-tooltip>Edit</q-tooltip>
             </q-btn>
           </div>
         </q-item>
@@ -106,9 +112,10 @@
         class="col"
       />
     </div>
-    <div class="fixed-bottom-right q-mb-md q-mr-md" style="z-index: 10">
+
+    <!-- Enable edit mode -->
+    <!--<div class="fixed-bottom-right q-mb-md q-mr-md" style="z-index: 10">
       <div class="q-gutter-x-md" style="display: flex; align-items: center; justify-content: flex-end">
-        <!-- Enable edit mode -->
         <q-checkbox v-model="enableEditRef" left-label>
           <q-tooltip anchor="top right" class="bg-primary" self="bottom right">
             When this is activated, just click on a message to start editing it.
@@ -116,7 +123,7 @@
           Enable edits
         </q-checkbox>
       </div>
-    </div>
+    </div>-->
     <!-- This should really not pass the ref, but it's a quick fix for now -->
     <q-dialog v-model="showKnowledgeUploaderRef" position="bottom">
       <KnowledgeStoreUploader
@@ -147,6 +154,7 @@ import { useChatsStore } from 'src/stores/chats-store';
 import { useModelsStore } from 'src/stores/models-store';
 import { useKnowledgeStore } from 'src/stores/knowledge-store';
 import { useAccount } from 'src/stores/account';
+import { usePersonasStore } from 'src/stores/personas-store';
 
 // Components
 import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
@@ -171,6 +179,7 @@ export default defineComponent({
     const chatsStore = useChatsStore();
     const modelsStore = useModelsStore();
     const knowledgeStore = useKnowledgeStore();
+    const personasStore = usePersonasStore();
 
     // Local page state
     const inputTextRef = ref('');
@@ -450,7 +459,8 @@ export default defineComponent({
         await router.push({ name: 'new-chat' });
         return;
       }
-
+      console.log("change chat!!", chatRef);
+      personasStore.setPersona(chatRef.value.persona);
       // Extract the chat properties
       let title = chatRef.value.title;
       let username = chatRef.value.username;
@@ -509,6 +519,14 @@ export default defineComponent({
       $q.notify('Message copied to clipboard');
     }
 
+    async function editMessage(message_id) {
+      this.enableEditRef = true;
+
+      setTimeout(() => {
+        this.$refs[message_id][0].$el.click()
+      }, 50);
+    }
+
     async function clearCookies() {
       // Clear the slots
       inferenceEngine.clearSlots();
@@ -544,6 +562,7 @@ export default defineComponent({
       regenerateMessage,
       updateChatMessageContent,
       copyMessage,
+      editMessage,
       chatId: route.params.id,
     };
   },

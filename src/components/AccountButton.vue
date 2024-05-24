@@ -8,9 +8,10 @@
       rounded
       unelevated
       @click="eth_web3_login"
-      no-caps
-      icon="img:src/assets/wallet.svg"
-    >
+      >
+      <q-icon class="text-dark" size="xs" left>
+        <img src="~assets/wallet.svg" />
+      </q-icon>
       Connect Wallet
     </q-btn>
     <q-btn-dropdown
@@ -22,14 +23,14 @@
       rounded
       unelevated
     >
-      <div class="row no-wrap q-pa-md q-pt-none bg-primary border-primary-highlight">
+      <div class="row no-wrap q-pa-md q-pt-none">
         <div class="column items-center">
           <div class="text-small q-mb-xs">{{ account.address }}</div>
 
           <q-btn
             v-close-popup
-            class="text-semibold border-primary-highlight gt-sm"
-            color="secondary"
+            class="text-semibold gt-sm"
+            color="primary"
             label="Disconnect"
             no-caps
             rounded

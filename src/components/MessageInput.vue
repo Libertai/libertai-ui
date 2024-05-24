@@ -1,5 +1,5 @@
 <template>
-  <q-input
+<q-input
     outlined
     v-model="model"
     placeholder="Write your message here"
@@ -17,7 +17,7 @@
     :bottom-slots="props.hint !== ''"
   >
     <template v-slot:prepend>
-      <q-btn round dense flat icon="img:icons/attachment.svg" @click="sendMessage" color="" />
+      <q-btn round dense flat icon="img:icons/svg/attachment.svg" @click="sendMessage" color="white" />
     </template>
     <template v-slot:append>
       <q-btn round dense flat icon="img:icons/mic.svg" @click="sendMessage" color="" />

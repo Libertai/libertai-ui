@@ -1,51 +1,28 @@
 <template>
-  <q-page class="align-items-center" style="display: flex; flex-direction: column">
-    <!-- Persona Selection -->
-    <q-tabs
-      v-model="selectedPersonaIdRef"
-      narrow-indicator
-      dense
-      align="justify"
-      active-color="white"
-      no-caps
-      mobile-arrows
-      class="q-pa-lg"
-    >
-      <q-tab v-for="persona of personasStore.personas" :key="persona.id" :name="persona.id">
-        <q-avatar size="64px" color="white" class="q-mb-xs">
-          <img :src="persona.avatarUrl" class="q-pa-xs" />
+<q-page class="align-items-center" style="display: flex; flex-direction: column">
+  
+  <div class="q-pb-xl">
+    <div class="row q-ma-xl ">
+      <div class="col"></div>
+      <div class="col-4">
+      <q-card class="my-card center text-center q-my-xl" flat>
+        <q-avatar>
+          <img :src="personasStore.persona.avatarUrl">
         </q-avatar>
-        {{ persona.name }}
-      </q-tab>
-    </q-tabs>
-
-    <q-expansion-item
-      v-model="advancedShownRef"
-      :icon="'img:' + selectedPersonaRef.avatarUrl"
-      label="Customize"
-      style="flex-grow: 1"
-      class="q-pa-lg"
-    >
-      <q-card>
-        <q-card-section class="row q-col-gutter-sm">
-          <q-input v-model="usernameInputRef" placeholder="user" label="Your name" standout class="col-6" />
-          <q-input v-model="selectedPersonaRef.name" label="Persona name" standout class="col-6" />
+        
+        <q-card-section>
+          <div class="rounded-borders bg-secondary q-pa-md text-left text-light">Hi I'm your Libertai Assistant.<br/>How can I assist you today?</div>
         </q-card-section>
-        <q-card-section class="">
-          <q-input
-            autogrow
-            v-model="selectedPersonaRef.description"
-            type="textarea"
-            label="Persona Description"
-            standout
-          />
+        
+        <q-card-section class="q-pt-none">
+          {{ lorem }}
         </q-card-section>
       </q-card>
-    </q-expansion-item>
-
-    <div class="q-pb-xl">
-      <message-input
-        @sendMessage="sendMessage"
+      </div>
+      <div class="col"></div>
+    </div>
+    <message-input
+      @sendMessage="sendMessage"
         v-model="messageInputRef"
         ref="input"
         hint="Disclaimer: This chat bot uses personas for entertainment and informational purposes only. The
@@ -87,27 +64,9 @@ export default defineComponent({
 
     // Our local page state
 
-    // Control whether the advanced persona customization is shown
-    const advancedShownRef = ref(false);
-    // Persona selection state -- set to the first persona by default
-    // NOTE: this is kinda janky but we'll keep this around to reset the personas
-    //  once a user initiates a new chat. This is probably an indication that available personas
-    //   should not be a part of global state.
-    const personasClone = JSON.parse(JSON.stringify(personasStore.personas));
-    const selectedPersonaRef = ref(personasStore.personas[0]);
-    const selectedPersonaIdRef = ref(personasStore.personas[0].id);
-    // Username input state
     const usernameInputRef = ref('user');
     // Message input state
     const messageInputRef = ref('');
-
-    // now watch for that id change
-    watch(
-      () => selectedPersonaIdRef.value,
-      (newId) => {
-        setPersona(newId);
-      },
-    );
 
     async function sendMessage() {
       let message = messageInputRef.value;
@@ -121,11 +80,10 @@ export default defineComponent({
       let username = usernameInputRef.value;
       // NOTE: these are refs to the store, so we need to deep clone them
       let model = JSON.parse(JSON.stringify(modelsStore.selectedModel));
-      let persona = JSON.parse(JSON.stringify(selectedPersonaRef.value));
+      let persona = JSON.parse(JSON.stringify(personasStore.persona));
 
       // Reset the personas now that we have a deep clone of the selected persona
-      personasStore.personas = personasClone;
-
+      //personasStore.personas = personasClone;
       // Creates the new chat
       let chat = await chatsStore.createChat(title, username, model, persona);
       // Append the first user message to the chat history
@@ -137,18 +95,10 @@ export default defineComponent({
       router.push({ name: 'chat', params: { id: chat.id } });
     }
 
-    function setPersona(id) {
-      selectedPersonaRef.value = personasStore.personas.find((persona) => persona.id === id);
-    }
-
     return {
-      advancedShownRef,
-      selectedPersonaRef,
-      selectedPersonaIdRef,
       usernameInputRef,
       messageInputRef,
       sendMessage,
-      setPersona,
       modelsStore,
       personasStore,
       localSettings: {

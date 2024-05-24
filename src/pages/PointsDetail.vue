@@ -1,48 +1,55 @@
 <template>
-  <q-page class="flex flex-center bg-dark">
-    <div class="row q-pa-xl q-col-gutter-md">
+  <q-page class="flex flex-center q-pa-xl font-mulish text-purple-700">
+    <div class="row q-pa-xl q-col-gutter-md q-py-xl">
       <q-card flat class="col-12 text-center">
-        <q-card-section class="bg-dark-page">
+        <q-card-section>
           <p class="q-py-md">
-            <span class="text-white bg-primary q-py-sm q-px-xl rounded">{{ address }}</span>
+            <span class="bg-purple-50 q-py-sm q-px-xl rounded text-bold">{{ address }}</span>
           </p>
-          <div class="text-h4 text-bold q-pb-sm">Your Libertai Points</div>
-          <p>
+          <div class="text-h4 text-bold q-pb-sm text-left">Your Libertai Points</div>
+          <p class="text-left">
             Run aleph.im network nodes, stake ALEPH to continue earning Libertai points. New ways will be available
             soon!
           </p>
         </q-card-section>
-        <q-card-section class="q-pt-none bg-dark-page">
-          <p class="text-h6 text-bold text-light">Total Points Received</p>
+      </q-card>
+      <q-card flat class="bg-purple-50 col-12 q-pa-none">
+        <q-card-section class="q-pt-none q-pa-xl row">
+          <div class="text-h6 text-bold col-8 text-left">
+            <q-avatar class="q-mr-sm">
+              <img src="icons/svg/libertai.svg"
+            </q-avatar>
+            Total Points Received
+          </div>
 
-          <p class="q-py-md">
-            <span class="text-h4 text-bold text-white bg-light q-py-sm q-px-xl rounded">{{
+          <div class="col-4">
+            <span class="text-h4 text-bold">{{
               points.getAddressPoints(address).toFixed(2)
             }}</span>
-          </p>
+          </div>
         </q-card-section>
       </q-card>
-      <q-card flat class="col-6 text-center column">
-        <q-card-section class="bg-primary">
-          <p class="text-h6 text-bold text-white">Pending Points</p>
-          <p class="q-py-md">
-            <span class="text-h4 text-bold text-light bg-white q-py-sm q-px-xl rounded">{{
+      <q-card flat class="col-6 text-center column q-pl-none">
+        <q-card-section class="bg-purple-50 q-pa-xl">
+          <p class="text-h6 text-bold text-left">Pending Points</p>
+          <p class="q-py-md text-right">
+            <span class="text-h4 text-bold rounded">{{
               currentPendingPoints.toFixed(2)
             }}</span>
           </p>
-          <p class="">You are getting {{ hourlyRate.toFixed(2) }} points per hour.</p>
         </q-card-section>
       </q-card>
       <q-card flat class="col-6 text-center column">
-        <q-card-section class="bg-primary">
-          <p class="text-h6 text-bold text-white">36 Month estimated Points*</p>
-          <p class="q-py-md">
-            <span class="text-h4 text-bold text-light bg-white q-py-sm q-px-xl rounded">{{
+        <q-card-section class="bg-purple-50 q-pa-xl">
+          <p class="text-h6 text-bold text-left">36 Month estimated Points*</p>
+          <p class="q-py-md text-right">
+            <span class="text-h4 text-bold rounded">{{
               ThreeYearsPoints.toFixed(2)
             }}</span>
           </p>
         </q-card-section>
       </q-card>
+      <p class="">You are getting {{ hourlyRate.toFixed(2) }} points per hour.</p>
       <p class="text-grey text-center col-12">
         * Estimate only, and under current rules, if your participation stays at the same level. <br />
         The availability of Libertai Points is subject to change without notice. We may suspend, modify, or terminate
