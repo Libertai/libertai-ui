@@ -1,6 +1,6 @@
 <template>
 <q-page class="align-items-center" style="display: flex; flex-direction: column">
-  
+
   <div class="q-pb-xl">
     <div class="row q-ma-xl ">
       <div class="col"></div>
@@ -9,11 +9,11 @@
         <q-avatar>
           <img :src="personasStore.persona.avatarUrl">
         </q-avatar>
-        
+
         <q-card-section>
           <div class="rounded-borders bg-secondary q-pa-md text-left text-light">Hi I'm your Libertai Assistant.<br/>How can I assist you today?</div>
         </q-card-section>
-        
+
         <q-card-section class="q-pt-none">
           {{ lorem }}
         </q-card-section>
@@ -41,7 +41,7 @@ import { defaultChatTopic } from 'src/utils/chat';
 import { useModelsStore } from 'src/stores/models-store';
 import { useChatsStore } from 'src/stores/chats-store';
 import { usePersonasStore } from 'src/stores/personas-store';
-import { defineComponent, ref, watch } from 'vue';
+import { defineComponent, ref} from 'vue';
 import { useRouter } from 'vue-router';
 
 // Import components

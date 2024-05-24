@@ -61,17 +61,12 @@
 </template>
 
 <script>
-import { useModelsStore } from 'src/stores/models-store';
 import { usePersonasStore } from 'src/stores/personas-store';
-import { defineComponent, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { defineComponent, ref} from 'vue';
 
 export default defineComponent({
   name: 'PersonaDialog',
-  setup(props) {
-    const router = useRouter();
-    const modelsStore = useModelsStore();
-    // TODO: We probably don't need to use a store for this
+  setup() {
     const personasStore = usePersonasStore();
     const selectedPersonaRef = ref(personasStore.persona);
     const usernameInputRef = ref('user');

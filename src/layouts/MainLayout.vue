@@ -75,7 +75,7 @@
           rounded
           unelevated
           no-caps
-          icon="img:src/assets/engine.svg"
+          icon="img:icons/svg/engine.svg"
           >
           <q-list>
             <q-item
