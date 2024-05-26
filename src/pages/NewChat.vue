@@ -1,23 +1,22 @@
 <template>
 <q-page class="align-items-center" style="display: flex; flex-direction: column">
-
+  
   <div class="q-pb-xl">
-    <div class="row q-ma-xl ">
+    <div :class="$q.screen.gt.sm ? 'row q-ma-xl' : 'row qm-ma-md'">
       <div class="col"></div>
-      <div class="col-4">
-      <q-card class="my-card center text-center q-my-xl" flat>
-        <q-avatar>
-          <img :src="personasStore.persona.avatarUrl">
-        </q-avatar>
-
-        <q-card-section>
-          <div class="rounded-borders bg-secondary q-pa-md text-left text-light">Hi I'm your Libertai Assistant.<br/>How can I assist you today?</div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none">
-          {{ lorem }}
-        </q-card-section>
-      </q-card>
+      <div :class="$q.screen.gt.sm ? 'col-4' : 'col-10'">
+        <q-card class="my-card center text-center q-my-xl" flat>
+          <q-avatar>
+            <img :src="personasStore.persona.avatarUrl">
+          </q-avatar>
+          
+          <q-card-section>
+            <div class="rounded-borders bg-secondary q-pa-md text-left text-light">Hi I'm your Libertai Assistant.<br/>How can I assist you today?</div>
+          </q-card-section>
+          <q-card-section>
+            <persona-drop-down />
+          </q-card-section>
+        </q-card>
       </div>
       <div class="col"></div>
     </div>
@@ -46,11 +45,13 @@ import { useRouter } from 'vue-router';
 
 // Import components
 import MessageInput from 'src/components/MessageInput.vue';
+import PersonaDropDown from 'src/components/PersonaDropDown.vue';
 
 export default defineComponent({
   name: 'NewChat',
   components: {
     MessageInput,
+    PersonaDropDown
   },
   setup() {
     const router = useRouter();

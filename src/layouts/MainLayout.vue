@@ -3,79 +3,26 @@
   <q-header class="bg-transparent q-mt-sm">
     <q-toolbar>
       <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" color="primary" />
-      <q-btn-dropdown
-        no-caps
-        unelevated
-        rounded
-        :icon="'img:'+personasStore.persona.avatarUrl"
-        dropdown-icon="img:icons/svg/chevron-down.svg"
-        class="no-shadow rounded-img personas-dropdown q-py-sm"
-        text-color="primary"
-        :label="personasStore.persona.name"
-        >
-        <q-list>
-          <q-item
-            clickable
-            v-close-popup
-            v-for="persona of personasStore.personas"
-            :key="persona.id"
-            :name="persona.id"
-            @click="setPersona(persona.id)"
-            >
-            <q-avatar size="32px" class="q-mr-md">
-              <img :src="persona.avatarUrl">
-            </q-avatar>
-            <q-item-section>
-              <q-item-label>
-                {{ persona.name }}
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-btn-dropdown>
+      <!--<persona-drop-down />-->
       <q-btn flat @click="editPersona = true">
         <q-icon size="xs">
           <img src="icons/svg/settings.svg" />
         </q-icon>
       </q-btn>
-  <persona-dialog v-model="editPersona" />
+      <persona-dialog v-model="editPersona" />
       <q-space />
 
       <div class="row q-gutter-x-sm">
-        <q-btn
-          unelevated
-          rounded
-          text-color="white"
-          no-caps
-          class="btn-gradient"
-          label="Earn Points"
-          to="/points"
-          v-if="!account.active"
-          />
-        <q-btn
-          unelevated
-          rounded
-          text-color="white"
-          class="btn-gradient"
-          no-caps
-          :to="{
-               name: 'points-detail',
-               params: { address: account.address },
-               }"
-          v-else
-          >
-          <span :key="account.address">{{ addressPoints.toFixed(0) }} Points</span>
-        </q-btn>
         <!-- model selector -->
         <q-btn-dropdown
-          :label="modelsStore.selectedModel.name"
+          :label="modelsStore.selectedModel.name.substring(0,12)+'..'"
           color="primary"
           text-color="white"
           class="border-primary-highlight"
           rounded
           unelevated
           no-caps
-          icon="img:icons/svg/engine.svg"
+          :icon="$q.screen.gt.sm ? 'img:icons/svg/engine.svg' : None"
           >
           <q-list>
             <q-item
@@ -93,7 +40,33 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <account-button />
+        <q-btn
+          unelevated
+          rounded
+          text-color="white"
+          no-caps
+          :class="$q.screen.gt.sm ? 'btn-gradient' : 'float-right q-pa-sm'"
+          :label="$q.screen.gt.sm ? 'Earn Points' : ''"
+          :icon="$q.screen.gt.sm ? None : 'img:icons/svg/star.svg'"
+          to="/points"
+          v-if="!account.active"
+          />
+        <q-btn
+          unelevated
+          rounded
+          :text-color="$q.screen.gt.sm ? 'white' : 'black'"
+          :class="$q.screen.gt.sm ? 'btn-gradient' : 'float-right q-pa-sm'"
+          :icon="$q.screen.gt.sm ? None : 'img:icons/svg/star.svg'"
+          no-caps
+          :to="{
+               name: 'points-detail',
+               params: { address: account.address },
+               }"
+          v-else
+          >
+          <span :key="account.address">{{ addressPoints.toFixed(0) }} <span v-if="$q.screen.gt.sm">Points</span></span>
+        </q-btn>
+        <account-button />
         </div>
       </q-toolbar>
     </q-header>
@@ -101,7 +74,7 @@
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      class="bg-white flex-grow"
+      class="bg-white flex-grow fit"
       style="display: flex; flex-direction: column"
     >
 
@@ -117,9 +90,10 @@
         no-caps
         to="/new"
         >+ New Chat</q-btn>
+
       <!-- list of chats by reference to the chats-store -->
       <q-list style="flex-grow: 1">
-        <!--<q-item-label header class="text-uppercase text-bold"> Chats </q-item-label>-->
+        <q-scroll-area visible style="height: 100%; min-height:100px">
         <q-item
           v-for="chat of chats.slice().reverse()"
           :key="chat.id"
@@ -152,6 +126,7 @@
             </q-btn-group>
           </q-item-section>
         </q-item>
+        </q-scroll-area>
       </q-list>
       <!-- socials and support links (follow us, support, disclaimer) -->
       <q-list class="q-pt-md">
@@ -213,12 +188,14 @@ import { useRouter, useRoute } from 'vue-router';
 // IMport Components
 import AccountButton from 'src/components/AccountButton.vue';
 import PersonaDialog from 'src/components/PersonaDialog.vue';
+import PersonaDropDown from 'src/components/PersonaDropDown.vue';
 
 export default defineComponent({
   name: 'MainLayout',
   components: {
     AccountButton,
-    PersonaDialog
+    PersonaDialog,
+    PersonaDropDown
   },
 
   setup() {
@@ -263,12 +240,6 @@ export default defineComponent({
       }
     }
 
-    function setPersona(id) {
-      personasStore.setPersona(
-        personasStore.personas.find((persona) => persona.id === id)
-      );
-    }
-
     return {
       chats,
       modelsStore,
@@ -280,7 +251,6 @@ export default defineComponent({
       leftDrawerOpen,
       addressPoints,
       deleteChat,
-      setPersona,
       editPersona,
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;

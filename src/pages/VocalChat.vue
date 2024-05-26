@@ -30,7 +30,8 @@ const openai = new OpenAI({
 // Initialize the entries array
 const entries = ref([]);
 
-window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
 const recognition = new SpeechRecognition();
 
 // let's define some functions

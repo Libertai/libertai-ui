@@ -16,12 +16,13 @@
     </q-btn>
     <q-btn-dropdown
       v-else
-      :label="`${account.address.slice(0, 5)}...${account.address.slice(-5)}`"
-      class="text-semibold border-primary-highlight gt-sm"
-      color="primary"
+      :label="`${account.address.slice(0, 4)}...${account.address.slice(-2)}`"
+      class="border-primary-highlight gt-sm"
+      text-color="primary"
       no-caps
       rounded
       unelevated
+      icon="img:icons/svg/avatar.svg"
     >
       <div class="row no-wrap q-pa-md q-pt-none">
         <div class="column items-center">

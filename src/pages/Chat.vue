@@ -384,6 +384,7 @@ export default defineComponent({
           // Update the local state include updates
           response.content = content;
           response.stopped = stopped;
+
           messagesRef.value = [...messagesRef.value];
           // Scroll to the bottom of the chat
           nextTick(scrollBottom);
@@ -459,7 +460,7 @@ export default defineComponent({
         await router.push({ name: 'new-chat' });
         return;
       }
-      console.log("change chat!!", chatRef);
+
       personasStore.setPersona(chatRef.value.persona);
       // Extract the chat properties
       let title = chatRef.value.title;
