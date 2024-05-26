@@ -188,14 +188,12 @@ import { useRouter, useRoute } from 'vue-router';
 // IMport Components
 import AccountButton from 'src/components/AccountButton.vue';
 import PersonaDialog from 'src/components/PersonaDialog.vue';
-import PersonaDropDown from 'src/components/PersonaDropDown.vue';
 
 export default defineComponent({
   name: 'MainLayout',
   components: {
     AccountButton,
-    PersonaDialog,
-    PersonaDropDown
+    PersonaDialog
   },
 
   setup() {
