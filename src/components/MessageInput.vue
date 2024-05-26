@@ -7,7 +7,7 @@
     bg-color="secondary"
     label-color="grey"
     input-class="text-light"
-    class="q-pa-lg"
+    :class="$q.screen.gt.sm ? 'q-pa-lg': 'q-pa-sm'"
     ref="input"
     type="textarea"
     autogrow
@@ -17,11 +17,11 @@
     :bottom-slots="props.hint !== ''"
   >
     <template v-slot:prepend>
-      <q-btn round dense flat icon="img:icons/svg/attachment.svg" @click="sendMessage" color="white" />
+      <!--<q-btn round dense flat icon="img:icons/svg/attachment.svg" @click="sendMessage" color="white" />-->
     </template>
     <template v-slot:append>
-      <q-btn round dense flat icon="img:icons/mic.svg" @click="sendMessage" color="" />
-      <q-btn round dense flat icon="img:icons/send.svg" @click="sendMessage" color="" />
+      <q-btn round dense flat icon="img:icons/mic.svg" @click="sendMessage" color="" class="" />
+      <q-btn round dense flat icon="img:icons/send.svg" @click="sendMessage" color="" class=""/>
     </template>
 
     <template v-slot:hint>

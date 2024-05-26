@@ -7,7 +7,7 @@
         <q-item
           v-for="(message, message_index) in messagesRef"
           :key="message.id"
-          :class="`q-py-lg q-mx-xl items-start dyn-container chat-item rounded-borders ${message.role == usernameRef ? 'bg-white' : 'bg-secondary'}`"
+          :class="`q-py-lg ${$q.screen.gt.sm ? 'q-mx-xl' : 'q-mx-sm'} items-start dyn-container chat-item rounded-borders ${message.role == usernameRef ? 'bg-white' : 'bg-secondary'}`"
         >
           <!-- Display the avatar of the user or the AI -->
           <q-item-section avatar>
