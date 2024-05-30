@@ -1,6 +1,6 @@
 <template>
   <!-- It's a page with chat entries, by the user or by the AI assistant.
-    We are using Quasard q-chat-message compoents -->
+    We are using Quasard q-chat-message components -->
   <q-page class="flex flex-center">
     <div>
       hey there
@@ -8,10 +8,10 @@
         <q-chat-message
           v-for="entry in entries"
           :key="entry.id"
-          :sent="entry.sent"
-          :name="entry.name"
-          :text="[entry.text]"
           :avatar="entry.avatar"
+          :name="entry.name"
+          :sent="entry.sent"
+          :text="[entry.text]"
           :text-color="entry.isFinal ? 'black' : 'grey-8'"
         />
       </div>
@@ -19,8 +19,9 @@
   </q-page>
 </template>
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { nextTick, onMounted, ref } from 'vue';
 import OpenAI from 'openai';
+
 const openai = new OpenAI({
   apiKey: 'libertai',
   dangerouslyAllowBrowser: true,

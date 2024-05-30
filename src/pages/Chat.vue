@@ -1,6 +1,6 @@
 <template>
   <q-page class="column align-items-center q-mx-xl">
-    <div class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)" ref="scrollAreaRef">
+    <div ref="scrollAreaRef" class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)">
       <!-- Display message history -->
       <q-list class="col-grow">
         <!-- Determine styling based on the role of the message (if it's the user or the AI) -->
@@ -19,16 +19,16 @@
             </q-avatar>
           </q-item-section>
           <!-- Edit message popup -- triggered on click if the edit mode is enabled -->
-          <q-item-section :style="`max-width: calc(960px - 56px);`" :ref="'message-' + message_index">
+          <q-item-section :ref="'message-' + message_index" :style="`max-width: calc(960px - 56px);`">
             <q-popup-edit
+              v-if="enableEditRef"
+              v-slot="scope"
               v-model="message.content"
               auto-save
-              v-slot="scope"
-              v-if="enableEditRef"
               @save="(v, iV) => updateChatMessageContent(message_index, v, iV)"
             >
               <strong>{{ message.role }}</strong>
-              <q-input v-model="scope.value" dense autofocus counter autogrow />
+              <q-input v-model="scope.value" autofocus autogrow counter dense />
             </q-popup-edit>
             <!-- Display the role of the user or the AI -->
             <q-item-label class="text-semibold">
@@ -48,9 +48,9 @@
             <q-item-label style="display: block">
               <MarkdownRenderer :content="message.content" breaks />
               <!-- Display the loading spinner if the message is still loading -->
-              <q-spinner-bars color="white" size="2em" v-if="!message.stopped && isLoadingRef" />
+              <q-spinner-bars v-if="!message.stopped && isLoadingRef" color="white" size="2em" />
               <!-- Display the error message if the message errored  on generate -->
-              <span class="text-warning" v-if="!!message.error">
+              <span v-if="!!message.error" class="text-warning">
                 <q-tooltip>Error: {{ message.error.message }}</q-tooltip>
                 <q-icon name="warning" /> There has been an error, please <a @click="regenerateMessage()">retry</a>.
               </span>
@@ -60,20 +60,20 @@
           <div class="absolute dyn-container chat-toolbar">
             <!-- Allow regenerating the last message from the AI if fully completed -->
             <q-btn
-              @click="regenerateMessage()"
-              icon="refresh"
+              v-if="!isLoadingRef && message_index == messagesRef.length - 1"
               dense
               flat
+              icon="refresh"
               size="sm"
-              v-if="!isLoadingRef && message_index == messagesRef.length - 1"
+              @click="regenerateMessage()"
             >
               <q-tooltip>Regenerate</q-tooltip>
             </q-btn>
             <!-- Allow copying the message to the clipboard -->
-            <q-btn @click="copyMessage(message)" icon="img:icons/svg/copy2.svg" dense flat size="sm">
+            <q-btn dense flat icon="img:icons/svg/copy2.svg" size="sm" @click="copyMessage(message)">
               <q-tooltip>Copy</q-tooltip>
             </q-btn>
-            <q-btn @click="editMessage('message-' + message_index)" icon="img:icons/svg/edit.svg" dense flat size="sm">
+            <q-btn dense flat icon="img:icons/svg/edit.svg" size="sm" @click="editMessage('message-' + message_index)">
               <q-tooltip>Edit</q-tooltip>
             </q-btn>
           </div>
@@ -85,12 +85,12 @@
       <!-- "+" icon for uploading files, shown only when knowledge search is enabled -->
       <q-btn
         v-if="enableKnowledgeRef"
-        flat
-        round
-        icon="add"
         class="cursor-pointer q-mr-sm"
-        @click="openKnowledgeUploader"
+        flat
+        icon="add"
+        round
         style="margin-left: 16px"
+        @click="openKnowledgeUploader"
       />
 
       <q-chip
@@ -102,11 +102,11 @@
         {{ attachment.title }}
       </q-chip>
       <message-input
-        :isLoading="isLoadingRef"
-        @sendMessage="sendMessage"
-        v-model="inputTextRef"
         ref="inputRef"
+        v-model="inputTextRef"
+        :isLoading="isLoadingRef"
         class="col"
+        @sendMessage="sendMessage"
       />
     </div>
 
@@ -124,12 +124,12 @@
     <!-- This should really not pass the ref, but it's a quick fix for now -->
     <q-dialog v-model="showKnowledgeUploaderRef" position="bottom">
       <KnowledgeStoreUploader
-        @attachment-added="addAttachment"
         :chatRef="chatRef"
-        label="Auto KnowledgeStoreUploader"
         auto-upload
-        url="http://localhost:4444/upload"
+        label="Auto KnowledgeStoreUploader"
         multiple
+        url="http://localhost:4444/upload"
+        @attachment-added="addAttachment"
       />
     </q-dialog>
   </q-page>
@@ -137,11 +137,11 @@
 
 <script>
 import 'highlight.js/styles/devibeans.css';
-import { useQuasar, copyToClipboard } from 'quasar';
-import { defineComponent, ref, watch, nextTick, onMounted } from 'vue';
+import { copyToClipboard, useQuasar } from 'quasar';
+import { defineComponent, nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-import { inferChatTopic, defaultChatTopic } from 'src/utils/chat';
+import { defaultChatTopic, inferChatTopic } from 'src/utils/chat';
 
 // LlamaCppApiEngine
 import { LlamaCppApiEngine } from '@libertai/libertai-js';
@@ -307,7 +307,7 @@ export default defineComponent({
         isLoadingRef.value = true;
         hasResetRef.value = false;
 
-        // NOTE: assuming last message is gauranteed to be non-empty and the user's last message
+        // NOTE: assuming last message is guaranteed to be non-empty and the user's last message
         // Get the last message from the user
         let lastMessage = messages[messages.length - 1];
         let searchResultMessages = [];
@@ -320,7 +320,7 @@ export default defineComponent({
         });
 
         // Expand all the messages to inline any compatible attachments
-        const exapndedMessages = messages
+        const expandedMessages = messages
           .map((message) => {
             let ret = [];
             // Push any attachments ahead of the message
@@ -341,7 +341,7 @@ export default defineComponent({
             }
 
             // Push what search results we found based on the message
-            // TODO: this should prabably be a more generic tool-call or llm-chain-link
+            // TODO: this should probably be a more generic tool-call or llm-chain-link
             // TODO: this should probably link back to the document id
             // TODO: I should probably write these below messages in the log
             //  Really these search results should get attached to the message that
@@ -361,7 +361,7 @@ export default defineComponent({
           .flat();
 
         // Append the search results to the messages
-        const allMessages = [...exapndedMessages, ...searchResultMessages];
+        const allMessages = [...expandedMessages, ...searchResultMessages];
 
         // Generate a stream of responses from the AI
         for await (const output of inferenceEngine.generateAnswer(
@@ -492,7 +492,7 @@ export default defineComponent({
         setChatName(messages[0].content);
       }
 
-      // Determine if there are messages we need to repsond to
+      // Determine if there are messages we need to respond to
       // NOTE: this is assuming all chats should be initiated by the user
       if (messages.length % 2 === 1) {
         await generatePersonaMessage();

@@ -21,7 +21,7 @@ const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
  *  model: Model;
  *  persona: Persona;
  *  // Note: we will populate these with additional data,
- *  // by inlinging attachments, search-results, etc.
+ *  // by inlining attachments, search-results, etc.
  *  messages: Message[];
  *  createdAt: Date;
  * }
@@ -47,7 +47,7 @@ const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
  * interface SearchResult {
  *  // embedding document id
  *  documentId: string;
- *  // embdedding conent
+ *  // embedding content
  *  content: string;
  * }
  */
@@ -72,7 +72,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       // Get the partial chats of the form { id, title }
       let chats = await this.chatsStore.readChats();
       this.chats = chats;
-      return;
+
     },
 
     /**
@@ -259,7 +259,7 @@ class ChatsStore {
     await Promise.all(updatedChats);
 
     // Done!
-    return;
+
   }
 
   /**
