@@ -23,9 +23,7 @@
           </div>
 
           <div class="col-4">
-            <span class="text-h4 text-bold">{{
-              points.getAddressPoints(address).toFixed(2)
-            }}</span>
+            <span class="text-h4 text-bold">{{ points.getAddressPoints(address).toFixed(2) }}</span>
           </div>
         </q-card-section>
       </q-card>
@@ -33,9 +31,7 @@
         <q-card-section class="bg-purple-50 q-pa-xl">
           <p class="text-h6 text-bold text-left">Pending Points</p>
           <p class="q-py-md text-right">
-            <span class="text-h4 text-bold rounded">{{
-              currentPendingPoints.toFixed(2)
-            }}</span>
+            <span class="text-h4 text-bold rounded">{{ currentPendingPoints.toFixed(2) }}</span>
           </p>
         </q-card-section>
       </q-card>
@@ -43,9 +39,7 @@
         <q-card-section class="bg-purple-50 q-pa-xl">
           <p class="text-h6 text-bold text-left">36 Month estimated Points*</p>
           <p class="q-py-md text-right">
-            <span class="text-h4 text-bold rounded">{{
-              ThreeYearsPoints.toFixed(2)
-            }}</span>
+            <span class="text-h4 text-bold rounded">{{ ThreeYearsPoints.toFixed(2) }}</span>
           </p>
         </q-card-section>
       </q-card>

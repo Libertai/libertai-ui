@@ -3,12 +3,12 @@
     no-caps
     unelevated
     rounded
-    :icon="'img:'+personasStore.persona.avatarUrl"
+    :icon="'img:' + personasStore.persona.avatarUrl"
     dropdown-icon="img:icons/svg/chevron-down.svg"
     class="no-shadow rounded-img personas-dropdown q-py-sm"
     text-color="primary"
     :label="personasStore.persona.name"
-    >
+  >
     <q-list>
       <q-item
         clickable
@@ -17,9 +17,9 @@
         :key="persona.id"
         :name="persona.id"
         @click="setPersona(persona.id)"
-        >
+      >
         <q-avatar size="32px" class="q-mr-md">
-          <img :src="persona.avatarUrl">
+          <img :src="persona.avatarUrl" />
         </q-avatar>
         <q-item-section>
           <q-item-label>
@@ -41,15 +41,13 @@ export default defineComponent({
     const personasStore = usePersonasStore();
 
     function setPersona(id) {
-      personasStore.setPersona(
-        personasStore.personas.find((persona) => persona.id === id)
-      );
+      personasStore.setPersona(personasStore.personas.find((persona) => persona.id === id));
     }
 
     return {
       personasStore,
-      setPersona
-    }
-  }
-})
+      setPersona,
+    };
+  },
+});
 </script>

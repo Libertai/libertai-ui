@@ -1,35 +1,39 @@
 <template>
-<q-page class="align-items-center" style="display: flex; flex-direction: column">
-  
-  <div class="q-pb-xl">
-    <div :class="$q.screen.gt.sm ? 'row q-ma-xl' : 'row qm-ma-md'">
-      <div class="col"></div>
-      <div :class="$q.screen.gt.sm ? 'col-4' : 'col-10'">
-        <q-card class="my-card center text-center q-my-xl" flat>
-          <q-avatar>
-            <img :src="personasStore.persona.avatarUrl">
-          </q-avatar>
-          
-          <q-card-section>
-            <div class="rounded-borders bg-secondary q-pa-md text-left text-light">Hi I'm your Libertai Assistant.<br/>How can I assist you today?</div>
-          </q-card-section>
-          <q-card-section>
-            <persona-drop-down />
-          </q-card-section>
-        </q-card>
+  <q-page class="align-items-center" style="display: flex; flex-direction: column">
+    <div class="q-pb-xl">
+      <div :class="$q.screen.gt.sm ? 'row q-ma-xl' : 'row qm-ma-md'">
+        <div class="col"></div>
+        <div :class="$q.screen.gt.sm ? 'col-4' : 'col-10'">
+          <q-card class="my-card center text-center q-my-xl" flat>
+            <q-avatar>
+              <img :src="personasStore.persona.avatarUrl" />
+            </q-avatar>
+
+            <q-card-section>
+              <div class="rounded-borders bg-secondary q-pa-md text-left text-light">
+                Hi I'm your Libertai Assistant.<br />How can I assist you today?
+              </div>
+            </q-card-section>
+            <q-card-section>
+              <persona-drop-down />
+            </q-card-section>
+          </q-card>
+        </div>
+        <div class="col"></div>
       </div>
-      <div class="col"></div>
-    </div>
-    <message-input
-      @sendMessage="sendMessage"
-        v-model="messageInputRef"
-        ref="input"
-        hint="Disclaimer: This chat bot uses personas for entertainment and informational purposes only. The
-                chat bot's responses are not a reflection of any real person or organization's views or opinions, and should not
-                be used as a substitute for professional advice. The accuracy and reliability of the chat bot's responses cannot
-                be guaranteed. Users should exercise their own judgment and discretion when interacting with the chat bot and
-                its personas. By using this chat bot, you acknowledge and agree to these terms."
-      />
+      <div class="fixed-bottom absolute q-mb-xl q-pb-xs">
+        <message-input
+          @sendMessage="sendMessage"
+          v-model="messageInputRef"
+          ref="input"
+          hint="Disclaimer: This chat bot uses personas for entertainment and informational purposes only. The
+              chat bot's responses are not a reflection of any real person or organization's views or opinions, and should not
+              be used as a substitute for professional advice. The accuracy and reliability of the chat bot's responses cannot
+              be guaranteed. Users should exercise their own judgment and discretion when interacting with the chat bot and
+              its personas. By using this chat bot, you acknowledge and agree to these terms."
+        />
+      </div>
+      <q-space />
     </div>
   </q-page>
 </template>
@@ -40,7 +44,7 @@ import { defaultChatTopic } from 'src/utils/chat';
 import { useModelsStore } from 'src/stores/models-store';
 import { useChatsStore } from 'src/stores/chats-store';
 import { usePersonasStore } from 'src/stores/personas-store';
-import { defineComponent, ref} from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 // Import components
@@ -51,7 +55,7 @@ export default defineComponent({
   name: 'NewChat',
   components: {
     MessageInput,
-    PersonaDropDown
+    PersonaDropDown,
   },
   setup() {
     const router = useRouter();
