@@ -72,7 +72,6 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       // Get the partial chats of the form { id, title }
       let chats = await this.chatsStore.readChats();
       this.chats = chats;
-
     },
 
     /**
@@ -259,7 +258,6 @@ class ChatsStore {
     await Promise.all(updatedChats);
 
     // Done!
-
   }
 
   /**

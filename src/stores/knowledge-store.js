@@ -30,7 +30,6 @@ export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
       }
       await Promise.all(addedDocuments);
       this.documents = docs;
-
     },
     async addDocument(title, content, tags = []) {
       let doc = await this.knowledgeStore.addDocument(title, content, tags);
