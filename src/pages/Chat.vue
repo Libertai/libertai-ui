@@ -19,10 +19,7 @@
             </q-avatar>
           </q-item-section>
           <!-- Edit message popup -- triggered on click if the edit mode is enabled -->
-          <q-item-section
-            :style="`max-width: calc(960px - 56px);`"
-            :ref="'message-'+message_index"
-            >
+          <q-item-section :style="`max-width: calc(960px - 56px);`" :ref="'message-' + message_index">
             <q-popup-edit
               v-model="message.content"
               auto-save
@@ -76,7 +73,7 @@
             <q-btn @click="copyMessage(message)" icon="img:icons/svg/copy2.svg" dense flat size="sm">
               <q-tooltip>Copy</q-tooltip>
             </q-btn>
-            <q-btn @click="editMessage('message-'+message_index)" icon="img:icons/svg/edit.svg" dense flat size="sm">
+            <q-btn @click="editMessage('message-' + message_index)" icon="img:icons/svg/edit.svg" dense flat size="sm">
               <q-tooltip>Edit</q-tooltip>
             </q-btn>
           </div>
@@ -461,6 +458,7 @@ export default defineComponent({
         return;
       }
 
+      console.log('set persona from chat');
       personasStore.setPersona(chatRef.value.persona);
       // Extract the chat properties
       let title = chatRef.value.title;
@@ -524,7 +522,7 @@ export default defineComponent({
       this.enableEditRef = true;
 
       setTimeout(() => {
-        this.$refs[message_id][0].$el.click()
+        this.$refs[message_id][0].$el.click();
       }, 50);
     }
 

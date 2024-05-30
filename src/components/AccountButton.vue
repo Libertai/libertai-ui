@@ -8,7 +8,7 @@
       rounded
       unelevated
       @click="eth_web3_login"
-      >
+    >
       <q-icon class="text-dark" size="xs" left>
         <img src="~assets/wallet.svg" />
       </q-icon>
