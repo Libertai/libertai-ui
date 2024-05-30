@@ -28,5 +28,11 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
+  Router.beforeEach(async (to, from, next) => {
+    // @TODO ensure pinia+persist storage ready
+    // something like await storageReady
+    next();
+  });
+
   return Router;
 });
