@@ -9,25 +9,29 @@
       unelevated
       @click="eth_web3_login"
     >
+      <q-icon class="text-dark" size="xs" left>
+        <img src="~assets/wallet.svg" />
+      </q-icon>
       Connect Wallet
     </q-btn>
     <q-btn-dropdown
       v-else
-      :label="`${account.address.slice(0, 5)}...${account.address.slice(-5)}`"
-      class="text-semibold border-primary-highlight gt-sm"
-      color="primary"
+      :label="`${account.address.slice(0, 4)}...${account.address.slice(-2)}`"
+      class="border-primary-highlight gt-sm"
+      text-color="primary"
       no-caps
       rounded
       unelevated
+      icon="img:icons/svg/avatar.svg"
     >
-      <div class="row no-wrap q-pa-md q-pt-none bg-primary border-primary-highlight">
+      <div class="row no-wrap q-pa-md q-pt-none">
         <div class="column items-center">
           <div class="text-small q-mb-xs">{{ account.address }}</div>
 
           <q-btn
             v-close-popup
-            class="text-semibold border-primary-highlight gt-sm"
-            color="secondary"
+            class="text-semibold gt-sm"
+            color="primary"
             label="Disconnect"
             no-caps
             rounded

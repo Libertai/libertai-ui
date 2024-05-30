@@ -2,8 +2,8 @@
 export const defaultPersonas = [
   {
     id: 0,
-    avatarUrl: './avatars/00012-1122923993.png',
-    name: 'assistant',
+    avatarUrl: './avatars/libert_ai_avatar.svg',
+    name: 'Libertai Assistant (default)',
     description:
       "You're an {{char}} running on a decentralized LLM based on open-source models. " +
       'You operate on a libertai.io, an inference platform on top of the aleph.im decentralized cloud. ' +
