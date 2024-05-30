@@ -10,23 +10,24 @@
       <q-card-section horizontal>
         <q-card-section>
           <q-avatar>
-            <img :src="persona.avatarUrl" />
+            <img :src="personasStore.persona.avatarUrl" />
           </q-avatar>
         </q-card-section>
         <q-card-section>
           <label class="text-light">Persona name</label>
-          <q-input v-model="persona.name" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
+          <q-input v-model="personasStore.persona.name" bg-color="secondary" input-class="text-light q-px-sm" outlined>
+          </q-input>
         </q-card-section>
       </q-card-section>
 
       <q-card-section>
         <label class="text-light">Your name</label>
-        <q-input v-model="usernameInputRef" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
+        <q-input v-model="username" bg-color="secondary" input-class="text-light q-px-sm" outlined> </q-input>
       </q-card-section>
       <q-card-section>
         <label class="text-light">Persona Description</label>
         <q-input
-          v-model="persona.description"
+          v-model="personasStore.persona.description"
           autogrow
           bg-color="secondary"
           input-class="text-light"
@@ -52,13 +53,14 @@
 
 <script setup>
 import { usePersonasStore } from 'src/stores/personas-store';
-import { ref } from 'vue';
+import { useSettingsStore } from 'src/stores/settings';
+import { storeToRefs } from 'pinia';
 
 const personasStore = usePersonasStore();
-const persona = personasStore.persona;
-const usernameInputRef = ref('user');
+const settings = useSettingsStore();
+const { username } = storeToRefs(settings);
 
 function updatePersona() {
-  personasStore.persona = persona;
+  // on update persona event
 }
 </script>

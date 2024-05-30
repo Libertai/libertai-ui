@@ -4,7 +4,7 @@
       <div :class="$q.screen.gt.sm ? 'row q-ma-xl' : 'row qm-ma-md'">
         <div class="col"></div>
         <div :class="$q.screen.gt.sm ? 'col-4' : 'col-10'">
-          <q-card class="my-card center text-center q-my-xl" flat>
+          <q-card class="my-card center text-center q-pa-md" flat>
             <q-avatar>
               <img :src="personasStore.persona.avatarUrl" />
             </q-avatar>

@@ -2,12 +2,12 @@
   <q-btn-dropdown
     :icon="'img:' + personasStore.persona.avatarUrl"
     :label="personasStore.persona.name"
-    class="no-shadow rounded-img personas-dropdown q-py-sm"
+    class="no-shadow rounded-img personas-dropdown q-py-sm icon-md"
     dropdown-icon="img:icons/svg/chevron-down.svg"
     no-caps
     rounded
-    text-color="primary"
     unelevated
+    text-color="primary"
   >
     <q-list>
       <q-item
