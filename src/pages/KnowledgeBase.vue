@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { useKnowledgeStore } from 'src/stores/knowledge-store';
@@ -39,23 +39,23 @@ import { useKnowledgeStore } from 'src/stores/knowledge-store';
 const knowledgeStore = useKnowledgeStore();
 
 // Columns for the table displaying documents
-const columns = [
-  { name: 'id', label: 'ID', field: 'id' },
-  { name: 'title', label: 'Title', field: 'title' },
-];
+// const columns = [
+//   { name: 'id', label: 'ID', field: 'id' },
+//   { name: 'title', label: 'Title', field: 'title' },
+// ];
 
 // Documents data source
 const { documents } = storeToRefs(knowledgeStore);
 
 // Selected document
-const selectedDocument = ref(null);
+// const selectedDocument = ref(null);
 const selectedDocumentId = ref(null);
 
 // Edited document object
-const editedDocument = ref({ title: '', description: '' });
+// const editedDocument = ref({ title: '', description: '' });
 
 // Form title based on whether we're adding or editing a document
-const formTitle = computed(() => (selectedDocument.value ? 'Edit Document' : 'Add Document'));
+// const formTitle = computed(() => (selectedDocument.value ? 'Edit Document' : 'Add Document'));
 
 // On row click event handler for the table
 function onRowClick(evt, row) {
