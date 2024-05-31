@@ -11,8 +11,6 @@ export const useAccount = defineStore('account', {
   getters: {
     alephAccount() {
       return {
-        private_key: null,
-        mnemonics: null,
         address: this.address,
         name: this.address,
         type: 'ETH',
