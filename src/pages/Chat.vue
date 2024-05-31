@@ -158,8 +158,6 @@ import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
 import MessageInput from 'src/components/MessageInput.vue';
 import axios from 'axios';
 
-console.log(nextTick);
-
 export default defineComponent({
   name: 'ChatPage',
   components: {
@@ -221,7 +219,6 @@ export default defineComponent({
     watch(
       () => account.active,
       (active) => {
-        console.log('pages::Chat.vue::watch - account.active', active);
         enableKnowledgeRef.value = active;
       },
     );
@@ -417,7 +414,6 @@ export default defineComponent({
     }
 
     async function sendMessage(content) {
-      console.log('pages::Chat.vue::sendMessage');
       let chatId = chatRef.value.id;
       let inputText = inputTextRef.value;
       const attachments = JSON.parse(JSON.stringify(attachmentsRef.value));
@@ -458,7 +454,6 @@ export default defineComponent({
         return;
       }
 
-      console.log('set persona from chat');
       personasStore.persona = chatRef.value.persona;
       // Extract the chat properties
       let title = chatRef.value.title;

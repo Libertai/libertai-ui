@@ -56,7 +56,6 @@ async function ask(question) {
     model: 'openhermes-2.5',
     max_tokens: 128,
   });
-  console.log(chatCompletion);
   // We add the answer to the entries array
   const answer = chatCompletion.choices[0].message.content;
   entries.value.push({
@@ -78,12 +77,10 @@ onMounted(() => {
   recognition.lang = 'fr-FR';
   var last_entry = null;
   recognition.addEventListener('result', (e) => {
-    console.log(e.results);
     const transcript = Array.from(e.results)
       .map((result) => result[0])
       .map((result) => result.transcript)
       .join('');
-    console.log(transcript);
 
     // We add the transcript to the entries array, only if we weren't working on it yet (final arg)
     if (last_entry == null) {
@@ -107,7 +104,6 @@ onMounted(() => {
       ask(transcript);
     }
   });
-  console.log(speech);
   if (speech == true) {
     recognition.start();
     recognition.addEventListener('end', recognition.start);

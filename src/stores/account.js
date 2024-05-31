@@ -13,13 +13,10 @@ export const useAccount = defineStore('account', {
     async setProvider(provider) {
       // you can directly mutate the state
       this.provider = provider;
-      console.log(provider.provider);
       provider.provider.on('accountsChanged', async (accounts) => {
-        console.log('accountsChanged', accounts);
         this.address = ethers.utils.getAddress(accounts[0]);
         this.signer = await this.provider.getSigner();
       });
-      console.log('provider', provider);
       this.signer = await this.provider.getSigner();
       this.address = await this.signer.getAddress();
       this.active = true;

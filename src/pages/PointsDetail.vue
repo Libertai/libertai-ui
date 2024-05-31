@@ -1,7 +1,7 @@
 <template>
   <q-page class="flex flex-center q-pa-xl font-mulish text-purple-700">
     <div class="row q-pa-xl q-col-gutter-md q-py-xl">
-      <q-card flat class="col-12 text-center">
+      <q-card class="col-12 text-center" flat>
         <q-card-section>
           <p class="q-py-md">
             <span class="bg-purple-50 q-py-sm q-px-xl rounded text-bold">{{ address }}</span>
@@ -13,7 +13,7 @@
           </p>
         </q-card-section>
       </q-card>
-      <q-card flat class="bg-purple-50 col-12 q-pa-none">
+      <q-card class="bg-purple-50 col-12 q-pa-none" flat>
         <q-card-section class="q-pt-none q-pa-xl row">
           <div class="text-h6 text-bold col-8 text-left">
             <q-avatar class="q-mr-sm">
@@ -27,7 +27,7 @@
           </div>
         </q-card-section>
       </q-card>
-      <q-card flat class="col-6 text-center column q-pl-none">
+      <q-card class="col-6 text-center column q-pl-none" flat>
         <q-card-section class="bg-purple-50 q-pa-xl">
           <p class="text-h6 text-bold text-left">Pending Points</p>
           <p class="q-py-md text-right">
@@ -35,7 +35,7 @@
           </p>
         </q-card-section>
       </q-card>
-      <q-card flat class="col-6 text-center column">
+      <q-card class="col-6 text-center column" flat>
         <q-card-section class="bg-purple-50 q-pa-xl">
           <p class="text-h6 text-bold text-left">36 Month estimated Points*</p>
           <p class="q-py-md text-right">
@@ -55,12 +55,11 @@
 </template>
 
 <script>
-import { defineComponent, ref, watch, onMounted, computed, onBeforeUnmount } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, defineComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { usePoints } from '../stores/points';
 import { useAccount } from '../stores/account';
 import { ethers } from 'ethers';
-import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'PointsDetail',
@@ -96,7 +95,6 @@ export default defineComponent({
     watch(
       () => account.address,
       async (newAddress, oldAddress) => {
-        console.log(address.value, oldAddress, newAddress);
         if (oldAddress == address.value) {
           router.push({
             name: 'points-detail',
@@ -108,6 +106,7 @@ export default defineComponent({
 
     const currentPendingPoints = ref(0);
     const hourlyRate = ref(0);
+
     async function updatePoints() {
       const pendingInfo = await points.getAddressRealtimePendingPointsInfo(address.value);
       hourlyRate.value = pendingInfo.hourlyRate;
@@ -129,14 +128,12 @@ export default defineComponent({
 
       const current_decay = daily_decay ** (currentTimeSinceStart / 86400);
       const current_ratio = initial_ratio * current_decay;
-      console.log(current_ratio);
       // we extrapolate on what would a 10 days distribution be
       let current_base = ((pendingPoints / totalDuration) * 3600 * 24 * 10) / current_ratio;
       if (current_base < 0) {
         // something is fishy
         current_base = ((currentPoints / (lastTime - firstTime)) * 3600 * 24 * 10) / current_ratio;
       }
-      console.log(current_base);
 
       const distributions = (365 * 3) / 10;
       let total = currentPoints;

@@ -32,7 +32,6 @@ export default createUploaderComponent({
       // Set the loading state
       loading.value = true;
       const files = helpers.queuedFiles.value;
-      console.log(`components::KnowledgeStoreUploader::upload - files: ${files}`);
       fileStatus.value = {};
       fileStatus.value = files.reduce((acc, file) => {
         acc[file.name] = 'queued';

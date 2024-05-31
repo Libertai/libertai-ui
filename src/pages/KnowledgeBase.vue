@@ -62,7 +62,6 @@ export default defineComponent({
 
     // On row click event handler for the table
     function onRowClick(evt, row) {
-      console.log('Row clicked', row);
       selectedDocumentId.value = row.id;
     }
 

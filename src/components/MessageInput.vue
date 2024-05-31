@@ -1,27 +1,27 @@
 <template>
   <q-input
-    outlined
-    v-model="model"
-    placeholder="Write your message here"
-    autofocus
-    bg-color="secondary"
-    label-color="grey"
-    input-class="text-light"
-    :class="` ${$q.screen.gt.sm ? 'q-pa-lg' : 'q-pa-sm'}`"
     ref="input"
-    type="textarea"
-    autogrow
-    input-style="max-height: 10em;"
-    @keydown.enter="sendMessage"
-    :loading="isLoading"
+    v-model="model"
     :bottom-slots="props.hint !== ''"
+    :class="` ${$q.screen.gt.sm ? 'q-pa-lg' : 'q-pa-sm'}`"
+    :loading="isLoading"
+    autofocus
+    autogrow
+    bg-color="secondary"
+    input-class="text-light"
+    input-style="max-height: 10em;"
+    label-color="grey"
+    outlined
+    placeholder="Write your message here"
+    type="textarea"
+    @keydown.enter="sendMessage"
   >
     <template v-slot:prepend>
       <!--<q-btn round dense flat icon="img:icons/svg/attachment.svg" @click="sendMessage" color="white" />-->
     </template>
     <template v-slot:append>
       <!--<q-btn round dense flat icon="img:icons/mic.svg" @click="sendMessage" color="" class="" />-->
-      <q-btn round dense flat icon="img:icons/send.svg" @click="sendMessage" color="" class="" />
+      <q-btn class="" color="" dense flat icon="img:icons/send.svg" round @click="sendMessage" />
     </template>
 
     <template v-slot:hint>
@@ -49,7 +49,6 @@ const sendMessage = (event) => {
     return;
   }
   event.preventDefault();
-  console.log(model.value);
 
   if (!model.value.trim()) return;
   let content = model.value;

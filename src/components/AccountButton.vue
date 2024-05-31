@@ -54,7 +54,6 @@ const account = useAccount();
 
 async function eth_web3_login() {
   const points = usePoints();
-  console.log(window.ethereum);
   if (window.ethereum) {
     try {
       // Request account access if needed
@@ -62,13 +61,11 @@ async function eth_web3_login() {
       let provider = new ethers.providers.Web3Provider(window['ethereum'] || window.web3.currentProvider);
       await account.setProvider(provider);
     } catch (error) {
-      console.log(error);
       // User denied account access...
     }
   } else {
     alert('No ethereum provider detected. Please install metamask or similar.');
   }
-  console.log(account);
   if (!account.active) {
     alert('Error getting web3 account');
     return;

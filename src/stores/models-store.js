@@ -15,10 +15,8 @@ export const useModelsStore = defineStore('models', {
       this.selectedModel = model;
     },
     setModelByURL(modelUrl) {
-      console.log('searching for', modelUrl);
       for (let model of defaultModels)
         if (model.apiUrl == modelUrl) {
-          console.log('found', model.name, model.apiUrl);
           this.selectedModel = model;
         }
     },
