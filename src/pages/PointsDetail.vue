@@ -54,116 +54,102 @@
   </q-page>
 </template>
 
-<script>
-import { computed, defineComponent, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+<script setup>
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { usePoints } from '../stores/points';
 import { useAccount } from '../stores/account';
 import { ethers } from 'ethers';
 
-export default defineComponent({
-  name: 'PointsDetail',
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-    const points = usePoints();
-    const account = useAccount();
-    // got address as an address part from vue router
-    const address = ref(ethers.utils.getAddress(route.params.address));
-    let interval = null;
+const route = useRoute();
+const router = useRouter();
+const points = usePoints();
+const account = useAccount();
+// got address as an address part from vue router
+const address = ref(ethers.utils.getAddress(route.params.address));
+let interval = null;
 
-    onMounted(async () => {
-      if (Object.keys(points.points).length === 0) {
-        await points.update();
-        await updatePoints();
-      }
-      interval = setInterval(() => {
-        updatePoints();
-      }, 1000);
-    });
+onMounted(async () => {
+  if (Object.keys(points.points).length === 0) {
+    await points.update();
+    await updatePoints();
+  }
+  interval = setInterval(() => {
+    updatePoints();
+  }, 1000);
+});
 
-    onBeforeUnmount(() => {
-      clearInterval(interval);
-    });
+onBeforeUnmount(() => {
+  clearInterval(interval);
+});
 
-    watch(
-      () => route.params.address,
-      async (newAddress) => {
-        address.value = ethers.utils.getAddress(newAddress);
-      },
-    );
-    watch(
-      () => account.address,
-      async (newAddress, oldAddress) => {
-        if (oldAddress == address.value) {
-          router.push({
-            name: 'points-detail',
-            params: { address: newAddress },
-          });
-        }
-      },
-    );
-
-    const currentPendingPoints = ref(0);
-    const hourlyRate = ref(0);
-
-    async function updatePoints() {
-      const pendingInfo = await points.getAddressRealtimePendingPointsInfo(address.value);
-      hourlyRate.value = pendingInfo.hourlyRate;
-      currentPendingPoints.value = pendingInfo.pending;
-    }
-
-    const ThreeYearsPoints = computed(() => {
-      const currentTime = Math.floor(Date.now() / 1000); // Get current timestamp in seconds
-      const pendingPoints = points.getAddressPendingPoints(address.value);
-      const currentPoints = points.getAddressPoints(address.value);
-      const firstTime = points.info.first_time;
-      const lastTime = points.info.last_time;
-      const pendingTime = points.info.pending_time;
-      const reward_start = points.info.reward_start;
-      const totalDuration = pendingTime - lastTime;
-      const currentTimeSinceStart = currentTime - reward_start;
-      const daily_decay = points.info.daily_decay;
-      const initial_ratio = points.info.ratio;
-
-      const current_decay = daily_decay ** (currentTimeSinceStart / 86400);
-      const current_ratio = initial_ratio * current_decay;
-      // we extrapolate on what would a 10 days distribution be
-      let current_base = ((pendingPoints / totalDuration) * 3600 * 24 * 10) / current_ratio;
-      if (current_base < 0) {
-        // something is fishy
-        current_base = ((currentPoints / (lastTime - firstTime)) * 3600 * 24 * 10) / current_ratio;
-      }
-
-      const distributions = (365 * 3) / 10;
-      let total = currentPoints;
-      for (let i = 0; i < distributions; i++) {
-        const time = reward_start + i * 10 * 24 * 3600;
-        // if time is less than last time, we pass
-        if (time < lastTime) {
-          continue;
-        }
-        // code in python:
-        // days_since_start = (reward_time - settings['reward_start_ts']) / 86400
-        // print(f"Processing rewards for {reward_time} ({days_since_start} days since start)")
-        // decay = settings['daily_decay'] ** int((reward_time - settings['reward_start_ts']) / 86400)
-
-        const days_since_start = (time - reward_start) / 86400;
-        const decay = daily_decay ** days_since_start;
-        const ratio = initial_ratio * decay;
-        total += current_base * ratio;
-      }
-      return total;
-    });
-
-    // const count = ref(0)
-    return {
-      points,
-      address,
-      currentPendingPoints,
-      hourlyRate,
-      ThreeYearsPoints,
-    };
+watch(
+  () => route.params.address,
+  async (newAddress) => {
+    address.value = ethers.utils.getAddress(newAddress);
   },
+);
+watch(
+  () => account.address,
+  async (newAddress, oldAddress) => {
+    if (oldAddress == address.value) {
+      router.push({
+        name: 'points-detail',
+        params: { address: newAddress },
+      });
+    }
+  },
+);
+
+const currentPendingPoints = ref(0);
+const hourlyRate = ref(0);
+
+async function updatePoints() {
+  const pendingInfo = await points.getAddressRealtimePendingPointsInfo(address.value);
+  hourlyRate.value = pendingInfo.hourlyRate;
+  currentPendingPoints.value = pendingInfo.pending;
+}
+
+const ThreeYearsPoints = computed(() => {
+  const currentTime = Math.floor(Date.now() / 1000); // Get current timestamp in seconds
+  const pendingPoints = points.getAddressPendingPoints(address.value);
+  const currentPoints = points.getAddressPoints(address.value);
+  const firstTime = points.info.first_time;
+  const lastTime = points.info.last_time;
+  const pendingTime = points.info.pending_time;
+  const reward_start = points.info.reward_start;
+  const totalDuration = pendingTime - lastTime;
+  const currentTimeSinceStart = currentTime - reward_start;
+  const daily_decay = points.info.daily_decay;
+  const initial_ratio = points.info.ratio;
+
+  const current_decay = daily_decay ** (currentTimeSinceStart / 86400);
+  const current_ratio = initial_ratio * current_decay;
+  // we extrapolate on what would a 10 days distribution be
+  let current_base = ((pendingPoints / totalDuration) * 3600 * 24 * 10) / current_ratio;
+  if (current_base < 0) {
+    // something is fishy
+    current_base = ((currentPoints / (lastTime - firstTime)) * 3600 * 24 * 10) / current_ratio;
+  }
+
+  const distributions = (365 * 3) / 10;
+  let total = currentPoints;
+  for (let i = 0; i < distributions; i++) {
+    const time = reward_start + i * 10 * 24 * 3600;
+    // if time is less than last time, we pass
+    if (time < lastTime) {
+      continue;
+    }
+    // code in python:
+    // days_since_start = (reward_time - settings['reward_start_ts']) / 86400
+    // print(f"Processing rewards for {reward_time} ({days_since_start} days since start)")
+    // decay = settings['daily_decay'] ** int((reward_time - settings['reward_start_ts']) / 86400)
+
+    const days_since_start = (time - reward_start) / 86400;
+    const decay = daily_decay ** days_since_start;
+    const ratio = initial_ratio * decay;
+    total += current_base * ratio;
+  }
+  return total;
 });
 </script>

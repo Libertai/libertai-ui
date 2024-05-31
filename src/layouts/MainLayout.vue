@@ -3,7 +3,6 @@
     <q-header class="bg-transparent q-mt-sm">
       <q-toolbar>
         <q-btn aria-label="Menu" color="primary" dense flat icon="menu" round @click="toggleLeftDrawer" />
-        <!--<persona-drop-down />-->
         <q-btn flat @click="editPersona = true">
           <q-icon size="xs">
             <img src="icons/svg/settings.svg" />
@@ -148,7 +147,7 @@
       </q-list>
       <!-- socials and support links (follow us, support, disclaimer) -->
       <q-list class="q-pt-md">
-        <q-item href="https://twitter.com/libertai_dai" target="_blank">
+        <q-item href="https://x.com/libertai_dai" target="_blank">
           <q-item-section avatar>
             <img alt="Twitter - X" src="icons/twitter-x.svg" width="32px" />
           </q-item-section>
@@ -188,14 +187,13 @@
   </q-layout>
 </template>
 
-<script>
-import { computed, defineComponent, nextTick, ref, watch } from 'vue';
+<script setup>
+import { computed, nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
 // Import State
 import { useChatsStore } from '../stores/chats-store';
 import { useModelsStore } from '../stores/models-store';
-import { usePersonasStore } from 'src/stores/personas-store';
 import { useAccount } from '../stores/account';
 import { usePoints } from 'src/stores/points';
 import { useRoute, useRouter } from 'vue-router';
@@ -204,82 +202,47 @@ import { useRoute, useRouter } from 'vue-router';
 import AccountButton from 'src/components/AccountButton.vue';
 import PersonaDialog from 'src/components/PersonaDialog.vue';
 
-export default defineComponent({
-  name: 'MainLayout',
-  components: {
-    AccountButton,
-    PersonaDialog,
-  },
+const leftDrawerOpen = ref(false);
+// Control whether the advanced persona customization is shown
+const editPersona = ref(false);
 
-  setup() {
-    const leftDrawerOpen = ref(false);
-    // Control whether the advanced persona customization is shown
-    const editPersona = ref(false);
+const deleteChatConfirmAction = ref(false);
+const deleteChatId = ref(null);
 
-    const deleteChatConfirmAction = ref(false);
-    const deleteChatId = ref(null);
+// Setup Stores
+const modelsStore = useModelsStore();
+const chatsStore = useChatsStore();
+const account = useAccount();
+const points = usePoints();
 
-    // Setup Stores
-    const modelsStore = useModelsStore();
-    const chatsStore = useChatsStore();
-    const personasStore = usePersonasStore();
-    const account = useAccount();
-    const points = usePoints();
+const router = useRouter();
+const route = useRoute();
 
-    const router = useRouter();
-    const route = useRoute();
+// Reference to the chat-store state
+const { chats } = storeToRefs(chatsStore);
 
-    // Reference to the chat-store state
-    const { chats } = storeToRefs(chatsStore);
-
-    const addressPoints = computed(() => {
-      if (account.active) {
-        return points.getAddressRealtimePoints(account.address);
-      } else {
-        return 0;
-      }
-    });
-
-    // TODO: this is an invalid use of watch, as we are watching a computed value
-    // watch for account changes, and update points if not already done
-    watch(account.address, () => {
-      if (account.active && Object.keys(points.points).length === 0) {
-        points.update();
-      }
-    });
-
-    // Delete a chat
-    async function deleteChat(chat_id) {
-      await chatsStore.deleteChat(chat_id);
-      if (route.params?.id == chat_id) {
-        nextTick(() => router.push('/new'));
-      }
-    }
-
-    async function deleteChatConfirm(chat_id) {
-      deleteChatConfirmAction.value = true;
-      deleteChatId.value = chat_id;
-    }
-
-    return {
-      chats,
-      modelsStore,
-      personasStore,
-      account,
-      points,
-      router,
-      route,
-      leftDrawerOpen,
-      addressPoints,
-      deleteChat,
-      deleteChatConfirm,
-      deleteChatConfirmAction,
-      deleteChatId,
-      editPersona,
-      toggleLeftDrawer() {
-        leftDrawerOpen.value = !leftDrawerOpen.value;
-      },
-    };
-  },
+const addressPoints = computed(() => {
+  if (account.active) {
+    return points.getAddressRealtimePoints(account.address);
+  } else {
+    return 0;
+  }
 });
+
+// Delete a chat
+async function deleteChat(chat_id) {
+  await chatsStore.deleteChat(chat_id);
+  if (route.params?.id == chat_id) {
+    nextTick(() => router.push('/new'));
+  }
+}
+
+async function deleteChatConfirm(chat_id) {
+  deleteChatConfirmAction.value = true;
+  deleteChatId.value = chat_id;
+}
+
+function toggleLeftDrawer() {
+  leftDrawerOpen.value = !leftDrawerOpen.value;
+}
 </script>

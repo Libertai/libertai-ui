@@ -31,23 +31,12 @@
   </q-btn-dropdown>
 </template>
 
-<script>
-import { defineComponent } from 'vue';
-import { usePersonasStore } from 'src/stores/personas-store';
+<script setup>
+import { usePersonasStore } from 'stores/personas-store';
 
-export default defineComponent({
-  name: 'PersonaDropDown',
-  setup() {
-    const personasStore = usePersonasStore();
+const personasStore = usePersonasStore();
 
-    function setPersona(id) {
-      personasStore.persona = personasStore.personas.find((persona) => persona.id === id);
-    }
-
-    return {
-      personasStore,
-      setPersona,
-    };
-  },
-});
+function setPersona(id) {
+  personasStore.persona = personasStore.personas.find((persona) => persona.id === id);
+}
 </script>

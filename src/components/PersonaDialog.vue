@@ -50,26 +50,15 @@
   </q-dialog>
 </template>
 
-<script>
+<script setup>
 import { usePersonasStore } from 'src/stores/personas-store';
-import { defineComponent, ref } from 'vue';
+import { ref } from 'vue';
 
-export default defineComponent({
-  name: 'PersonaDialog',
-  setup() {
-    const personasStore = usePersonasStore();
-    const persona = personasStore.persona;
-    const usernameInputRef = ref('user');
+const personasStore = usePersonasStore();
+const persona = personasStore.persona;
+const usernameInputRef = ref('user');
 
-    function updatePersona() {
-      personasStore.persona = persona;
-    }
-
-    return {
-      usernameInputRef,
-      persona,
-      updatePersona,
-    };
-  },
-});
+function updatePersona() {
+  personasStore.persona = persona;
+}
 </script>

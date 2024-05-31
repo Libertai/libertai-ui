@@ -107,53 +107,38 @@
   </q-page>
 </template>
 
-<script>
-import { defineComponent, nextTick, onMounted, ref } from 'vue';
+<script setup>
+import { nextTick, onMounted, ref } from 'vue';
 import { usePoints } from '../stores/points';
 import { ethers } from 'ethers';
 
-export default defineComponent({
-  name: 'PointsInfo',
-  setup() {
-    const expanded = ref(false);
-    const points = usePoints();
-    const address = ref('');
-    onMounted(async () => {
-      if (Object.keys(points.points).length === 0) {
-        points.update();
-      }
-    });
-
-    function addressVerifier(val) {
-      // Throws if a checksummed address is provided, but a
-      // letter is the wrong case
-      try {
-        const addr = ethers.utils.getAddress(val);
-        if (addr !== val) {
-          nextTick(() => {
-            address.value = addr;
-          });
-        }
-        return true;
-      } catch (e) {
-        return 'Invalid address';
-      }
-    }
-
-    // points.points is an object, let's check if it's empty
-
-    // const count = ref(0)
-    return {
-      points,
-      expanded,
-      address,
-      addressVerifier,
-      addressRules: [
-        addressVerifier,
-        (val) => (val && val.length > 0) || 'Please type something',
-        (val) => (val && val.length > 0) || 'Please type something',
-      ],
-    };
-  },
+const points = usePoints();
+const address = ref('');
+onMounted(async () => {
+  if (Object.keys(points.points).length === 0) {
+    points.update();
+  }
 });
+
+function addressVerifier(val) {
+  // Throws if a checksummed address is provided, but a
+  // letter is the wrong case
+  try {
+    const addr = ethers.utils.getAddress(val);
+    if (addr !== val) {
+      nextTick(() => {
+        address.value = addr;
+      });
+    }
+    return true;
+  } catch (e) {
+    return 'Invalid address';
+  }
+}
+
+const addressRules = [
+  addressVerifier,
+  (val) => (val && val.length > 0) || 'Please type something',
+  (val) => (val && val.length > 0) || 'Please type something',
+];
 </script>

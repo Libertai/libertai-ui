@@ -47,7 +47,7 @@
 
 <script setup>
 import { ethers } from 'ethers';
-import { useAccount } from '../stores/account';
+import { useAccount } from 'stores/account';
 import { usePoints } from 'stores/points';
 
 const account = useAccount();
@@ -60,6 +60,7 @@ async function eth_web3_login() {
       await window.ethereum.enable();
       let provider = new ethers.providers.Web3Provider(window['ethereum'] || window.web3.currentProvider);
       await account.setProvider(provider);
+      await points.update();
     } catch (error) {
       // User denied account access...
     }
@@ -68,8 +69,6 @@ async function eth_web3_login() {
   }
   if (!account.active) {
     alert('Error getting web3 account');
-    return;
   }
-  await points.update();
 }
 </script>
