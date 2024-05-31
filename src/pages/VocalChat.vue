@@ -1,6 +1,6 @@
 <template>
   <!-- It's a page with chat entries, by the user or by the AI assistant.
-    We are using Quasard q-chat-message compoents -->
+    We are using Quasard q-chat-message components -->
   <q-page class="flex flex-center">
     <div>
       hey there
@@ -8,10 +8,10 @@
         <q-chat-message
           v-for="entry in entries"
           :key="entry.id"
-          :sent="entry.sent"
-          :name="entry.name"
-          :text="[entry.text]"
           :avatar="entry.avatar"
+          :name="entry.name"
+          :sent="entry.sent"
+          :text="[entry.text]"
           :text-color="entry.isFinal ? 'black' : 'grey-8'"
         />
       </div>
@@ -19,8 +19,9 @@
   </q-page>
 </template>
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { nextTick, onMounted, ref } from 'vue';
 import OpenAI from 'openai';
+
 const openai = new OpenAI({
   apiKey: 'libertai',
   dangerouslyAllowBrowser: true,
@@ -55,7 +56,6 @@ async function ask(question) {
     model: 'openhermes-2.5',
     max_tokens: 128,
   });
-  console.log(chatCompletion);
   // We add the answer to the entries array
   const answer = chatCompletion.choices[0].message.content;
   entries.value.push({
@@ -77,12 +77,10 @@ onMounted(() => {
   recognition.lang = 'fr-FR';
   var last_entry = null;
   recognition.addEventListener('result', (e) => {
-    console.log(e.results);
     const transcript = Array.from(e.results)
       .map((result) => result[0])
       .map((result) => result.transcript)
       .join('');
-    console.log(transcript);
 
     // We add the transcript to the entries array, only if we weren't working on it yet (final arg)
     if (last_entry == null) {
@@ -106,7 +104,6 @@ onMounted(() => {
       ask(transcript);
     }
   });
-  console.log(speech);
   if (speech == true) {
     recognition.start();
     recognition.addEventListener('end', recognition.start);

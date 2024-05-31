@@ -32,7 +32,6 @@ export default createUploaderComponent({
       // Set the loading state
       loading.value = true;
       const files = helpers.queuedFiles.value;
-      console.log(`components::KnowledgeStoreUploader::upload - files: ${files}`);
       fileStatus.value = {};
       fileStatus.value = files.reduce((acc, file) => {
         acc[file.name] = 'queued';
@@ -56,7 +55,7 @@ export default createUploaderComponent({
             if (text.length < 4 * 1024) {
               fileStatus.value[file.name] = 'uploaded';
               helpers.updateFileStatus(file, 'uploaded');
-              // If you don't embed the doucment, make sure to set the content
+              // If you don't embed the document, make sure to set the content
               emit('attachment-added', { title, type, content: text });
               return;
             }

@@ -9,7 +9,7 @@
       unelevated
       @click="eth_web3_login"
     >
-      <q-icon class="text-dark" size="xs" left>
+      <q-icon class="text-dark" left size="xs">
         <img src="~assets/wallet.svg" />
       </q-icon>
       Connect Wallet
@@ -18,11 +18,11 @@
       v-else
       :label="`${account.address.slice(0, 4)}...${account.address.slice(-2)}`"
       class="border-primary-highlight gt-sm"
-      text-color="primary"
+      icon="img:icons/svg/avatar.svg"
       no-caps
       rounded
+      text-color="primary"
       unelevated
-      icon="img:icons/svg/avatar.svg"
     >
       <div class="row no-wrap q-pa-md q-pt-none">
         <div class="column items-center">
@@ -47,34 +47,28 @@
 
 <script setup>
 import { ethers } from 'ethers';
-import { useAccount } from '../stores/account';
+import { useAccount } from 'stores/account';
 import { usePoints } from 'stores/points';
-
-console.log(ethers);
 
 const account = useAccount();
 
 async function eth_web3_login() {
   const points = usePoints();
-  console.log(window.ethereum);
   if (window.ethereum) {
     try {
       // Request account access if needed
       await window.ethereum.enable();
       let provider = new ethers.providers.Web3Provider(window['ethereum'] || window.web3.currentProvider);
       await account.setProvider(provider);
+      await points.update();
     } catch (error) {
-      console.log(error);
       // User denied account access...
     }
   } else {
     alert('No ethereum provider detected. Please install metamask or similar.');
   }
-  console.log(account);
   if (!account.active) {
     alert('Error getting web3 account');
-    return;
   }
-  await points.update();
 }
 </script>

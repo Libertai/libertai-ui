@@ -1,4 +1,4 @@
-// Configuration for base pomprts for different types of chatbots
+// Configuration for base prompts for different types of chatbots
 export const defaultPersonas = [
   {
     id: 0,
