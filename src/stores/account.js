@@ -8,18 +8,6 @@ export const useAccount = defineStore('account', {
     signer: null,
     address: '',
   }),
-  getters: {
-    alephAccount() {
-      return {
-        address: this.address,
-        name: this.address,
-        type: 'ETH',
-        source: 'provider',
-        provider: this.provider,
-        signer: this.signer,
-      };
-    },
-  },
   actions: {
     // any amount of arguments, return a promise or not
     async setProvider(provider) {

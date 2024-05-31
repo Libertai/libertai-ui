@@ -9,7 +9,7 @@
       unelevated
       @click="eth_web3_login"
     >
-      <q-icon class="text-dark" size="xs" left>
+      <q-icon class="text-dark" left size="xs">
         <img src="~assets/wallet.svg" />
       </q-icon>
       Connect Wallet
@@ -18,11 +18,11 @@
       v-else
       :label="`${account.address.slice(0, 4)}...${account.address.slice(-2)}`"
       class="border-primary-highlight gt-sm"
-      text-color="primary"
+      icon="img:icons/svg/avatar.svg"
       no-caps
       rounded
+      text-color="primary"
       unelevated
-      icon="img:icons/svg/avatar.svg"
     >
       <div class="row no-wrap q-pa-md q-pt-none">
         <div class="column items-center">
@@ -49,8 +49,6 @@
 import { ethers } from 'ethers';
 import { useAccount } from '../stores/account';
 import { usePoints } from 'stores/points';
-
-console.log(ethers);
 
 const account = useAccount();
 
