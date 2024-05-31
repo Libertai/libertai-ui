@@ -32,9 +32,6 @@ export const usePoints = defineStore('points', {
       this.points = pointsData.points;
       this.info = pointsData.info;
       this.pending_points = pointsData.pending_points;
-      console.log('points', this.points);
-      console.log('info', this.info);
-      console.log('pending_points', this.pending_points);
     },
 
     getAddressPoints(address) {

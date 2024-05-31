@@ -1,7 +1,7 @@
 <template>
   <q-page class="flex flex-center bg-dark_deleted font-mulish text-purple-700">
     <div class="row q-pa-xl q-col-gutter-md">
-      <q-card flat class="col-12 text-center">
+      <q-card class="col-12 text-center" flat>
         <q-card-section class="bg-dark-page_deleted">
           <div class="text-h4 text-bold">Earn Libertai Points</div>
         </q-card-section>
@@ -15,7 +15,7 @@
           <p>How to participate:</p>
         </q-card-section>
       </q-card>
-      <q-card flat class="col-6 text-center column">
+      <q-card class="col-6 text-center column" flat>
         <q-card-section class="bg-purple-50">
           <div class="text-h6 text-semibold">Stake ALEPH</div>
         </q-card-section>
@@ -26,7 +26,7 @@
           </p>
         </q-card-section>
       </q-card>
-      <q-card flat class="col-6 text-center column">
+      <q-card class="col-6 text-center column" flat>
         <q-card-section class="bg-purple-50">
           <div class="text-h6 text-semibold">aleph.im Core Channel Node Operator</div>
         </q-card-section>
@@ -37,7 +37,7 @@
           </p>
         </q-card-section>
       </q-card>
-      <q-card flat class="col-6 text-center column">
+      <q-card class="col-6 text-center column" flat>
         <q-card-section class="bg-purple-50">
           <div class="text-h6 text-semibold">aleph.im Resource Node Operator</div>
         </q-card-section>
@@ -48,7 +48,7 @@
           </p>
         </q-card-section>
       </q-card>
-      <q-card flat class="col-6 text-center column">
+      <q-card class="col-6 text-center column" flat>
         <q-card-section class="bg-purple-50">
           <div class="text-h6 text-semibold">Connect your wallet and Start earning points today!</div>
         </q-card-section>
@@ -59,31 +59,31 @@
           </p>
         </q-card-section>
       </q-card>
-      <q-card flat class="col-12 text-center">
+      <q-card class="col-12 text-center" flat>
         <q-card-section class="bg-purple-50">
           <div class="text-h6">Check your points</div>
         </q-card-section>
         <q-card-section class="q-pt-none bg-purple-50">
           <q-input
             v-model="address"
-            bottom-slots
-            counter
+            :rules="addressRules"
             autofocus
-            rounded
-            standout
             bg-color="secondary"
+            bottom-slots
             class="q-pa-lg"
+            counter
             input-class="text-light"
             label="Address"
             label-color="grey"
             maxlength="42"
-            :rules="addressRules"
+            rounded
+            standout
           >
             <template v-slot:prepend>
               <q-icon name="wallet" />
             </template>
 
-            <template v-slot:hint> Enter an address to check if there are points associated with it. </template>
+            <template v-slot:hint> Enter an address to check if there are points associated with it.</template>
           </q-input>
           <div v-if="addressVerifier(address) === true" class="text-h6 text-bold q-pa-lg">
             <div v-if="points.getAddressPoints(address) === 0">
@@ -93,11 +93,11 @@
               You have points!<br /><br />
               <q-btn
                 :to="{ name: 'points-detail', params: { address: address } }"
-                label="View details"
                 color="white"
-                text-color="primary"
+                label="View details"
                 no-caps
                 rounded
+                text-color="primary"
               />
             </div>
           </div>
@@ -107,55 +107,38 @@
   </q-page>
 </template>
 
-<script>
-import { defineComponent, ref, onMounted, nextTick } from 'vue';
-import { useCounterStore } from '../stores/counter-store';
+<script setup>
+import { nextTick, onMounted, ref } from 'vue';
 import { usePoints } from '../stores/points';
 import { ethers } from 'ethers';
 
-export default defineComponent({
-  name: 'PointsInfo',
-  setup() {
-    const counter = useCounterStore();
-    const expanded = ref(false);
-    const points = usePoints();
-    const address = ref('');
-    onMounted(async () => {
-      if (Object.keys(points.points).length === 0) {
-        points.update();
-      }
-    });
-
-    function addressVerifier(val) {
-      // Throws if a checksummed address is provided, but a
-      // letter is the wrong case
-      try {
-        const addr = ethers.utils.getAddress(val);
-        if (addr !== val) {
-          nextTick(() => {
-            address.value = addr;
-          });
-        }
-        return true;
-      } catch (e) {
-        return 'Invalid address';
-      }
-    }
-    // points.points is an object, let's check if it's empty
-
-    // const count = ref(0)
-    return {
-      points,
-      counter,
-      expanded,
-      address,
-      addressVerifier,
-      addressRules: [
-        addressVerifier,
-        (val) => (val && val.length > 0) || 'Please type something',
-        (val) => (val && val.length > 0) || 'Please type something',
-      ],
-    };
-  },
+const points = usePoints();
+const address = ref('');
+onMounted(async () => {
+  if (Object.keys(points.points).length === 0) {
+    points.update();
+  }
 });
+
+function addressVerifier(val) {
+  // Throws if a checksummed address is provided, but a
+  // letter is the wrong case
+  try {
+    const addr = ethers.utils.getAddress(val);
+    if (addr !== val) {
+      nextTick(() => {
+        address.value = addr;
+      });
+    }
+    return true;
+  } catch (e) {
+    return 'Invalid address';
+  }
+}
+
+const addressRules = [
+  addressVerifier,
+  (val) => (val && val.length > 0) || 'Please type something',
+  (val) => (val && val.length > 0) || 'Please type something',
+];
 </script>
