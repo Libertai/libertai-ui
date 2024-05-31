@@ -11,7 +11,7 @@
       <div class="row justify-center q-pa-md">
         <div class="col-lg-8 col-sm-12">
           <q-list>
-            <q-item v-for="document in documents" :key="document.id" clickable @click="onRowClick($event, document)">
+            <q-item v-for="document in documents" :key="document.id" clickable @click="onRowClick(document)">
               <q-item-section>
                 <q-item-label>{{ document.title }}</q-item-label>
               </q-item-section>
@@ -58,7 +58,7 @@ const selectedDocumentId = ref(null);
 // const formTitle = computed(() => (selectedDocument.value ? 'Edit Document' : 'Add Document'));
 
 // On row click event handler for the table
-function onRowClick(evt, row) {
+function onRowClick(row) {
   selectedDocumentId.value = row.id;
 }
 
