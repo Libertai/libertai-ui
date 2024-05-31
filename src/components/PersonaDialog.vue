@@ -62,7 +62,7 @@ export default defineComponent({
     const usernameInputRef = ref('user');
 
     function updatePersona() {
-      personasStore.setPersona(persona);
+      personasStore.persona = persona;
     }
 
     return {

@@ -459,7 +459,7 @@ export default defineComponent({
       }
 
       console.log('set persona from chat');
-      personasStore.setPersona(chatRef.value.persona);
+      personasStore.persona = chatRef.value.persona;
       // Extract the chat properties
       let title = chatRef.value.title;
       let username = chatRef.value.username;
