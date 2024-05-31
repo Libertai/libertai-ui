@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
-
-import { Get } from 'aleph-sdk-ts/dist/messages/aggregate';
+import { AlephHttpClient } from '@aleph-sdk/client';
 
 export const usePoints = defineStore('points', {
   state: () => ({
@@ -23,12 +22,9 @@ export const usePoints = defineStore('points', {
   actions: {
     // any amount of arguments, return a promise or not
     async update() {
-      const aggregateGetConfiguration = {
-        APIServer: this.api_server,
-        address: this.points_source,
-        limit: 1,
-      };
-      const pointsData = await Get(aggregateGetConfiguration);
+      const client = new AlephHttpClient();
+
+      const pointsData = await client.fetchAggregates(this.points_source);
       this.points = pointsData.points;
       this.info = pointsData.info;
       this.pending_points = pointsData.pending_points;

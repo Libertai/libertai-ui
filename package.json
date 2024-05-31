@@ -20,9 +20,9 @@
     "build": "quasar build"
   },
   "dependencies": {
+    "@aleph-sdk/client": "^1.0.6",
     "@libertai/libertai-js": "0.0.4",
     "@quasar/extras": "^1.16.11",
-    "aleph-sdk-ts": "^3.9.2",
     "axios": "^1.2.1",
     "buffer": "^6.0.3",
     "dompurify": "^3.0.9",
