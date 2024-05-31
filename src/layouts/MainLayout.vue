@@ -42,7 +42,7 @@
           <q-btn
             v-if="!account.active"
             :class="$q.screen.gt.sm ? 'btn-gradient' : 'float-right q-pa-sm'"
-            :icon="$q.screen.gt.sm ? '' : 'img:icons/svg/star.svg'"
+            :icon="$q.screen.gt.sm ? undefined : 'img:icons/svg/star.svg'"
             :label="$q.screen.gt.sm ? 'Earn Points' : ''"
             no-caps
             rounded
@@ -53,7 +53,7 @@
           <q-btn
             v-else
             :class="$q.screen.gt.sm ? 'btn-gradient' : 'float-right q-pa-sm'"
-            :icon="$q.screen.gt.sm ? '' : 'img:icons/svg/star.svg'"
+            :icon="$q.screen.gt.sm ? undefined : 'img:icons/svg/star.svg'"
             :text-color="$q.screen.gt.sm ? 'white' : 'black'"
             :to="{
               name: 'points-detail',
