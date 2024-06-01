@@ -16,10 +16,13 @@ export const useAccount = defineStore('account', {
       provider.provider.on('accountsChanged', async (accounts) => {
         this.address = ethers.utils.getAddress(accounts[0]);
         this.signer = await this.provider.getSigner();
+        // TODO: Sign message again here and fetch data
       });
       this.signer = await this.provider.getSigner();
       this.address = await this.signer.getAddress();
       this.active = true;
+      const result = await this.signer.signMessage('Reza');
+      console.log(result);
     },
     disconnect() {
       this.active = false;
