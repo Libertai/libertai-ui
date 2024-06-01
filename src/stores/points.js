@@ -25,7 +25,6 @@ export const usePoints = defineStore('points', {
       const client = new AlephHttpClient();
 
       const pointsData = await client.fetchAggregates(this.points_source);
-      console.log(pointsData);
       this.points = pointsData.points;
       this.info = pointsData.info;
       this.pending_points = pointsData.pending_points;

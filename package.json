@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@aleph-sdk/client": "^1.0.6",
+    "@aleph-sdk/ethereum": "^1.0.3",
     "@aleph-sdk/message": "^1.0.7",
     "@libertai/libertai-js": "0.0.4",
     "@quasar/extras": "^1.16.11",
@@ -50,8 +51,5 @@
     "eslint-plugin-vue": "^9.24.0",
     "postcss": "^8.4.14",
     "prettier": "^3.2.5"
-  },
-  "resolutions": {
-    "webpack": "^5.0.0"
   }
 }
