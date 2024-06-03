@@ -125,6 +125,11 @@ body {
   .border-primary-highlight {
     border: 1px solid $primary;
   }
+
+  .bg-purple-50 {
+      background-color: $primary-dark !important;
+      color: $purple50 !important;
+  }
 }
 /* Quasar */
 .q-tooltip {
