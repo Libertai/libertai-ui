@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 import { ethers } from 'ethers';
 import { AlephPersistentStorage } from 'src/utils/aleph-persistent-storage';
+import { useSettingsStore } from 'stores/settings';
 
-export const useAccount = defineStore('account', {
+export const useAccountStore = defineStore('account', {
   state: () => ({
     active: false,
     provider: null,
@@ -18,15 +19,22 @@ export const useAccount = defineStore('account', {
       provider.provider.on('accountsChanged', async (accounts) => {
         this.address = ethers.utils.getAddress(accounts[0]);
         this.signer = await this.provider.getSigner();
-        // TODO: Sign message again here and fetch data
+        await this.initAlephStorage();
       });
       this.signer = await this.provider.getSigner();
       this.address = await this.signer.getAddress();
       this.active = true;
+      await this.initAlephStorage();
+    },
+
+    async initAlephStorage() {
+      const settingsStore = useSettingsStore();
 
       this.alephStorage = await AlephPersistentStorage.initialize(this.signer);
-      this.alephStorage.save({ test: 'Saved from localhost' });
+      const settingsOnAleph = await this.alephStorage.fetch();
+      settingsStore.update(settingsOnAleph ?? {});
     },
+
     disconnect() {
       this.active = false;
       this.provider = null;

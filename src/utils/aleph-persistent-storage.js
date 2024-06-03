@@ -28,6 +28,12 @@ export class AlephPersistentStorage {
   }
 
   async fetch() {
-    return this.client.fetchAggregate(this.account.address, AGGREGATE_KEY);
+    try {
+      const settings = await this.client.fetchAggregate(this.account.address, AGGREGATE_KEY);
+      return settings;
+    } catch (error) {
+      console.error(`Fetching settings from Aleph failed: ${error}`);
+      return undefined;
+    }
   }
 }

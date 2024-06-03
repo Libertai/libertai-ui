@@ -47,10 +47,10 @@
 
 <script setup>
 import { ethers } from 'ethers';
-import { useAccount } from 'stores/account';
+import { useAccountStore } from 'stores/account';
 import { usePoints } from 'stores/points';
 
-const account = useAccount();
+const account = useAccountStore();
 
 async function eth_web3_login() {
   const points = usePoints();

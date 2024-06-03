@@ -58,13 +58,13 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { usePoints } from '../stores/points';
-import { useAccount } from '../stores/account';
+import { useAccountStore } from '../stores/account';
 import { ethers } from 'ethers';
 
 const route = useRoute();
 const router = useRouter();
 const points = usePoints();
-const account = useAccount();
+const account = useAccountStore();
 // got address as an address part from vue router
 const address = ref(ethers.utils.getAddress(route.params.address));
 let interval = null;

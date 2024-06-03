@@ -7,33 +7,25 @@
   />
 </template>
 
-<script>
+<script setup>
 import { useSettingsStore } from 'src/stores/settings';
-import { defineComponent, ref, watch } from 'vue';
+import { ref, toRef, watch } from 'vue';
 import { useQuasar } from 'quasar';
 
-export default defineComponent({
-  name: 'ToggleTheme',
-  setup() {
-    const settings = useSettingsStore();
-    const $q = useQuasar();
-    console.log('settings', settings.darkmode);
-    const darkmode = ref(settings.darkmode);
-    $q.dark.set(settings.darkmode);
-    console.log('Dark mode', $q.dark.isActive); // true, false
+const settings = useSettingsStore();
+const $q = useQuasar();
+const darkmode = ref(settings.darkmode);
+$q.dark.set(settings.darkmode);
 
-    watch(
-      () => darkmode.value,
-      async (value) => {
-        console.log('update storage');
-        //$q.dark.set(darkmode.value);
-        $q.dark.set(value);
-        settings.darkmode = value;
-      },
-    );
-    return {
-      darkmode,
-    };
-  },
+// Update the theme when the store value changes (might be updated by Aleph settings fetching)
+watch(toRef(settings, 'darkmode'), () => {
+  $q.dark.set(settings.darkmode);
 });
+
+watch(
+  () => darkmode.value,
+  async (value) => {
+    settings.update({ darkmode: value });
+  },
+);
 </script>

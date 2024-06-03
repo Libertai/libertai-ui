@@ -7,7 +7,6 @@ export const useModelsStore = defineStore('models', {
     models: defaultModels,
     selectedModel: defaultModels[0],
   }),
-  getters: {},
   actions: {
     // any amount of arguments, return a promise or not
     setModel(model) {
