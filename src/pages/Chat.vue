@@ -1,8 +1,8 @@
 <template>
-  <q-page class="column align-items-center q-mx-xl">
+  <q-page class="column align-items-center">
     <div ref="scrollAreaRef" class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)">
       <!-- Display message history -->
-      <q-list class="col-grow">
+      <q-list class="col-grow q-ma-xl">
         <!-- Determine styling based on the role of the message (if it's the user or the AI) -->
         <q-item
           v-for="(message, message_index) in messagesRef"
@@ -32,7 +32,7 @@
             </q-popup-edit>
             <!-- Display the role of the user or the AI -->
             <q-item-label class="text-semibold q-mb-md">
-              {{ message.role.replace(chatRef.username, 'You').replace('assistant', 'Libertai') }}
+              {{message.role}}
             </q-item-label>
             <!-- Display any attachments -->
             <q-item-label v-if="message.attachments && message.attachments.length > 0">
