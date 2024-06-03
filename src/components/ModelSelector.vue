@@ -2,7 +2,7 @@
   <q-btn-dropdown
     :label="modelsStore.selectedModel.name.substring(0, 12) + '..'"
     class="text-semibold icon-md border-primary-highlight"
-    dropdown-icon="img:icons/svg/chevron-down.svg"
+    dropdown-icon="img:icons/svg/chevron-down_lighten.svg"
     size="md"
     color="primary"
     no-caps
