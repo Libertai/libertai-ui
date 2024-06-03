@@ -1,11 +1,11 @@
 <template>
-  <q-page class="flex flex-center bg-dark_deleted font-mulish text-purple-700">
+  <q-page class="flex flex-center text-purple-700">
     <div class="row q-pa-xl q-col-gutter-md">
       <q-card class="col-12 text-center" flat>
-        <q-card-section class="bg-dark-page_deleted">
+        <q-card-section>
           <div class="text-h4 text-bold">Earn Libertai Points</div>
         </q-card-section>
-        <q-card-section class="q-pt-none bg-dark-page_deleted">
+        <q-card-section class="q-pt-none">
           <p>
             Are you ready to dive into a new world of decentralized computing, where your contributions are rewarded
             with tangible benefits? Look no further than Libertai Points! These points play an essential role within the

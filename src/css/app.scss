@@ -49,10 +49,96 @@
     U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-/* Quasar */
+body {
+  font-family: 'mulish';
+}
 
+/* Quasar */
+.body--light {
+  /* ... */
+  .engine-message {
+    background-color: $secondary;
+  }
+
+  .message-content {
+    color: $purple700;
+  }
+
+  .q-toggle {
+    .q-toggle__track {
+      background-color: $purple700;
+      opacity: 0.7;
+    }
+  }
+
+  .personas-dropdown {
+    border: 1px solid $secondary;
+  }
+
+  .text-light {
+    color: $primary;
+  }
+}
+
+.body--dark {
+  /* ... */
+  .q-dark,
+  .text-primary {
+    color: $dark-text-color !important;
+  }
+
+  .bg-primary {
+    background-color: $primary-dark !important;
+  }
+
+  .btn-gradient {
+    background-image: inherit;
+    background-color: $primary-dark !important;
+  }
+
+  .engine-message {
+  }
+
+  .message-content {
+    color: $dark-text-color;
+  }
+
+  .personas-dropdown {
+    background-color: $secondary;
+  }
+
+  .text-light {
+    color: $primary;
+  }
+
+  aside {
+    & .item-history {
+      border: inherit;
+      color: $dark-text-color;
+    }
+  }
+
+  .q-item--dark {
+    color: $dark-text-color;
+  }
+
+  .border-primary-highlight {
+    border: 1px solid $primary;
+  }
+
+  .bg-purple-50 {
+    background-color: $primary-dark !important;
+    color: $purple50 !important;
+  }
+}
+/* Quasar */
 .q-tooltip {
   background-color: $primary;
+}
+
+/* fix broken avatar radius */
+.q-avatar__content {
+  border-radius: 50%;
 }
 
 /* TEXT */
@@ -60,20 +146,16 @@
   font-weight: 600;
 }
 
-.text-light {
-  color: #644df9;
-}
-
 .text-purple700,
 .text-purple-700 {
-  font-family: 'Mulish';
-  color: $purple700;
+  color: $purple700 !important;
 }
 .font-mulish {
-  font-family: 'Mulish';
+  font-family: 'Mulish' !important;
 }
+
 .border-primary-highlight {
-  border: 1px solid #644df9;
+  border: 1px solid $border-color;
 }
 
 .dyn-container {
@@ -124,17 +206,24 @@ input {
   -webkit-background-clip: text !important;
 }
 
-/* fix broken avatar radius */
-.q-avatar__content {
-  border-radius: 50%;
-}
 .rounded-img img {
   border-radius: 50%;
 }
+
 .avatar {
   border-radius: 50%;
 }
 
-.personas-dropdown {
-  border: 2px solid $secondary;
+.icon-md > svg,
+.icon-md img {
+  width: 0.8em;
+  height: 0.8em;
+}
+
+.bull-date {
+  color: $dark-text-color;
+}
+.bull-date::before {
+  content: '● ';
+  margin-left: 5px;
 }

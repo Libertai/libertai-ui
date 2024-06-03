@@ -4,14 +4,14 @@
       <div :class="$q.screen.gt.sm ? 'row q-ma-xl' : 'row qm-ma-md'">
         <div class="col"></div>
         <div :class="$q.screen.gt.sm ? 'col-4' : 'col-10'">
-          <q-card class="my-card center text-center q-my-xl" flat>
+          <q-card class="my-card center text-center q-pa-md" flat>
             <q-avatar>
               <img :src="personasStore.persona.avatarUrl" />
             </q-avatar>
 
             <q-card-section>
               <div class="rounded-borders bg-secondary q-pa-md text-left text-light">
-                Hi I'm your Libertai Assistant.<br />How can I assist you today?
+                Hi I'm your Libertai assistant.<br />How can I assist you today?
               </div>
             </q-card-section>
             <q-card-section>
@@ -44,6 +44,7 @@ import { defaultChatTopic } from 'src/utils/chat';
 import { useModelsStore } from 'src/stores/models-store';
 import { useChatsStore } from 'src/stores/chats-store';
 import { usePersonasStore } from 'src/stores/personas-store';
+import { useSettingsStore } from 'src/stores/settings';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -60,9 +61,11 @@ const chatsStore = useChatsStore();
 // TODO: We probably don't need to use a store for this
 const personasStore = usePersonasStore();
 
+const settings = useSettingsStore();
 // Our local page state
 
-const usernameInputRef = ref('user');
+const { username } = settings;
+
 // Message input state
 const messageInputRef = ref('');
 
@@ -75,7 +78,6 @@ async function sendMessage() {
 
   // Extract the values out of our relevant refs
   let title = defaultChatTopic;
-  let username = usernameInputRef.value;
   // NOTE: these are refs to the store, so we need to deep clone them
   let model = JSON.parse(JSON.stringify(modelsStore.selectedModel));
   let persona = JSON.parse(JSON.stringify(personasStore.persona));

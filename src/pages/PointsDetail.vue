@@ -43,7 +43,7 @@
           </p>
         </q-card-section>
       </q-card>
-      <p class="">You are getting {{ hourlyRate.toFixed(2) }} points per hour.</p>
+      <p :class="$q.dark.mode ? 'text-white' : ''">You are getting {{ hourlyRate.toFixed(2) }} points per hour.</p>
       <p class="text-grey text-center col-12">
         * Estimate only, and under current rules, if your participation stays at the same level. <br />
         The availability of Libertai Points is subject to change without notice. We may suspend, modify, or terminate

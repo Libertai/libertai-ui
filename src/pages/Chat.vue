@@ -1,13 +1,13 @@
 <template>
-  <q-page class="column align-items-center q-mx-xl">
+  <q-page class="column align-items-center">
     <div ref="scrollAreaRef" class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)">
       <!-- Display message history -->
-      <q-list class="col-grow">
+      <q-list class="col-grow q-ma-xl">
         <!-- Determine styling based on the role of the message (if it's the user or the AI) -->
         <q-item
           v-for="(message, message_index) in messagesRef"
           :key="message.id"
-          :class="`q-py-lg ${$q.screen.gt.sm ? 'q-mx-xl' : 'q-mx-sm'} items-start dyn-container chat-item rounded-borders ${message.role == usernameRef ? 'bg-white' : 'bg-secondary'}`"
+          :class="`q-py-md q-my-md ${$q.screen.gt.sm ? 'q-mx-xl' : 'q-mx-sm'} items-start dyn-container chat-item rounded-borders ${$q.dark.mode ? '' : message.role == usernameRef ? 'bg-white' : 'bg-secondary'}`"
         >
           <!-- Display the avatar of the user or the AI -->
           <q-item-section avatar>
@@ -31,8 +31,9 @@
               <q-input v-model="scope.value" autofocus autogrow counter dense />
             </q-popup-edit>
             <!-- Display the role of the user or the AI -->
-            <q-item-label class="text-semibold">
-              {{ message.role.replace(chatRef.username, 'You').replace('assistant', 'Libertai') }}
+            <q-item-label class="text-semibold q-mb-md">
+              {{ message.role }}
+              <span class="bull-date">{{ formatDate(message.timestamp) }}</span>
             </q-item-label>
             <!-- Display any attachments -->
             <q-item-label v-if="message.attachments && message.attachments.length > 0">
@@ -46,7 +47,11 @@
             </q-item-label>
             <!-- Display the content of the message -->
             <q-item-label style="display: block">
-              <MarkdownRenderer :content="message.content" breaks />
+              <MarkdownRenderer
+                :content="message.content"
+                breaks
+                :class="message.role == usernameRef ? '' : 'message-content'"
+              />
               <!-- Display the loading spinner if the message is still loading -->
               <q-spinner-bars v-if="!message.stopped && isLoadingRef" color="white" size="2em" />
               <!-- Display the error message if the message errored  on generate -->
@@ -70,10 +75,22 @@
               <q-tooltip>Regenerate</q-tooltip>
             </q-btn>
             <!-- Allow copying the message to the clipboard -->
-            <q-btn dense flat icon="img:icons/svg/copy2.svg" size="sm" @click="copyMessage(message)">
+            <q-btn
+              dense
+              flat
+              :icon="`img:icons/svg/copy2${$q.dark.mode ? '_lighten' : ''}.svg`"
+              size="sm"
+              @click="copyMessage(message)"
+            >
               <q-tooltip>Copy</q-tooltip>
             </q-btn>
-            <q-btn dense flat icon="img:icons/svg/edit.svg" size="sm" @click="editMessage('message-' + message_index)">
+            <q-btn
+              dense
+              flat
+              :icon="`img:icons/svg/edit${$q.dark.mode ? '_lighten' : ''}.svg`"
+              size="sm"
+              @click="editMessage('message-' + message_index)"
+            >
               <q-tooltip>Edit</q-tooltip>
             </q-btn>
           </div>
@@ -137,7 +154,7 @@
 
 <script setup>
 import 'highlight.js/styles/devibeans.css';
-import { copyToClipboard, useQuasar } from 'quasar';
+import { copyToClipboard, useQuasar, date } from 'quasar';
 import { nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -448,6 +465,11 @@ async function setChat(chatId) {
   }
 
   personasStore.persona = chatRef.value.persona;
+  let persona = chatRef.value.persona;
+  watch(personasStore.persona, async (persona) => {
+    personaRef.value = persona;
+  });
+
   // Extract the chat properties
   let title = chatRef.value.title;
   let username = chatRef.value.username;
@@ -459,7 +481,6 @@ async function setChat(chatId) {
     message.error = null;
     return message;
   });
-  let persona = chatRef.value.persona;
 
   // Set the selected model for the chat by its URL
   let modelApiUrl = chatRef.value.model.apiUrl;
@@ -527,6 +548,34 @@ async function clearCookies() {
 
 function openKnowledgeUploader() {
   showKnowledgeUploaderRef.value = true;
+}
+
+function formatDate(d) {
+  if (!d) d = new Date();
+  const currentDate = new Date();
+  const timeDiff = currentDate.getTime() / 1000 - d.getTime() / 1000;
+
+  let unit = 'hour';
+  let txtUnit = 'h';
+  if (timeDiff < 60) {
+    unit = 'second';
+    txtUnit = 's';
+  } else if (timeDiff < 3600) {
+    unit = 'minute';
+    txtUnit = 'm';
+  } else if (timeDiff < 86400) {
+    unit = 'hour';
+    txtUnit = 'h';
+  } else if (timeDiff < 2592000) {
+    unit = 'day';
+    txtUnit = 'd';
+  } else if (timeDiff > 2592000) {
+    unit = 'month';
+    txtUnit = 'month';
+  }
+
+  const diff = date.getDateDiff(currentDate, d, unit);
+  return diff + txtUnit;
 }
 </script>
 <style>
