@@ -1,29 +1,29 @@
 import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
 import { importAccountFromPrivateKey } from '@aleph-sdk/ethereum';
+import web3 from 'web3';
 
 const MESSAGE = 'Reza';
+const AGGREGATE_KEY = 'libertai-chat-ui';
 
 export class AlephPersistentStorage {
   constructor(account) {
-    console.log('account: ', account.address);
     this.account = account;
   }
 
   static async initialize(signer) {
     const hash = await signer.signMessage(MESSAGE);
-    const account = importAccountFromPrivateKey(hash);
+    const privateKey = web3.utils.sha3(hash);
+    const account = importAccountFromPrivateKey(privateKey);
 
     return new AlephPersistentStorage(account);
   }
 
-  async save(_content) {
-    console.log('Posting message');
+  async save(content) {
     const client = new AuthenticatedAlephHttpClient(this.account);
     const message = await client.createAggregate({
-      key: 'libertai-chat-ui',
-      content: { bio: 'tester', name: 'Moshe on Ethereum' },
+      key: AGGREGATE_KEY,
+      content,
     });
-    console.log('Message posted');
-    console.log(message.content);
+    console.log(`Saved on Aleph with hash ${message.item_hash}`);
   }
 }

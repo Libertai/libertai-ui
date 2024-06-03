@@ -24,7 +24,7 @@ export const useAccount = defineStore('account', {
       this.address = await this.signer.getAddress();
       this.active = true;
 
-      this.alephStorage = AlephPersistentStorage.initialize(this.signer);
+      this.alephStorage = await AlephPersistentStorage.initialize(this.signer);
       this.alephStorage.save({ test: 'Saved from localhost' });
     },
     disconnect() {

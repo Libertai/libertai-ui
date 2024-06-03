@@ -40,7 +40,8 @@
     "stream": "^0.0.2",
     "uuid": "^9.0.1",
     "vue": "^3.0.0",
-    "vue-router": "^4.0.0"
+    "vue-router": "^4.0.0",
+    "web3": "^4.9.0"
   },
   "devDependencies": {
     "@quasar/app-vite": "^1.9.3",
@@ -50,6 +51,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-vue": "^9.24.0",
     "postcss": "^8.4.14",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "vite-plugin-node-polyfills": "^0.22.0"
   }
 }

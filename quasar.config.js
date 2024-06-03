@@ -9,6 +9,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 const { configure } = require('quasar/wrappers');
+const { nodePolyfills } = require('vite-plugin-node-polyfills');
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -60,6 +61,11 @@ module.exports = configure(function (/* ctx */) {
           viteConf.build.commonjsOptions = {};
         }
         viteConf.build.commonjsOptions.transformMixedEsModules = true;
+
+        if (viteConf.plugins === undefined) {
+          viteConf.plugins = [];
+        }
+        viteConf.plugins = [...viteConf.plugins, nodePolyfills()];
       },
 
       // vueRouterBase,
