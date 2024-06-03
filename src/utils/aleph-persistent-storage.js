@@ -8,6 +8,7 @@ const AGGREGATE_KEY = 'libertai-chat-ui';
 export class AlephPersistentStorage {
   constructor(account) {
     this.account = account;
+    this.client = new AuthenticatedAlephHttpClient(this.account);
   }
 
   static async initialize(signer) {
@@ -19,11 +20,14 @@ export class AlephPersistentStorage {
   }
 
   async save(content) {
-    const client = new AuthenticatedAlephHttpClient(this.account);
-    const message = await client.createAggregate({
+    const message = await this.client.createAggregate({
       key: AGGREGATE_KEY,
       content,
     });
-    console.log(`Saved on Aleph with hash ${message.item_hash}`);
+    console.log(`Data saved on Aleph with hash ${message.item_hash}`);
+  }
+
+  async fetch() {
+    return this.client.fetchAggregate(this.account.address, AGGREGATE_KEY);
   }
 }
