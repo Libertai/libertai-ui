@@ -1,11 +1,12 @@
 <template>
   <q-btn-dropdown
     :label="modelsStore.selectedModel.name.substring(0, 12) + '..'"
-    :text-color="$q.dark.mode ? '' : 'purple700'"
-    class="font-mulish text-semibold icon-md"
+    class="text-semibold icon-md border-primary-highlight"
     dropdown-icon="img:icons/svg/chevron-down.svg"
     size="md"
+    color="primary"
     no-caps
+    rounded
     unelevated
   >
     <q-list>

@@ -41,6 +41,8 @@
               >{{ addressPoints.toFixed(0) }} <span v-if="$q.screen.gt.sm">Points</span></span
             >
           </q-btn>
+          <!-- model selector -->
+          <model-selector />
           <account-button />
         </div>
       </q-toolbar>
@@ -55,9 +57,7 @@
       <!-- image link with the logo -->
       <q-item class="q-mb-md text-left" clickable to="/">
         <img alt="Libertai" :src="`icons/svg/libertai_full${$q.dark.mode ? '_lighten' : ''}.svg`" />
-        <model-selector />
       </q-item>
-      <!-- model selector -->
       <div class="q-mr-xl q-ml-md q-mt-md">
         <q-btn
           cclass="q-mx-xl q-my-xl border-primary-highlight text-semibold"
