@@ -219,3 +219,11 @@ input {
   width: 0.8em;
   height: 0.8em;
 }
+
+.bull-date {
+    color: $dark-text-color;
+}
+.bull-date::before {
+    content: "● ";
+    margin-left: 5px;
+}
