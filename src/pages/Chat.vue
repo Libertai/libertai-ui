@@ -32,8 +32,8 @@
             </q-popup-edit>
             <!-- Display the role of the user or the AI -->
             <q-item-label class="text-semibold q-mb-md">
-              {{message.role}}
-              <span class="bull-date">{{formatDate(message.timestamp)}}</span>
+              {{ message.role }}
+              <span class="bull-date">{{ formatDate(message.timestamp) }}</span>
             </q-item-label>
             <!-- Display any attachments -->
             <q-item-label v-if="message.attachments && message.attachments.length > 0">
@@ -551,30 +551,30 @@ function openKnowledgeUploader() {
 }
 
 function formatDate(d) {
-  if(!d) d = new Date();
+  if (!d) d = new Date();
   const currentDate = new Date();
-  const timeDiff = currentDate.getTime()/1000 - d.getTime()/1000;
+  const timeDiff = currentDate.getTime() / 1000 - d.getTime() / 1000;
 
-  let unit = "hour";
-  let txtUnit = "h"
-  if(timeDiff < 60) {
-    unit = "second"
-    txtUnit = "s"
-  } else if(timeDiff < 3600) {
-    unit = "minute"
-    txtUnit = "m"
-  } else if(timeDiff < 86400) {
-    unit = "hour"
-    txtUnit = "h"
-  } else if(timeDiff < 2592000) {
-    unit = "day"
-    txtUnit = "d"
-  } else if(timeDiff > 2592000) {
-    unit = "month"
-    txtUnit = "month"
+  let unit = 'hour';
+  let txtUnit = 'h';
+  if (timeDiff < 60) {
+    unit = 'second';
+    txtUnit = 's';
+  } else if (timeDiff < 3600) {
+    unit = 'minute';
+    txtUnit = 'm';
+  } else if (timeDiff < 86400) {
+    unit = 'hour';
+    txtUnit = 'h';
+  } else if (timeDiff < 2592000) {
+    unit = 'day';
+    txtUnit = 'd';
+  } else if (timeDiff > 2592000) {
+    unit = 'month';
+    txtUnit = 'month';
   }
 
-  const diff = date.getDateDiff(currentDate, d, unit)
+  const diff = date.getDateDiff(currentDate, d, unit);
   return diff + txtUnit;
 }
 </script>
