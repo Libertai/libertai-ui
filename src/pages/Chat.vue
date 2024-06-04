@@ -89,7 +89,7 @@
               dense
               flat
               size="sm"
-              @click="editMessage(this.$refs['message-' + message_index][0])"
+              @click="editMessage($refs['message-' + message_index][0])"
             >
               <q-tooltip>Edit</q-tooltip>
             </q-btn>
