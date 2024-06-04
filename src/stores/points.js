@@ -4,7 +4,6 @@ import { AlephHttpClient } from '@aleph-sdk/client';
 export const usePoints = defineStore('points', {
   state: () => ({
     points_source: '0xCBFc3EeC41CBBfCAcc50337d712890C47a14ba99',
-    api_server: 'https://official.aleph.cloud',
     points: {},
     pending_points: {},
     info: {
