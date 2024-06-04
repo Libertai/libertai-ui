@@ -193,7 +193,7 @@ const hasResetRef = ref(false);
 const inputRef = ref(null);
 const scrollAreaRef = ref(null);
 const enableEditRef = ref(false);
-const enableKnowledgeRef = ref(true);
+const enableKnowledgeRef = ref(false);
 const showKnowledgeUploaderRef = ref(false);
 const attachmentsRef = ref([]);
 
@@ -229,7 +229,7 @@ watch(
 watch(
   () => account.active,
   (active) => {
-    enableKnowledgeRef.value = active;
+    //enableKnowledgeRef.value = active;
   },
 );
 
