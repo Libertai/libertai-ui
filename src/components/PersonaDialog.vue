@@ -6,8 +6,8 @@
         <q-space />
         <q-btn
           v-close-popup
-          flat
           :icon="`img:icons/svg/close${$q.dark.mode ? '_lighten' : ''}.svg`"
+          flat
           size="sm"
           unelevated
         />
@@ -21,19 +21,18 @@
         </q-card-section>
         <q-card-section>
           <label>Persona name</label>
-          <q-input v-model="personasStore.persona.name" bg-color="secondary" input-class="text-light q-px-sm" outlined>
-          </q-input>
+          <q-input v-model="personaName" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
         </q-card-section>
       </q-card-section>
 
       <q-card-section>
         <label>Your name</label>
-        <q-input v-model="username" bg-color="secondary" input-class="text-light q-px-sm" outlined> </q-input>
+        <q-input v-model="username" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
       </q-card-section>
       <q-card-section>
         <label>Persona Description</label>
         <q-input
-          v-model="personasStore.persona.description"
+          v-model="personaDescription"
           autogrow
           bg-color="secondary"
           input-class="text-light"
@@ -50,7 +49,7 @@
           label="Confirm"
           rounded
           text-color="white"
-          @click="updatePersona()"
+          @click="updatePersona"
         />
       </q-card-section>
     </q-card>
@@ -60,13 +59,19 @@
 <script setup>
 import { usePersonasStore } from 'src/stores/personas-store';
 import { useSettingsStore } from 'src/stores/settings';
-import { storeToRefs } from 'pinia';
+import { ref } from 'vue';
 
 const personasStore = usePersonasStore();
-const settings = useSettingsStore();
-const { username } = storeToRefs(settings);
+const settingsStore = useSettingsStore();
+
+// Form values
+const username = ref(settingsStore.username);
+const personaName = ref(personasStore.persona.name);
+const personaDescription = ref(personasStore.persona.description);
 
 function updatePersona() {
-  // on update persona event
+  personasStore.persona.name = personaName;
+  personasStore.persona.description = personaDescription;
+  settingsStore.update({ username: username.value });
 }
 </script>

@@ -48,9 +48,9 @@
             <!-- Display the content of the message -->
             <q-item-label style="display: block">
               <MarkdownRenderer
+                :class="message.role == usernameRef ? '' : 'message-content'"
                 :content="message.content"
                 breaks
-                :class="message.role == usernameRef ? '' : 'message-content'"
               />
               <!-- Display the loading spinner if the message is still loading -->
               <q-spinner-bars v-if="!message.stopped && isLoadingRef" color="white" size="2em" />
@@ -76,18 +76,18 @@
             </q-btn>
             <!-- Allow copying the message to the clipboard -->
             <q-btn
+              :icon="`img:icons/svg/copy2${$q.dark.mode ? '_lighten' : ''}.svg`"
               dense
               flat
-              :icon="`img:icons/svg/copy2${$q.dark.mode ? '_lighten' : ''}.svg`"
               size="sm"
               @click="copyMessage(message)"
             >
               <q-tooltip>Copy</q-tooltip>
             </q-btn>
             <q-btn
+              :icon="`img:icons/svg/edit${$q.dark.mode ? '_lighten' : ''}.svg`"
               dense
               flat
-              :icon="`img:icons/svg/edit${$q.dark.mode ? '_lighten' : ''}.svg`"
               size="sm"
               @click="editMessage('message-' + message_index)"
             >
@@ -167,7 +167,7 @@ import { LlamaCppApiEngine } from '@libertai/libertai-js';
 import { useChatsStore } from 'src/stores/chats-store';
 import { useModelsStore } from 'src/stores/models-store';
 import { useKnowledgeStore } from 'src/stores/knowledge-store';
-import { useAccount } from 'src/stores/account';
+import { useAccountStore } from 'src/stores/account';
 import { usePersonasStore } from 'src/stores/personas-store';
 
 // Components
@@ -180,7 +180,7 @@ const route = useRoute();
 const router = useRouter();
 
 // App state
-const account = useAccount();
+const account = useAccountStore();
 const chatsStore = useChatsStore();
 const modelsStore = useModelsStore();
 const knowledgeStore = useKnowledgeStore();

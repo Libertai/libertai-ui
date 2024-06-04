@@ -3,7 +3,7 @@
     <q-header class="bg-transparent q-mt-sm">
       <q-toolbar>
         <q-btn aria-label="Menu" color="primary" dense flat icon="menu" round @click="toggleLeftDrawer" />
-        <q-btn flat @click="editPersona = true" class="q-pa-xs">
+        <q-btn class="q-pa-xs" flat @click="editPersona = true">
           <q-icon size="xs">
             <img :src="`icons/svg/settings${$q.dark.mode ? '_lighten' : ''}.svg`" />
           </q-icon>
@@ -56,16 +56,16 @@
     >
       <!-- image link with the logo -->
       <q-item class="q-mb-md text-left" clickable to="/">
-        <img alt="Libertai" :src="`icons/svg/libertai_full${$q.dark.mode ? '_lighten' : ''}.svg`" />
+        <img :src="`icons/svg/libertai_full${$q.dark.mode ? '_lighten' : ''}.svg`" alt="Libertai" />
       </q-item>
       <div class="q-mr-xl q-ml-md q-mt-md">
         <q-btn
           cclass="q-mx-xl q-my-xl border-primary-highlight text-semibold"
           class="border-primary-highlight"
-          text-color="dark-mode-text"
-          to="/new"
           no-caps
           rounded
+          text-color="dark-mode-text"
+          to="/new"
           unelevated
         >
           <q-icon class="text-dark" left size="xs">
@@ -75,7 +75,7 @@
         </q-btn>
       </div>
       <!-- list of chats by reference to the chats-store -->
-      <q-list style="flex-grow: 1" class="q-mt-md">
+      <q-list class="q-mt-md" style="flex-grow: 1">
         <q-scroll-area style="height: 100%; min-height: 100px" visible>
           <q-item
             v-for="chat of chats.slice().reverse()"
@@ -96,9 +96,9 @@
               </q-btn>
               <q-btn
                 v-if="route.params?.id != chat.id"
+                :icon="`img:icons/svg/msg${$q.dark.mode ? '_lighten' : ''}.svg`"
                 class="q-pa-xs"
                 flat
-                :icon="`img:icons/svg/msg${$q.dark.mode ? '_lighten' : ''}.svg`"
                 size="sm"
               >
               </q-btn>
@@ -170,7 +170,7 @@
         </q-item>
         <!-- powered by aleph.im -->
         <q-item clickable href="https://aleph.im" target="_blank">
-          <img alt="aleph.im" :src="`icons/svg/powered-by${$q.dark.mode ? '_lighten' : ''}.svg`" />
+          <img :src="`icons/svg/powered-by${$q.dark.mode ? '_lighten' : ''}.svg`" alt="aleph.im" />
         </q-item>
       </q-list>
     </q-drawer>
@@ -187,7 +187,7 @@ import { storeToRefs } from 'pinia';
 
 // Import State
 import { useChatsStore } from '../stores/chats-store';
-import { useAccount } from '../stores/account';
+import { useAccountStore } from '../stores/account';
 import { usePoints } from 'src/stores/points';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -206,7 +206,7 @@ const deleteChatId = ref(null);
 
 // Setup Stores
 const chatsStore = useChatsStore();
-const account = useAccount();
+const account = useAccountStore();
 const points = usePoints();
 
 const router = useRouter();
