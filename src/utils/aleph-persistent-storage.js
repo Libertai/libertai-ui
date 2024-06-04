@@ -2,7 +2,7 @@ import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
 import { getAccountFromProvider, importAccountFromPrivateKey } from '@aleph-sdk/ethereum';
 import web3 from 'web3';
 
-const MESSAGE = 'LibertAi';
+const MESSAGE = 'LibertAI';
 const AGGREGATE_KEY = 'libertai-chat-ui';
 const SECURITY_AGGREGATE_KEY = 'security';
 
