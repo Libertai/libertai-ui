@@ -53,5 +53,9 @@
     "postcss": "^8.4.14",
     "prettier": "^3.2.5",
     "vite-plugin-node-polyfills": "^0.22.0"
+  },
+  "overrides": {
+    "vite": "^4.0.0",
+    "@vitejs/plugin-vue": "^4.0.0"
   }
 }
