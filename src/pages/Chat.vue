@@ -89,7 +89,7 @@
               dense
               flat
               size="sm"
-              @click="editMessage('message-' + message_index)"
+              @click="editMessage(this.$refs['message-' + message_index][0])"
             >
               <q-tooltip>Edit</q-tooltip>
             </q-btn>
@@ -527,11 +527,11 @@ async function copyMessage(message) {
   $q.notify('Message copied to clipboard');
 }
 
-async function editMessage(message_id) {
-  this.enableEditRef = true;
+async function editMessage($message) {
+  enableEditRef.value = true;
 
   setTimeout(() => {
-    this.$refs[message_id][0].$el.click();
+    $message.$el.click();
   }, 50);
 }
 
