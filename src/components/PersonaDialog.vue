@@ -59,7 +59,7 @@
 <script setup>
 import { usePersonasStore } from 'src/stores/personas-store';
 import { useSettingsStore } from 'src/stores/settings';
-import { ref } from 'vue';
+import { ref, toRef, watch } from 'vue';
 
 const personasStore = usePersonasStore();
 const settingsStore = useSettingsStore();
@@ -68,6 +68,11 @@ const settingsStore = useSettingsStore();
 const username = ref(settingsStore.username);
 const personaName = ref(personasStore.persona.name);
 const personaDescription = ref(personasStore.persona.description);
+
+// Update the name input when the store changes  (might be updated by Aleph settings fetching)
+watch(toRef(settingsStore, 'username'), () => {
+  username.value = settingsStore.username;
+});
 
 function updatePersona() {
   personasStore.persona.name = personaName;
