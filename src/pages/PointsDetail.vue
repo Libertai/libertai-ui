@@ -5,9 +5,12 @@
         <q-card class="col-12 text-center" flat>
           <q-card-section>
             <p class="q-py-md">
-              <span class="bg-purple-50 q-py-sm q-px-xl rounded text-bold">
-                {{ address.slice(0, 10) }}...{{ address.slice(-10) }}</span
-              >
+              <span v-if="$q.screen.gt.sm" class="bg-purple-50 q-py-sm q-px-xl rounded text-bold">
+                {{ address }}
+              </span>
+              <span v-else class="bg-purple-50 q-py-sm q-px-xl rounded text-bold">
+                {{ address.slice(0, 10) }}...{{ address.slice(-10) }}
+              </span>
             </p>
             <div class="text-h4 text-bold q-pb-sm text-left">Your Libertai Points</div>
             <p class="text-left">
