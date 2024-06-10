@@ -139,6 +139,15 @@
           </q-card>
         </q-dialog>
       </q-list>
+
+      <q-item to="/persona">
+        <img :src="`icons/svg/robot${$q.dark.mode ? '_lighten' : ''}.svg`" alt="persona" />
+
+        <q-item-section class="q-pl-sm">
+          <span class="text-semibold">Persona management</span>
+        </q-item-section>
+      </q-item>
+
       <!-- socials and support links (follow us, support, disclaimer) -->
       <q-list class="q-pt-md flex">
         <q-item class="q-mx-auto" href="https://x.com/libertai_dai" target="_blank">
