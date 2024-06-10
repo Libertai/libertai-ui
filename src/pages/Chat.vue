@@ -226,12 +226,12 @@ watch(
 );
 
 // Update whether we should show the knowledge uploader based on whether the user is connected
-watch(
-  () => account.active,
-  (active) => {
-    //enableKnowledgeRef.value = active;
-  },
-);
+// watch(
+//   () => account.active,
+//   (active) => {
+//     enableKnowledgeRef.value = active;
+//   },
+// );
 
 // Update the chat model when the selected model changes
 watch(
@@ -550,6 +550,7 @@ function openKnowledgeUploader() {
   showKnowledgeUploaderRef.value = true;
 }
 
+// TODO: Replace this by using dayjs
 function formatDate(d) {
   if (!d) d = new Date();
   const currentDate = new Date();
@@ -580,7 +581,7 @@ function formatDate(d) {
 </script>
 <style>
 /* Ensure message input expands to fill available space */
-.message-input {
+message-input {
   width: 100%; /* Adjust as needed to ensure proper sizing */
 }
 
