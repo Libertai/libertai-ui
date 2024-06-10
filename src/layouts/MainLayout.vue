@@ -140,39 +140,27 @@
         </q-dialog>
       </q-list>
       <!-- socials and support links (follow us, support, disclaimer) -->
-      <q-list class="q-pt-md">
-        <q-item href="https://x.com/libertai_dai" target="_blank">
+      <q-list class="q-pt-md flex">
+        <q-item class="q-mx-auto" href="https://x.com/libertai_dai" target="_blank">
           <q-item-section avatar>
             <img alt="Twitter - X" src="icons/twitter-x.svg" width="32px" />
           </q-item-section>
-
-          <q-item-section>
-            <q-item-label> Follow us</q-item-label>
-          </q-item-section>
         </q-item>
-        <q-item href="https://t.me/libertai" target="_blank">
+        <q-item class="q-mx-auto" href="https://t.me/libertai" target="_blank">
           <q-item-section avatar>
             <img alt="Telegram" src="icons/telegram.svg" width="32px" />
           </q-item-section>
-
-          <q-item-section>
-            <q-item-label> Chat with us</q-item-label>
-          </q-item-section>
         </q-item>
-        <q-item href="https://aleph.im" target="_blank">
+        <q-item class="q-mx-auto" href="https://aleph.im" target="_blank">
           <q-item-section avatar>
             <img alt="Aleph" src="icons/aleph.svg" width="32px" />
           </q-item-section>
-
-          <q-item-section>
-            <q-item-label> Build with us</q-item-label>
-          </q-item-section>
-        </q-item>
-        <!-- powered by aleph.im -->
-        <q-item clickable href="https://aleph.im" target="_blank">
-          <img :src="`icons/svg/powered-by${$q.dark.mode ? '_lighten' : ''}.svg`" alt="aleph.im" />
         </q-item>
       </q-list>
+      <!-- powered by aleph.im -->
+      <q-item clickable href="https://aleph.im" target="_blank">
+        <img :src="`icons/svg/powered-by${$q.dark.mode ? '_lighten' : ''}.svg`" alt="aleph.im" />
+      </q-item>
     </q-drawer>
 
     <q-page-container>
