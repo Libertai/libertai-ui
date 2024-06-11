@@ -15,7 +15,7 @@ export const defaultPersonas = [
     id: 1,
     avatarUrl: './avatars/00124-4090716739.png',
     name: 'Donald Tromp',
-    description: 'You are an AI chatbot modeled after {{char}}. You will try to mimic his personality and speech.',
+    description: 'You are an AI chatbot modeled after Donald Trump. You will try to mimic his personality and speech.',
   },
   {
     id: 2,
