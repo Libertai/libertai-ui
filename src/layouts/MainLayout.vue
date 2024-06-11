@@ -8,7 +8,17 @@
             <img :src="`icons/svg/settings${$q.dark.mode ? '_lighten' : ''}.svg`" alt="settings" />
           </q-icon>
         </q-btn>
-        <persona-dialog v-model="editPersona" />
+        <persona-dialog
+          v-model="editPersona"
+          :description="personasStore.persona.description"
+          :name="personasStore.persona.name"
+          @savePersona="
+            (name, description) => {
+              personasStore.persona.name = name;
+              personasStore.persona.description = description;
+            }
+          "
+        />
         <toggle-theme />
         <q-space />
 
@@ -175,8 +185,8 @@ import { computed, nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
 // Import State
-import { useChatsStore } from '../stores/chats-store';
-import { useAccountStore } from '../stores/account';
+import { useChatsStore } from 'stores/chats-store';
+import { useAccountStore } from 'stores/account';
 import { usePoints } from 'src/stores/points';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -185,6 +195,7 @@ import AccountButton from 'src/components/AccountButton.vue';
 import PersonaDialog from 'src/components/PersonaDialog.vue';
 import ToggleTheme from 'src/components/ToggleTheme.vue';
 import ModelSelector from 'src/components/ModelSelector.vue';
+import { usePersonasStore } from 'stores/personas-store';
 
 const leftDrawerOpen = ref(false);
 // Control whether the advanced persona customization is shown
@@ -196,6 +207,7 @@ const deleteChatId = ref(null);
 // Setup Stores
 const chatsStore = useChatsStore();
 const account = useAccountStore();
+const personasStore = usePersonasStore();
 const points = usePoints();
 
 const router = useRouter();

@@ -1,7 +1,25 @@
 <template>
   <section class="max-sm:tw-mx-4 md:tw-mx-10">
-    <h4 class="text-h4 text-semibold tw-mt-5">Persona Management</h4>
-    <p class="tw-my-4">Click on a persona to edit</p>
+    <h4 class="text-h4 text-semibold tw-my-5">Persona Management</h4>
+    <p>Click on a persona to edit</p>
+    <div class="tw-my-4 tw-flex md:tw-justify-end">
+      <q-btn
+        icon="img:icons/svg/add.svg"
+        label="Create persona"
+        no-caps
+        rounded
+        unelevated
+        @click="createPersona = true"
+      />
+      <persona-dialog v-model="createPersona" title="Create persona" />
+      <persona-dialog
+        v-model="editPersona"
+        :description="personasStore.persona.description"
+        :name="personasStore.persona.name"
+      />
+
+      <q-btn disabled="" icon="img:icons/svg/import.svg" label="Import persona" no-caps rounded unelevated />
+    </div>
 
     <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 xl:tw-grid-cols-3 tw-gap-y-4 tw-gap-x-4">
       <q-card v-for="persona of personas" :key="persona.id" class="persona-card bg-purple-50">
@@ -15,15 +33,23 @@
         </p>
 
         <div class="tw-grid tw-grid-cols-3 tw-gap-x-4 tw-w-40 tw-mx-auto">
-          <q-icon class="tw-mx-auto" size="sm">
-            <img alt="new chat" src="/icons/svg/chat.svg" />
-          </q-icon>
-          <q-icon class="tw-mx-auto" size="sm">
-            <img :src="`icons/svg/settings.svg`" alt="settings" />
-          </q-icon>
-          <q-icon class="tw-mx-auto" size="sm">
-            <img alt="export" src="/icons/svg/download.svg" />
-          </q-icon>
+          <q-btn unelevated @click="startChatWithPersona(persona)">
+            <q-icon size="sm">
+              <img alt="new chat" src="/icons/svg/chat.svg" />
+            </q-icon>
+          </q-btn>
+
+          <q-btn unelevated @click="startEditingPersona(persona)">
+            <q-icon size="sm">
+              <img :src="`icons/svg/settings.svg`" alt="settings" />
+            </q-icon>
+          </q-btn>
+
+          <q-btn disabled="" unelevated>
+            <q-icon size="sm">
+              <img alt="export" src="/icons/svg/download.svg" />
+            </q-icon>
+          </q-btn>
         </div>
       </q-card>
     </div>
@@ -32,8 +58,26 @@
 
 <script setup>
 import { usePersonasStore } from 'stores/personas-store';
+import PersonaDialog from 'components/PersonaDialog.vue';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const personas = usePersonasStore().personas;
+const personasStore = usePersonasStore();
+const router = useRouter();
+
+const createPersona = ref(false);
+const editPersona = ref(false);
+
+const startChatWithPersona = (persona) => {
+  personasStore.persona = persona;
+  router.push('/new');
+};
+
+const startEditingPersona = (persona) => {
+  personasStore.persona = persona;
+  editPersona.value = true;
+};
 </script>
 
 <style lang="postcss" scoped>

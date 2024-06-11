@@ -2,7 +2,7 @@
   <q-dialog class="q-pa-lg text-light" label="Customize" style="flex-grow: 1">
     <q-card class="q-pa-md">
       <q-card-actions :class="`flex flex-left text-semibold ${$q.dark.mode ? '' : 'text-purple700'}`">
-        Customize persona
+        {{ title }}
         <q-space />
         <q-btn
           v-close-popup
@@ -20,19 +20,19 @@
           </q-avatar>
         </q-card-section>
         <q-card-section>
-          <label>Persona name</label>
-          <q-input v-model="personaName" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
+          <span>Persona name</span>
+          <q-input v-model="name" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
         </q-card-section>
       </q-card-section>
 
       <q-card-section>
-        <label>Your name</label>
+        <span>Your name</span>
         <q-input v-model="username" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
       </q-card-section>
       <q-card-section>
-        <label>Persona Description</label>
+        <span>Persona Description</span>
         <q-input
-          v-model="personaDescription"
+          v-model="description"
           autogrow
           bg-color="secondary"
           input-class="text-light"
@@ -49,7 +49,7 @@
           label="Confirm"
           rounded
           text-color="white"
-          @click="updatePersona"
+          @click="emit('savePersona', name, description)"
         />
       </q-card-section>
     </q-card>
@@ -64,19 +64,42 @@ import { ref, toRef, watch } from 'vue';
 const personasStore = usePersonasStore();
 const settingsStore = useSettingsStore();
 
+const props = defineProps({
+  title: {
+    type: String,
+    default: 'Customize persona',
+  },
+  avatar: {
+    type: Object,
+    required: false,
+  },
+  name: {
+    type: String,
+    default: '',
+  },
+  description: {
+    type: String,
+    default: '',
+  },
+});
+const emit = defineEmits(['savePersona']);
+
 // Form values
 const username = ref(settingsStore.username);
-const personaName = ref(personasStore.persona.name);
-const personaDescription = ref(personasStore.persona.description);
+const name = ref(props.name);
+const description = ref(props.description);
 
 // Update the name input when the store changes  (might be updated by Aleph settings fetching)
 watch(toRef(settingsStore, 'username'), () => {
   username.value = settingsStore.username;
 });
 
-function updatePersona() {
-  personasStore.persona.name = personaName;
-  personasStore.persona.description = personaDescription;
-  settingsStore.update({ username: username.value });
-}
+watch(
+  () => props.name,
+  () => (name.value = props.name),
+);
+watch(
+  () => props.description,
+  () => (description.value = props.description),
+);
 </script>
