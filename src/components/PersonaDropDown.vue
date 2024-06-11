@@ -6,8 +6,8 @@
     dropdown-icon="img:icons/svg/chevron-down.svg"
     no-caps
     rounded
-    unelevated
     text-color="primary"
+    unelevated
   >
     <q-list>
       <q-item
@@ -19,7 +19,7 @@
         @click="setPersona(persona.id)"
       >
         <q-avatar class="q-mr-md" size="32px">
-          <img :src="persona.avatarUrl" />
+          <img :src="persona.avatarUrl" alt="avatar" />
         </q-avatar>
         <q-item-section>
           <q-item-label>

@@ -61,7 +61,7 @@
       <div class="q-mr-xl q-ml-md q-mt-md">
         <q-btn class="border-primary-highlight" no-caps rounded text-color="dark-mode-text" to="/new" unelevated>
           <q-icon class="text-dark" left size="xs">
-            <img alt="new chat" src="icons/svg/chat-plus.svg" />
+            <img alt="new chat" src="/icons/svg/chat-plus.svg" />
           </q-icon>
           New Chat
         </q-btn>
@@ -136,7 +136,7 @@
         <img :src="`icons/svg/robot${$q.dark.mode ? '_lighten' : ''}.svg`" alt="persona" />
 
         <q-item-section class="q-pl-sm">
-          <span class="text-semibold">Persona management</span>
+          <span>Persona management</span>
         </q-item-section>
       </q-item>
 
@@ -144,17 +144,17 @@
       <q-list class="q-pt-md flex">
         <q-item class="q-mx-auto" href="https://x.com/libertai_dai" target="_blank">
           <q-item-section avatar>
-            <img alt="Twitter - X" src="icons/twitter-x.svg" width="32px" />
+            <img alt="Twitter - X" src="/icons/twitter-x.svg" width="32px" />
           </q-item-section>
         </q-item>
         <q-item class="q-mx-auto" href="https://t.me/libertai" target="_blank">
           <q-item-section avatar>
-            <img alt="Telegram" src="icons/telegram.svg" width="32px" />
+            <img alt="Telegram" src="/icons/telegram.svg" width="32px" />
           </q-item-section>
         </q-item>
         <q-item class="q-mx-auto" href="https://aleph.im" target="_blank">
           <q-item-section avatar>
-            <img alt="Aleph" src="icons/aleph.svg" width="32px" />
+            <img alt="Aleph" src="/icons/aleph.svg" width="32px" />
           </q-item-section>
         </q-item>
       </q-list>

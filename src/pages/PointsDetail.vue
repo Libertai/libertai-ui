@@ -23,7 +23,7 @@
           <q-card-section class="bg-purple-50 q-pa-xl row">
             <div class="text-h6 text-bold col-8 text-left">
               <q-avatar class="q-mr-sm">
-                <img src="icons/svg/libertai.svg" />
+                <img alt="libertai" src="/icons/svg/libertai.svg" />
               </q-avatar>
               Total Points Received
             </div>
