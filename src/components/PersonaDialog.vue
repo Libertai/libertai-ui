@@ -16,7 +16,7 @@
       <q-card-section horizontal>
         <q-card-section>
           <q-avatar>
-            <img :src="personasStore.persona.avatarUrl" />
+            <img :src="personasStore.persona.avatarUrl" alt="avatar" />
           </q-avatar>
         </q-card-section>
         <q-card-section>
@@ -40,7 +40,7 @@
           type="textarea"
         />
       </q-card-section>
-      <q-card-section align="right" class="text-primary" horizontal>
+      <q-card-section class="text-primary" horizontal>
         <q-btn v-close-popup class="q-px-xl q-py-xs" label="Close" rounded />
         <q-space />
         <q-btn

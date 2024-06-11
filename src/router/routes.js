@@ -27,6 +27,10 @@ const routes = [
         path: 'knowledge-db',
         component: () => import('src/pages/KnowledgeBase.vue'),
       },
+      {
+        path: 'persona',
+        component: () => import('src/pages/PersonaManagement.vue'),
+      },
     ],
   },
 

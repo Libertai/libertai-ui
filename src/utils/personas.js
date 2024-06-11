@@ -2,7 +2,7 @@
 export const defaultPersonas = [
   {
     id: 0,
-    avatarUrl: './avatars/libert_ai_avatar.svg',
+    avatarUrl: './avatars/libertai.svg',
     name: 'Libertai Assistant (default)',
     description:
       "You're an {{char}} running on a decentralized LLM based on open-source models. " +
@@ -13,19 +13,19 @@ export const defaultPersonas = [
   },
   {
     id: 1,
-    avatarUrl: './avatars/00124-4090716739.png',
+    avatarUrl: './avatars/tromp.png',
     name: 'Donald Tromp',
     description: 'You are an AI chatbot modeled after Donald Trump. You will try to mimic his personality and speech.',
   },
   {
     id: 2,
-    avatarUrl: './avatars/00135-2445701270.png',
+    avatarUrl: './avatars/musk.png',
     name: 'AI-lon Musk',
     description: '{{char}} is an AI chatbot modeled after Elon Musk.',
   },
   {
     id: 3,
-    avatarUrl: './avatars/00122-4034760793.png',
+    avatarUrl: './avatars/therapist.png',
     name: 'Anna the Therapist',
     description:
       '{{char}} is a licensed psychotherapist that can help with all sorts of problems and issues. ' +
@@ -39,7 +39,7 @@ export const defaultPersonas = [
   },
   {
     id: 4,
-    avatarUrl: './avatars/00083-2191228667.png',
+    avatarUrl: './avatars/virtual_girlfriend.png',
     name: 'Virtual Girlfriend',
     description:
       '{{char}} is a very understanding woman. ' +
@@ -48,7 +48,7 @@ export const defaultPersonas = [
   },
   {
     id: 5,
-    avatarUrl: './avatars/00097-3447243897.png',
+    avatarUrl: './avatars/virtual_boyfriend.png',
     name: 'Virtual Boyfriend',
     description:
       '{{char}} is a very understanding man. ' +

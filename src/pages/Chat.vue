@@ -12,7 +12,7 @@
           <!-- Display the avatar of the user or the AI -->
           <q-item-section avatar>
             <q-avatar v-if="message.role == usernameRef">
-              <img src="avatars/00057-2093295138.png" />
+              <img src="avatars/user.png" />
             </q-avatar>
             <q-avatar v-else>
               <img :src="personaRef.avatarUrl" />

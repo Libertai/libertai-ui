@@ -5,7 +5,7 @@
         <q-btn aria-label="Menu" color="primary" dense flat icon="menu" round @click="toggleLeftDrawer" />
         <q-btn class="q-pa-xs" flat @click="editPersona = true">
           <q-icon size="xs">
-            <img :src="`icons/svg/settings${$q.dark.mode ? '_lighten' : ''}.svg`" />
+            <img :src="`icons/svg/settings${$q.dark.mode ? '_lighten' : ''}.svg`" alt="settings" />
           </q-icon>
         </q-btn>
         <persona-dialog v-model="editPersona" />
@@ -59,17 +59,9 @@
         <img :src="`icons/svg/libertai_full${$q.dark.mode ? '_lighten' : ''}.svg`" alt="Libertai" />
       </q-item>
       <div class="q-mr-xl q-ml-md q-mt-md">
-        <q-btn
-          cclass="q-mx-xl q-my-xl border-primary-highlight text-semibold"
-          class="border-primary-highlight"
-          no-caps
-          rounded
-          text-color="dark-mode-text"
-          to="/new"
-          unelevated
-        >
+        <q-btn class="border-primary-highlight" no-caps rounded text-color="dark-mode-text" to="/new" unelevated>
           <q-icon class="text-dark" left size="xs">
-            <img src="icons/svg/chat-plus.svg" />
+            <img alt="new chat" src="icons/svg/chat-plus.svg" />
           </q-icon>
           New Chat
         </q-btn>
