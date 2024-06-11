@@ -113,7 +113,7 @@ body {
 
   aside {
     & .item-history {
-      border: inherit;
+      border: 1px solid $secondary;
       color: $dark-text-color;
     }
   }

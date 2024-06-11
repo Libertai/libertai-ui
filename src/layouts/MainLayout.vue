@@ -87,7 +87,7 @@
           >
             <q-item-section side>
               <q-btn
-                v-if="route.params?.id == chat.id"
+                v-if="route.params?.id === chat.id"
                 class="q-pa-xs"
                 flat
                 icon="img:icons/svg/msg_active.svg"
@@ -95,7 +95,7 @@
               >
               </q-btn>
               <q-btn
-                v-if="route.params?.id != chat.id"
+                v-if="route.params?.id !== chat.id"
                 :icon="`img:icons/svg/msg${$q.dark.mode ? '_lighten' : ''}.svg`"
                 class="q-pa-xs"
                 flat
@@ -110,7 +110,7 @@
               </q-item-label>
             </q-item-section>
 
-            <q-item-section v-if="route.params?.id == chat.id" side>
+            <q-item-section v-if="route.params?.id === chat.id" side>
               <q-btn-group dense flat>
                 <q-btn
                   class="q-pa-xs"
