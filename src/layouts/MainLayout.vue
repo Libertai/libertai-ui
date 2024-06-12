@@ -10,12 +10,17 @@
         </q-btn>
         <persona-dialog
           v-model="editPersona"
-          :description="personasStore.persona.description"
-          :name="personasStore.persona.name"
+          :base-persona="personasStore.persona"
           @savePersona="
-            (name, description) => {
-              personasStore.persona.name = name;
-              personasStore.persona.description = description;
+            (persona) => {
+              personasStore.persona = persona;
+
+              personasStore.personas.map((userPersona) => {
+                if (userPersona.id === persona.id) {
+                  return persona;
+                }
+                return userPersona;
+              });
             }
           "
         />

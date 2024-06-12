@@ -8,6 +8,6 @@ export const usePersonasStore = defineStore('personas', {
     persona: { ...defaultPersonas[0] },
   }),
   persist: {
-    paths: ['persona'], // key to persist
+    paths: ['persona', 'personas'], // key to persist
   },
 });

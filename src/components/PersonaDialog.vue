@@ -16,7 +16,7 @@
       <q-card-section horizontal>
         <q-card-section>
           <q-avatar>
-            <img :src="personasStore.persona.avatarUrl" alt="avatar" />
+            <img :src="basePersona?.avatarUrl" alt="avatar" />
           </q-avatar>
         </q-card-section>
         <q-card-section>
@@ -49,7 +49,7 @@
           label="Confirm"
           rounded
           text-color="white"
-          @click="emit('savePersona', name, description)"
+          @click="emit('savePersona', { ...basePersona, name, description })"
         />
       </q-card-section>
     </q-card>
@@ -57,11 +57,9 @@
 </template>
 
 <script setup>
-import { usePersonasStore } from 'src/stores/personas-store';
 import { useSettingsStore } from 'src/stores/settings';
 import { ref, toRef, watch } from 'vue';
 
-const personasStore = usePersonasStore();
 const settingsStore = useSettingsStore();
 
 const props = defineProps({
@@ -69,25 +67,17 @@ const props = defineProps({
     type: String,
     default: 'Customize persona',
   },
-  avatar: {
+  basePersona: {
     type: Object,
     required: false,
-  },
-  name: {
-    type: String,
-    default: '',
-  },
-  description: {
-    type: String,
-    default: '',
   },
 });
 const emit = defineEmits(['savePersona']);
 
 // Form values
 const username = ref(settingsStore.username);
-const name = ref(props.name);
-const description = ref(props.description);
+const name = ref(props.basePersona?.name ?? '');
+const description = ref(props.basePersona?.description ?? '');
 
 // Update the name input when the store changes  (might be updated by Aleph settings fetching)
 watch(toRef(settingsStore, 'username'), () => {
@@ -95,11 +85,11 @@ watch(toRef(settingsStore, 'username'), () => {
 });
 
 watch(
-  () => props.name,
-  () => (name.value = props.name),
+  () => props.basePersona?.name,
+  () => (name.value = props.basePersona?.name ?? ''),
 );
 watch(
-  () => props.description,
-  () => (description.value = props.description),
+  () => props.basePersona?.description,
+  () => (description.value = props.basePersona?.description ?? ''),
 );
 </script>
