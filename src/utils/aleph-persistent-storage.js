@@ -1,6 +1,7 @@
 import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
 import { getAccountFromProvider, importAccountFromPrivateKey } from '@aleph-sdk/ethereum';
 import web3 from 'web3';
+import { ItemType } from '@aleph-sdk/message';
 
 const MESSAGE = 'LibertAI';
 const AGGREGATE_KEY = 'libertai-chat-ui';
@@ -89,5 +90,10 @@ export class AlephPersistentStorage {
       console.error(`Fetching settings from Aleph failed: ${error}`);
       return undefined;
     }
+  }
+
+  async uploadFile(file) {
+    const message = await this.subAccountClient.createStore({ fileObject: file, storageEngine: ItemType.ipfs });
+    return message;
   }
 }

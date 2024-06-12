@@ -6,7 +6,7 @@
         <div :class="$q.screen.gt.sm ? 'col-4' : 'col-10'">
           <q-card class="my-card center text-center q-pa-md" flat>
             <q-avatar>
-              <img :src="personasStore.persona.avatarUrl" />
+              <img :src="getPersonaAvatarUrl(personasStore.persona.avatar.ipfs_hash)" alt="avatar" />
             </q-avatar>
 
             <q-card-section>
@@ -51,6 +51,7 @@ import { useRouter } from 'vue-router';
 // Import components
 import MessageInput from 'src/components/MessageInput.vue';
 import PersonaDropDown from 'src/components/PersonaDropDown.vue';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
 
 const router = useRouter();
 
@@ -60,10 +61,7 @@ const modelsStore = useModelsStore();
 const chatsStore = useChatsStore();
 const personasStore = usePersonasStore();
 
-const settings = useSettingsStore();
-// Our local page state
-
-const { username } = settings;
+const username = useSettingsStore().username;
 
 // Message input state
 const messageInputRef = ref('');
@@ -94,4 +92,3 @@ async function sendMessage() {
   router.push({ name: 'chat', params: { id: chat.id } });
 }
 </script>
-<style scoped></style>

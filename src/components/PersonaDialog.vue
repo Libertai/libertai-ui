@@ -15,8 +15,35 @@
 
       <q-card-section horizontal>
         <q-card-section>
-          <q-avatar>
-            <img :src="basePersona?.avatarUrl" alt="avatar" />
+          <q-avatar @click="$refs.avatarUpload.click()">
+            <input
+              ref="avatarUpload"
+              accept="image/*"
+              hidden
+              type="file"
+              @change="
+                async (event) => {
+                  const file = event.target.files[0];
+                  if (!file) {
+                    return;
+                  }
+                  if (accountStore.alephStorage === null) {
+                    $q.notify({
+                      message: 'Connect your wallet to upload an avatar',
+                      color: 'red',
+                    });
+                    return;
+                  }
+                  const uploadedFileMessage = await accountStore.alephStorage.uploadFile(file);
+                  avatar = {
+                    item_hash: uploadedFileMessage.item_hash,
+                    ipfs_hash: uploadedFileMessage.content.item_hash,
+                  };
+                }
+              "
+            />
+
+            <img :src="getPersonaAvatarUrl(avatar.ipfs_hash)" alt="avatar" />
           </q-avatar>
         </q-card-section>
         <q-card-section>
@@ -49,7 +76,7 @@
           label="Confirm"
           rounded
           text-color="white"
-          @click="emit('savePersona', { ...basePersona, name, description })"
+          @click="emit('savePersona', { ...basePersona, name, description, avatar: toRaw(avatar) })"
         />
       </q-card-section>
     </q-card>
@@ -58,9 +85,12 @@
 
 <script setup>
 import { useSettingsStore } from 'src/stores/settings';
-import { ref, toRef, watch } from 'vue';
+import { ref, toRaw, toRef, watch } from 'vue';
+import { useAccountStore } from 'stores/account';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
 
 const settingsStore = useSettingsStore();
+const accountStore = useAccountStore();
 
 const props = defineProps({
   title: {
@@ -78,6 +108,12 @@ const emit = defineEmits(['savePersona']);
 const username = ref(settingsStore.username);
 const name = ref(props.basePersona?.name ?? '');
 const description = ref(props.basePersona?.description ?? '');
+const avatar = ref(
+  props.basePersona?.avatar ?? {
+    item_hash: '90db3237796d27118e0b9e21dae10a4b1179878f869cb6c0058d0d7c00b0440d',
+    ipfs_hash: 'QmQMBfgnmuxcQ4kptR1oPE9guYxG13GpASjYVeFQSxNxjE',
+  },
+);
 
 // Update the name input when the store changes  (might be updated by Aleph settings fetching)
 watch(toRef(settingsStore, 'username'), () => {
@@ -91,5 +127,13 @@ watch(
 watch(
   () => props.basePersona?.description,
   () => (description.value = props.basePersona?.description ?? ''),
+);
+watch(
+  () => props.basePersona?.avatar,
+  () =>
+    (avatar.value = props.basePersona?.avatar ?? {
+      item_hash: '90db3237796d27118e0b9e21dae10a4b1179878f869cb6c0058d0d7c00b0440d',
+      ipfs_hash: 'QmQMBfgnmuxcQ4kptR1oPE9guYxG13GpASjYVeFQSxNxjE',
+    }),
 );
 </script>

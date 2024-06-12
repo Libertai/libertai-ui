@@ -16,7 +16,7 @@
         title="Create persona"
         @savePersona="
           (persona) => {
-            personasStore.personas.push({ ...persona, id: uuidv4() });
+            personasStore.personas.push({ ...persona, allowEdit: true, hidden: false, id: uuidv4() });
           }
         "
       />
@@ -47,7 +47,7 @@
         :class="`persona-card ${persona.hidden ? 'bg-purple-50' : ' tw-bg-white'}`"
       >
         <q-avatar class="tw-w-24 tw-h-24 tw-mx-auto">
-          <img :src="persona.avatarUrl" alt="avatar" />
+          <img :src="getPersonaAvatarUrl(persona.avatar.ipfs_hash)" alt="avatar" />
         </q-avatar>
         <q-card-section class="text-bold">{{ persona.name }}</q-card-section>
 
@@ -97,6 +97,7 @@ import PersonaDialog from 'components/PersonaDialog.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
 
 const personasStore = usePersonasStore();
 const router = useRouter();

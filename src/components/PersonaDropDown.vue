@@ -1,6 +1,6 @@
 <template>
   <q-btn-dropdown
-    :icon="'img:' + personasStore.persona.avatarUrl"
+    :icon="'img:' + getPersonaAvatarUrl(personasStore.persona.avatar.ipfs_hash)"
     :label="personasStore.persona.name"
     class="no-shadow rounded-img personas-dropdown q-py-sm icon-md"
     dropdown-icon="img:icons/svg/chevron-down.svg"
@@ -19,7 +19,7 @@
         @click="setPersona(persona.id)"
       >
         <q-avatar class="q-mr-md" size="32px">
-          <img :src="persona.avatarUrl" alt="avatar" />
+          <img :src="getPersonaAvatarUrl(persona.avatar.ipfs_hash)" alt="avatar" />
         </q-avatar>
         <q-item-section>
           <q-item-label>
@@ -33,6 +33,7 @@
 
 <script setup>
 import { usePersonasStore } from 'stores/personas-store';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
 
 const personasStore = usePersonasStore();
 

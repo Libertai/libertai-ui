@@ -12,10 +12,10 @@
           <!-- Display the avatar of the user or the AI -->
           <q-item-section avatar>
             <q-avatar v-if="message.role == usernameRef">
-              <img src="avatars/user.png" />
+              <img alt="user" src="/avatars/user.png" />
             </q-avatar>
             <q-avatar v-else>
-              <img :src="personaRef.avatarUrl" />
+              <img :src="getPersonaAvatarUrl(personaRef.avatar.ipfs_hash)" alt="AI" />
             </q-avatar>
           </q-item-section>
           <!-- Edit message popup -- triggered on click if the edit mode is enabled -->
@@ -174,6 +174,7 @@ import { usePersonasStore } from 'src/stores/personas-store';
 import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
 import MessageInput from 'src/components/MessageInput.vue';
 import axios from 'axios';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
 
 const $q = useQuasar();
 const route = useRoute();

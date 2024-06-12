@@ -2,7 +2,10 @@
 export const defaultPersonas = [
   {
     id: '77d15394-d142-4e73-8251-48be48cee016',
-    avatarUrl: './avatars/libertai.svg',
+    avatar: {
+      item_hash: '90db3237796d27118e0b9e21dae10a4b1179878f869cb6c0058d0d7c00b0440d',
+      ipfs_hash: 'QmQMBfgnmuxcQ4kptR1oPE9guYxG13GpASjYVeFQSxNxjE',
+    },
     name: 'LibertAI Assistant (default)',
     description:
       "You're an {{char}} running on a decentralized LLM based on open-source models. " +
@@ -15,14 +18,21 @@ export const defaultPersonas = [
   },
   {
     id: 'bed92afb-875f-46b9-a7ce-fc5bf3ccc981',
-    avatarUrl: './avatars/tromp.png',
+    avatar: {
+      item_hash: '35a0ead18bfb0fcf587cf808af79997f19fcd8ccef76919962c1212ce155241c',
+      ipfs_hash: 'QmaKj7nrqUiYkRp2jWRqSuYkHxhPoTstSS4eyttUeEGxF8',
+    },
     name: 'Donald Tromp',
     description: 'You are an AI chatbot modeled after Donald Trump. You will try to mimic his personality and speech.',
     allowEdit: false,
+    hidden: false,
   },
   {
     id: '880e9d17-261b-422d-ab86-ee05f161721e',
-    avatarUrl: './avatars/musk.png',
+    avatar: {
+      ipfs_hash: 'QmYbGiLitJFzV6sM1qkqY9QUbfNLC46hEAi6ga6GQuQv2W',
+      item_hash: 'b8d3e2e9d7652ecd63fba9714704c2abe126c138d7f09c218e1752f723b8460c',
+    },
     name: 'AI-lon Musk',
     description: '{{char}} is an AI chatbot modeled after Elon Musk.',
     allowEdit: false,
@@ -30,7 +40,10 @@ export const defaultPersonas = [
   },
   {
     id: '7973c531-a8a3-4526-b83d-7d3648158b5d',
-    avatarUrl: './avatars/therapist.png',
+    avatar: {
+      item_hash: 'a71692a74b675eb8e3b1f88c8cc4089b2d05d829d481b973442ea55ec03c281c',
+      ipfs_hash: 'QmakkAkoBrKG85ZGtZeusAdU5uSTk8YfUFxq95XsoSXLqc',
+    },
     name: 'Anna the Therapist',
     description:
       '{{char}} is a licensed psychotherapist that can help with all sorts of problems and issues. ' +
@@ -46,7 +59,10 @@ export const defaultPersonas = [
   },
   {
     id: '5b4f16ab-57d0-4722-af81-7ca1c668ad51',
-    avatarUrl: './avatars/virtual_girlfriend.png',
+    avatar: {
+      item_hash: '4c7ce4019fa09f0dcd9eaef035290cde8a91729764ce3e6f8cd4a7f2c16f05fc',
+      ipfs_hash: 'QmbvvopwBVNBs6qzjdDoemzohFd9uZoW1sobgRHXXQRhWd',
+    },
     name: 'Virtual Girlfriend',
     description:
       '{{char}} is a very understanding woman. ' +
@@ -57,7 +73,10 @@ export const defaultPersonas = [
   },
   {
     id: '624ae696-f5ff-4cb4-8daa-8b0f5c4b8c96',
-    avatarUrl: './avatars/virtual_boyfriend.png',
+    avatar: {
+      item_hash: '7e02fc79e1cdebd59a231fae51bcc2092377f475e0d52f131ac15c5c0eb9cad5',
+      ipfs_hash: 'QmagY37o86RZXnusM5ThMwQgcyPvSAJCWRyKhf9RmhVH8h',
+    },
     name: 'Virtual Boyfriend',
     description:
       '{{char}} is a very understanding man. ' +
@@ -67,3 +86,5 @@ export const defaultPersonas = [
     hidden: false,
   },
 ];
+
+export const getPersonaAvatarUrl = (ipfs_hash) => `https://api3.aleph.im/api/v0/storage/raw/${ipfs_hash}`;
