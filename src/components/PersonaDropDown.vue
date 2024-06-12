@@ -11,7 +11,7 @@
   >
     <q-list>
       <q-item
-        v-for="persona of personasStore.personas"
+        v-for="persona of personasStore.shownPersonas"
         :key="persona.id"
         v-close-popup
         :name="persona.id"

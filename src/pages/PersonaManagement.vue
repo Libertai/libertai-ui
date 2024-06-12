@@ -41,7 +41,11 @@
     </div>
 
     <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 xl:tw-grid-cols-3 tw-gap-y-4 tw-gap-x-4">
-      <q-card v-for="persona of personasStore.personas" :key="persona.id" class="persona-card bg-purple-50">
+      <q-card
+        v-for="persona of personasStore.sortedPersonas"
+        :key="persona.id"
+        :class="`persona-card ${persona.hidden ? 'bg-purple-50' : ' tw-bg-white'}`"
+      >
         <q-avatar class="tw-w-24 tw-h-24 tw-mx-auto">
           <img :src="persona.avatarUrl" alt="avatar" />
         </q-avatar>
@@ -75,9 +79,10 @@
               <img alt="delete" src="/icons/delete.svg" />
             </q-icon>
           </q-btn>
-          <q-btn v-else disabled unelevated>
+          <q-btn v-else unelevated @click="reversePersonaVisibility(persona)">
             <q-icon size="sm">
-              <img alt="delete" src="/icons/svg/hide.svg" />
+              <img v-if="persona.hidden" alt="hide" src="/icons/svg/show.svg" />
+              <img v-else alt="hide" src="/icons/svg/hide.svg" />
             </q-icon>
           </q-btn>
         </div>
@@ -112,9 +117,17 @@ const startEditingPersona = (persona) => {
 const deletePersona = (persona) => {
   personasStore.personas = personasStore.personas.filter((userPersona) => userPersona.id !== persona.id);
   if (personasStore.persona.id === persona.id) {
-    // TODO: find first with hidden = false
-    personasStore.persona = personasStore.personas[0];
+    personasStore.persona = personasStore.personas.find((userPersona) => !userPersona.hidden);
   }
+};
+
+const reversePersonaVisibility = (persona) => {
+  personasStore.personas = personasStore.personas.map((userPersona) => {
+    if (userPersona.id === persona.id) {
+      return { ...userPersona, hidden: !userPersona.hidden };
+    }
+    return userPersona;
+  });
 };
 </script>
 
@@ -122,7 +135,7 @@ const deletePersona = (persona) => {
 .persona-card {
   border: 1px solid rgba(0, 0, 0, 0.1);
 
-  @apply tw-shadow-none tw-bg-white tw-rounded-2xl tw-justify-center tw-text-center tw-p-6;
+  @apply tw-shadow-none tw-rounded-2xl tw-justify-center tw-text-center tw-p-6;
 }
 
 .persona-description {

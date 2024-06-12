@@ -58,7 +58,6 @@ const router = useRouter();
 
 const modelsStore = useModelsStore();
 const chatsStore = useChatsStore();
-// TODO: We probably don't need to use a store for this
 const personasStore = usePersonasStore();
 
 const settings = useSettingsStore();
