@@ -2,7 +2,7 @@
   <q-dialog class="q-pa-lg text-light" label="Customize" style="flex-grow: 1">
     <q-card class="q-pa-md">
       <q-card-actions :class="`flex flex-left text-semibold ${$q.dark.mode ? '' : 'text-purple700'}`">
-        {{ title }}
+        User settings
         <q-space />
         <q-btn
           v-close-popup
@@ -15,9 +15,9 @@
 
       <q-card-section horizontal>
         <q-card-section class="tw-my-auto">
-          <q-avatar @click="$refs.avatarUpload.click()">
+          <q-avatar @click="$refs.userAvatarUpload.click()">
             <input
-              ref="avatarUpload"
+              ref="userAvatarUpload"
               accept="image/*"
               hidden
               type="file"
@@ -35,6 +35,7 @@
                     return;
                   }
                   const uploadedFileMessage = await accountStore.alephStorage.uploadFile(file);
+                  console.log(uploadedFileMessage);
                   avatar = {
                     item_hash: uploadedFileMessage.item_hash,
                     ipfs_hash: uploadedFileMessage.content.item_hash,
@@ -47,26 +48,11 @@
           </q-avatar>
         </q-card-section>
         <q-card-section>
-          <span>Persona name</span>
-          <q-input v-model="name" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
+          <span>Your name</span>
+          <q-input v-model="username" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
         </q-card-section>
       </q-card-section>
 
-      <q-card-section>
-        <span>Your name</span>
-        <q-input v-model="username" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
-      </q-card-section>
-      <q-card-section>
-        <span>Persona Description</span>
-        <q-input
-          v-model="description"
-          autogrow
-          bg-color="secondary"
-          input-class="text-light"
-          outlined
-          type="textarea"
-        />
-      </q-card-section>
       <q-card-section class="text-primary" horizontal>
         <q-btn v-close-popup class="q-px-xl q-py-xs" label="Close" rounded />
         <q-space />
@@ -76,7 +62,11 @@
           label="Confirm"
           rounded
           text-color="white"
-          @click="emit('savePersona', { ...basePersona, name, description, avatar: toRaw(avatar) })"
+          @click="
+            () => {
+              settingsStore.update({ username, avatar: toRaw(avatar) });
+            }
+          "
         />
       </q-card-section>
     </q-card>
@@ -92,48 +82,15 @@ import { getPersonaAvatarUrl } from 'src/utils/personas';
 const settingsStore = useSettingsStore();
 const accountStore = useAccountStore();
 
-const props = defineProps({
-  title: {
-    type: String,
-    default: 'Customize persona',
-  },
-  basePersona: {
-    type: Object,
-    required: false,
-  },
-});
-const emit = defineEmits(['savePersona']);
-
 // Form values
 const username = ref(settingsStore.username);
-const name = ref(props.basePersona?.name ?? '');
-const description = ref(props.basePersona?.description ?? '');
-const avatar = ref(
-  props.basePersona?.avatar ?? {
-    item_hash: '90db3237796d27118e0b9e21dae10a4b1179878f869cb6c0058d0d7c00b0440d',
-    ipfs_hash: 'QmQMBfgnmuxcQ4kptR1oPE9guYxG13GpASjYVeFQSxNxjE',
-  },
-);
+const avatar = ref(settingsStore.avatar);
 
-// Update the name input when the store changes  (might be updated by Aleph settings fetching)
+// Update the inputs when the store changes (might be updated by Aleph settings fetching)
 watch(toRef(settingsStore, 'username'), () => {
   username.value = settingsStore.username;
 });
-
-watch(
-  () => props.basePersona?.name,
-  () => (name.value = props.basePersona?.name ?? ''),
-);
-watch(
-  () => props.basePersona?.description,
-  () => (description.value = props.basePersona?.description ?? ''),
-);
-watch(
-  () => props.basePersona?.avatar,
-  () =>
-    (avatar.value = props.basePersona?.avatar ?? {
-      item_hash: '90db3237796d27118e0b9e21dae10a4b1179878f869cb6c0058d0d7c00b0440d',
-      ipfs_hash: 'QmQMBfgnmuxcQ4kptR1oPE9guYxG13GpASjYVeFQSxNxjE',
-    }),
-);
+watch(toRef(settingsStore, 'avatar'), () => {
+  avatar.value = settingsStore.avatar;
+});
 </script>

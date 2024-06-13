@@ -3,27 +3,14 @@
     <q-header class="bg-transparent q-mt-sm">
       <q-toolbar>
         <q-btn aria-label="Menu" color="primary" dense flat icon="menu" round @click="toggleLeftDrawer" />
-        <q-btn class="q-pa-xs" flat @click="editPersona = true">
+
+        <q-btn class="q-pa-xs" flat @click="showUserSettingsDialog = true">
           <q-icon size="xs">
             <img :src="`icons/svg/settings${$q.dark.mode ? '_lighten' : ''}.svg`" alt="settings" />
           </q-icon>
         </q-btn>
-        <persona-dialog
-          v-model="editPersona"
-          :base-persona="personasStore.persona"
-          @savePersona="
-            (persona) => {
-              personasStore.persona = persona;
+        <user-settings-dialog v-model="showUserSettingsDialog" />
 
-              personasStore.personas.map((userPersona) => {
-                if (userPersona.id === persona.id) {
-                  return persona;
-                }
-                return userPersona;
-              });
-            }
-          "
-        />
         <toggle-theme />
         <q-space />
 
@@ -197,14 +184,13 @@ import { useRoute, useRouter } from 'vue-router';
 
 // Import Components
 import AccountButton from 'src/components/AccountButton.vue';
-import PersonaDialog from 'src/components/PersonaDialog.vue';
 import ToggleTheme from 'src/components/ToggleTheme.vue';
 import ModelSelector from 'src/components/ModelSelector.vue';
-import { usePersonasStore } from 'stores/personas-store';
+import UserSettingsDialog from 'components/UserSettingsDialog.vue';
 
 const leftDrawerOpen = ref(false);
 // Control whether the advanced persona customization is shown
-const editPersona = ref(false);
+const showUserSettingsDialog = ref(false);
 
 const deleteChatConfirmAction = ref(false);
 const deleteChatId = ref(null);
@@ -212,7 +198,6 @@ const deleteChatId = ref(null);
 // Setup Stores
 const chatsStore = useChatsStore();
 const account = useAccountStore();
-const personasStore = usePersonasStore();
 const points = usePoints();
 
 const router = useRouter();

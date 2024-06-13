@@ -12,7 +12,7 @@
           <!-- Display the avatar of the user or the AI -->
           <q-item-section avatar>
             <q-avatar v-if="message.role == usernameRef">
-              <img alt="user" src="/avatars/user.png" />
+              <img :src="getPersonaAvatarUrl(settingsStore.avatar.ipfs_hash)" alt="user" />
             </q-avatar>
             <q-avatar v-else>
               <img :src="getPersonaAvatarUrl(personaRef.avatar.ipfs_hash)" alt="AI" />
@@ -175,6 +175,7 @@ import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
 import MessageInput from 'src/components/MessageInput.vue';
 import axios from 'axios';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
+import { useSettingsStore } from 'stores/settings';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -186,6 +187,7 @@ const chatsStore = useChatsStore();
 const modelsStore = useModelsStore();
 const knowledgeStore = useKnowledgeStore();
 const personasStore = usePersonasStore();
+const settingsStore = useSettingsStore();
 
 // Local page state
 const inputTextRef = ref('');

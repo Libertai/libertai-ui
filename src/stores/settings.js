@@ -5,9 +5,13 @@ export const useSettingsStore = defineStore('settings', {
   state: () => ({
     darkmode: false,
     username: 'user',
+    avatar: {
+      item_hash: '3649c86b67d8bb45e0a6d7f7c06f860aebc10b322744ef15b797b707c65cc5fd',
+      ipfs_hash: 'QmWxB29Jauxwypn2HrrNDyxG9D6h61ncc12jLfPR4aKybZ',
+    },
   }),
   getters: {
-    currentPersistedSettings: (state) => ({ darkmode: state.darkmode, username: state.username }),
+    currentPersistedSettings: (state) => ({ darkmode: state.darkmode, username: state.username, avatar: state.avatar }),
   },
   actions: {
     async update(newSettings, saveOnAleph = true) {
@@ -17,9 +21,12 @@ export const useSettingsStore = defineStore('settings', {
       if (newSettings.username !== undefined) {
         this.username = newSettings.username;
       }
+      if (newSettings.avatar !== undefined) {
+        this.avatar = newSettings.avatar;
+      }
 
       if (saveOnAleph) {
-        this.persistOnAleph(this.currentPersistedSettings);
+        await this.persistOnAleph(this.currentPersistedSettings);
       }
     },
 
@@ -33,6 +40,6 @@ export const useSettingsStore = defineStore('settings', {
   },
   persist: {
     //storage: sessionStorage | idb
-    paths: ['darkmode', 'username'], // key to persist
+    paths: ['darkmode', 'username', 'avatar'], // key to persist
   },
 });
