@@ -13,6 +13,7 @@
       />
       <persona-dialog
         v-model="createPersona"
+        :base-persona="basePersonaCreate"
         title="Create persona"
         @savePersona="
           (persona) => {
@@ -55,35 +56,55 @@
           {{ persona.description }}
         </p>
 
-        <div class="tw-grid tw-grid-cols-4 tw-gap-x-4 tw-w-40 tw-mx-auto">
+        <div class="tw-grid tw-grid-cols-5 tw-gap-x-4 tw-w-40 tw-mx-auto">
           <q-btn unelevated @click="startChatWithPersona(persona)">
             <q-icon size="sm">
               <img alt="new chat" src="/icons/svg/chat.svg" />
             </q-icon>
+            <q-tooltip>New chat</q-tooltip>
           </q-btn>
 
           <q-btn unelevated @click="startEditingPersona(persona)">
             <q-icon size="sm">
               <img :src="`icons/svg/settings.svg`" alt="settings" />
             </q-icon>
+            <q-tooltip>Edit persona</q-tooltip>
           </q-btn>
 
           <q-btn disabled unelevated>
             <q-icon size="sm">
               <img alt="export" src="/icons/svg/download.svg" />
             </q-icon>
+            <q-tooltip>Export</q-tooltip>
           </q-btn>
 
           <q-btn v-if="persona.allowEdit" unelevated @click="deletePersona(persona)">
             <q-icon size="sm">
-              <img alt="delete" src="/icons/delete.svg" />
+              <img alt="delete" src="/icons/svg/delete.svg" />
             </q-icon>
+            <q-tooltip>Delete</q-tooltip>
           </q-btn>
           <q-btn v-else unelevated @click="reversePersonaVisibility(persona)">
             <q-icon size="sm">
               <img v-if="persona.hidden" alt="hide" src="/icons/svg/show.svg" />
               <img v-else alt="hide" src="/icons/svg/hide.svg" />
             </q-icon>
+            <q-tooltip>Hide</q-tooltip>
+          </q-btn>
+
+          <q-btn
+            unelevated
+            @click="
+              () => {
+                basePersonaCreate = persona;
+                createPersona = true;
+              }
+            "
+          >
+            <q-icon size="sm">
+              <img alt="duplicate" src="/icons/svg/duplicate.svg" />
+            </q-icon>
+            <q-tooltip>Duplicate</q-tooltip>
           </q-btn>
         </div>
       </q-card>
@@ -104,6 +125,7 @@ const router = useRouter();
 
 const createPersona = ref(false);
 const editPersona = ref(false);
+const basePersonaCreate = ref(undefined);
 
 const startChatWithPersona = (persona) => {
   personasStore.persona = persona;
