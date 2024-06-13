@@ -151,7 +151,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
      * @throws {Error} - if the chat is not found
      */
     async updateChatMessageContent(chatId, messageIndex, content) {
-      let chat = await this.chatsStore.readChat(chatId);
+      const chat = await this.chatsStore.readChat(chatId);
       let messages = chat.messages;
       messages[messageIndex].content = content;
       await this.chatsStore.updateChat(chatId, { messages });

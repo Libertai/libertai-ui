@@ -21,7 +21,7 @@
     </template>
     <template v-slot:append>
       <!--<q-btn round dense flat icon="img:icons/mic.svg" @click="sendMessage" color="" class="" />-->
-      <q-btn class="" color="" dense flat icon="img:icons/send.svg" round @click="sendMessage" />
+      <q-btn dense flat icon="img:icons/send.svg" round @click="sendMessage" />
     </template>
 
     <template v-slot:hint>

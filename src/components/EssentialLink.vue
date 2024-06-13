@@ -11,7 +11,7 @@
   </q-item>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 const { title, caption, link, icon } = defineProps({
   title: {
     type: String,
