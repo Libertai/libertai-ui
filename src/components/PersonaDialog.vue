@@ -52,10 +52,10 @@
         </q-card-section>
       </q-card-section>
 
-      <q-card-section>
-        <span>Your name</span>
-        <q-input v-model="username" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
-      </q-card-section>
+      <!--      <q-card-section>-->
+      <!--        <span>Your name</span>-->
+      <!--        <q-input v-model="username" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>-->
+      <!--      </q-card-section>-->
       <q-card-section>
         <span>Persona Description</span>
         <q-input
@@ -84,12 +84,10 @@
 </template>
 
 <script setup>
-import { useSettingsStore } from 'src/stores/settings';
-import { ref, toRaw, toRef, watch } from 'vue';
+import { ref, toRaw, watch } from 'vue';
 import { useAccountStore } from 'stores/account';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
 
-const settingsStore = useSettingsStore();
 const accountStore = useAccountStore();
 
 const props = defineProps({
@@ -105,7 +103,7 @@ const props = defineProps({
 const emit = defineEmits(['savePersona']);
 
 // Form values
-const username = ref(settingsStore.username);
+// const username = ref(settingsStore.username);
 const name = ref(props.basePersona?.name ?? '');
 const description = ref(props.basePersona?.description ?? '');
 const avatar = ref(
@@ -116,9 +114,9 @@ const avatar = ref(
 );
 
 // Update the name input when the store changes  (might be updated by Aleph settings fetching)
-watch(toRef(settingsStore, 'username'), () => {
-  username.value = settingsStore.username;
-});
+// watch(toRef(settingsStore, 'username'), () => {
+//   username.value = settingsStore.username;
+// });
 
 watch(
   () => props.basePersona?.name,
