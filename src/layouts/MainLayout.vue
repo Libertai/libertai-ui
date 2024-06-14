@@ -127,8 +127,14 @@
             </q-card-section>
 
             <q-card-actions align="right">
-              <q-btn v-close-popup color="primary" flat label="Cancel" />
-              <q-btn v-close-popup color="primary" flat label="Confirm" @click="deleteChat(deleteChatId)" />
+              <q-btn
+                v-close-popup
+                class="border-primary-highlight"
+                label="Cancel"
+                rounded
+                text-color="dark-mode-text"
+              />
+              <q-btn v-close-popup color="primary" label="Confirm" rounded @click="deleteChat(deleteChatId)" />
             </q-card-actions>
           </q-card>
         </q-dialog>

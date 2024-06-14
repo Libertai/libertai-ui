@@ -70,14 +70,14 @@
               :rules="addressRules"
               autofocus
               bg-color="secondary"
-              input-class="text-light"
-              outlined
               bottom-slots
               class="q-pa-lg"
               counter
+              input-class="text-light"
               label="Address"
               label-color="grey"
               maxlength="42"
+              outlined
               rounded
               standout
             >
@@ -139,8 +139,5 @@ function addressVerifier(val) {
   }
 }
 
-const addressRules = [
-  (val) => (val && val.length > 0) || 'Please type something',
-  addressVerifier,
-];
+const addressRules = [(val) => (val && val.length > 0) || 'Please type something', addressVerifier];
 </script>
