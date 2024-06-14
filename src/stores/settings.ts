@@ -1,8 +1,17 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from 'stores/account';
 
+type Settings = {
+  darkmode: boolean;
+  username: string;
+  avatar: {
+    item_hash: string;
+    ipfs_hash: string;
+  };
+};
+
 export const useSettingsStore = defineStore('settings', {
-  state: () => ({
+  state: (): Settings => ({
     darkmode: false,
     username: 'user',
     avatar: {
@@ -11,10 +20,14 @@ export const useSettingsStore = defineStore('settings', {
     },
   }),
   getters: {
-    currentPersistedSettings: (state) => ({ darkmode: state.darkmode, username: state.username, avatar: state.avatar }),
+    currentPersistedSettings: (state): Settings => ({
+      darkmode: state.darkmode,
+      username: state.username,
+      avatar: state.avatar,
+    }),
   },
   actions: {
-    async update(newSettings, saveOnAleph = true) {
+    async update(newSettings: Partial<Settings>, saveOnAleph: boolean = true) {
       if (newSettings.darkmode !== undefined) {
         this.darkmode = newSettings.darkmode;
       }
@@ -30,8 +43,8 @@ export const useSettingsStore = defineStore('settings', {
       }
     },
 
-    async persistOnAleph(settings) {
-      const account = useAccountStore();
+    async persistOnAleph(settings: Settings) {
+      const account: any = useAccountStore();
 
       if (account.alephStorage !== null) {
         account.alephStorage.save(settings);

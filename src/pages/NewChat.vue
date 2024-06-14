@@ -43,8 +43,8 @@ import { defaultChatTopic } from 'src/utils/chat';
 // Import State
 import { useModelsStore } from 'src/stores/models-store';
 import { useChatsStore } from 'src/stores/chats-store';
-import { usePersonasStore } from 'src/stores/personas-store';
-import { useSettingsStore } from 'src/stores/settings';
+import { usePersonasStore } from 'stores/personas-store';
+import { useSettingsStore } from 'stores/settings';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 

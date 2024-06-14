@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia';
 
-import { defaultPersonas } from '../utils/personas.js';
+import { defaultPersonas, Persona } from '../utils/personas';
 
 export const usePersonasStore = defineStore('personas', {
   state: () => ({
-    personas: JSON.parse(JSON.stringify(defaultPersonas)),
-    persona: { ...defaultPersonas[0] },
+    personas: JSON.parse(JSON.stringify(defaultPersonas)) as Persona[],
+    persona: { ...defaultPersonas[0] } as Persona,
   }),
   getters: {
+    // @ts-expect-error
     sortedPersonas: (state) => state.personas.slice().sort((a, b) => a.hidden - b.hidden),
     shownPersonas: (state) => state.personas.filter((persona) => !persona.hidden),
   },

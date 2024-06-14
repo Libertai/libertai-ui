@@ -1,5 +1,5 @@
 import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
-import { getAccountFromProvider, importAccountFromPrivateKey } from '@aleph-sdk/ethereum';
+import { ETHAccount, getAccountFromProvider, importAccountFromPrivateKey } from '@aleph-sdk/ethereum';
 import web3 from 'web3';
 import { ItemType } from '@aleph-sdk/message';
 
@@ -8,15 +8,21 @@ const AGGREGATE_KEY = 'libertai-chat-ui';
 const SECURITY_AGGREGATE_KEY = 'security';
 
 export class AlephPersistentStorage {
-  constructor(account, subAccountClient) {
-    this.account = account;
-    this.subAccountClient = subAccountClient;
-  }
+  constructor(
+    private account: ETHAccount,
+    private subAccountClient: AuthenticatedAlephHttpClient,
+  ) {}
 
-  static async initialize(signer) {
+  static async initialize(signer: any) {
     const hash = await signer.signMessage(MESSAGE);
     const privateKey = web3.utils.sha3(hash);
+
+    if (privateKey === undefined) {
+      console.error('Private key generation failed');
+      return undefined;
+    }
     const subAccount = importAccountFromPrivateKey(privateKey);
+    // @ts-expect-error
     const account = await getAccountFromProvider(window.ethereum);
     const accountClient = new AuthenticatedAlephHttpClient(account);
     const subAccountClient = new AuthenticatedAlephHttpClient(subAccount);
@@ -26,13 +32,18 @@ export class AlephPersistentStorage {
     return new AlephPersistentStorage(account, subAccountClient);
   }
 
-  static async getSecurityPermission(account, subAccount, accountClient) {
+  static async getSecurityPermission(
+    account: ETHAccount,
+    subAccount: ETHAccount,
+    accountClient: AuthenticatedAlephHttpClient,
+  ) {
     try {
-      const securitySettings = await accountClient.fetchAggregate(account.address, SECURITY_AGGREGATE_KEY);
+      // TODO: Add zod parsing
+      const securitySettings = (await accountClient.fetchAggregate(account.address, SECURITY_AGGREGATE_KEY)) as any;
 
       if (
         !securitySettings.authorizations.find(
-          (authorization) =>
+          (authorization: any) =>
             authorization.address === subAccount.address &&
             authorization.types.includes('AGGREGATE') &&
             authorization.aggregate_keys.includes(AGGREGATE_KEY),
@@ -69,7 +80,7 @@ export class AlephPersistentStorage {
     }
   }
 
-  async save(content) {
+  async save(content: object) {
     try {
       const message = await this.subAccountClient.createAggregate({
         key: AGGREGATE_KEY,
@@ -92,7 +103,7 @@ export class AlephPersistentStorage {
     }
   }
 
-  async uploadFile(file) {
+  async uploadFile(file: File) {
     const message = await this.subAccountClient.createStore({ fileObject: file, storageEngine: ItemType.ipfs });
     return message;
   }

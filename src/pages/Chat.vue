@@ -154,7 +154,7 @@
 
 <script setup>
 import 'highlight.js/styles/devibeans.css';
-import { copyToClipboard, useQuasar, date } from 'quasar';
+import { copyToClipboard, date, useQuasar } from 'quasar';
 import { nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -168,7 +168,7 @@ import { useChatsStore } from 'src/stores/chats-store';
 import { useModelsStore } from 'src/stores/models-store';
 import { useKnowledgeStore } from 'src/stores/knowledge-store';
 import { useAccountStore } from 'src/stores/account';
-import { usePersonasStore } from 'src/stores/personas-store';
+import { usePersonasStore } from 'stores/personas-store';
 
 // Components
 import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';

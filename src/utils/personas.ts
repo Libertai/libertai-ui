@@ -1,5 +1,17 @@
 // Configuration for base prompts for different types of chatbots
-export const defaultPersonas = [
+export type Persona = {
+  id: string;
+  avatar: {
+    item_hash: string;
+    ipfs_hash: string;
+  };
+  name: string;
+  description: string;
+  allowEdit: boolean;
+  hidden: boolean;
+};
+
+export const defaultPersonas: Persona[] = [
   {
     id: '77d15394-d142-4e73-8251-48be48cee016',
     avatar: {
@@ -87,4 +99,5 @@ export const defaultPersonas = [
   },
 ];
 
-export const getPersonaAvatarUrl = (ipfs_hash) => `https://api3.aleph.im/api/v0/storage/raw/${ipfs_hash}`;
+export const getPersonaAvatarUrl = (ipfs_hash: string): string =>
+  `https://api3.aleph.im/api/v0/storage/raw/${ipfs_hash}`;

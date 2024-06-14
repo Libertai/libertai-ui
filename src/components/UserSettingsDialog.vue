@@ -74,8 +74,8 @@
 </template>
 
 <script setup>
-import { useSettingsStore } from 'src/stores/settings';
-import { ref, toRaw, toRef, watch } from 'vue';
+import { useSettingsStore } from 'stores/settings';
+import { ref, toRef, watch } from 'vue';
 import { useAccountStore } from 'stores/account';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
 

@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { useSettingsStore } from 'src/stores/settings';
+import { useSettingsStore } from 'stores/settings';
 import { ref, toRef, watch } from 'vue';
 import { useQuasar } from 'quasar';
 

@@ -114,39 +114,39 @@
   </section>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { usePersonasStore } from 'stores/personas-store';
 import PersonaDialog from 'components/PersonaDialog.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
-import { getPersonaAvatarUrl } from 'src/utils/personas';
+import { getPersonaAvatarUrl, Persona } from 'src/utils/personas';
 
 const personasStore = usePersonasStore();
 const router = useRouter();
 
 const createPersona = ref(false);
 const editPersona = ref(false);
-const basePersonaCreate = ref(undefined);
+const basePersonaCreate = ref<Persona | undefined>(undefined);
 
-const startChatWithPersona = (persona) => {
+const startChatWithPersona = (persona: Persona) => {
   personasStore.persona = persona;
   router.push('/new');
 };
 
-const startEditingPersona = (persona) => {
+const startEditingPersona = (persona: Persona) => {
   personasStore.persona = persona;
   editPersona.value = true;
 };
 
-const deletePersona = (persona) => {
+const deletePersona = (persona: Persona) => {
   personasStore.personas = personasStore.personas.filter((userPersona) => userPersona.id !== persona.id);
   if (personasStore.persona.id === persona.id) {
-    personasStore.persona = personasStore.personas.find((userPersona) => !userPersona.hidden);
+    personasStore.persona = personasStore.personas.find((userPersona) => !userPersona.hidden)!;
   }
 };
 
-const reversePersonaVisibility = (persona) => {
+const reversePersonaVisibility = (persona: Persona) => {
   personasStore.personas = personasStore.personas.map((userPersona) => {
     if (userPersona.id === persona.id) {
       return { ...userPersona, hidden: !userPersona.hidden };
