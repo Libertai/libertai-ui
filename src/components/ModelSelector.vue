@@ -27,7 +27,7 @@
   </q-btn-dropdown>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { useModelsStore } from 'stores/models-store';
 
 const modelsStore = useModelsStore();

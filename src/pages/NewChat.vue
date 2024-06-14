@@ -37,7 +37,7 @@
     </div>
   </q-page>
 </template>
-<script setup>
+<script lang="ts" setup>
 import { defaultChatTopic } from 'src/utils/chat';
 
 // Import State

@@ -59,7 +59,6 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
     // List of partials chats of the form { id, title }
     chats: [],
   }),
-  getters: {},
   actions: {
     /**
      * Load the chats from persistent storage and update the models
@@ -175,7 +174,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
      * @param {[]} attachments - the attachments of the message
      * @returns {Promise<Message>} - the created message
      */
-    async appendUserMessage(chatId, message, attachments) {
+    async appendUserMessage(chatId, message, attachments = undefined) {
       return await this.chatsStore.appendUserMessage(chatId, message, attachments);
     },
 
