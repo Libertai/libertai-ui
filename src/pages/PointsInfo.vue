@@ -81,11 +81,11 @@
               rounded
               standout
             >
-              <template v-slot:prepend>
+              <template #prepend>
                 <q-icon name="wallet" />
               </template>
 
-              <template v-slot:hint>Enter an address to check if there are points associated with it.</template>
+              <template #hint>Enter an address to check if there are points associated with it.</template>
             </q-input>
             <div v-if="addressVerifier(address) === true" class="text-h6 text-bold q-pa-lg">
               <div v-if="points.getAddressPoints(address) === 0">

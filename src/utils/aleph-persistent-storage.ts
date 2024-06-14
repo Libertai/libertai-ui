@@ -9,7 +9,9 @@ const SECURITY_AGGREGATE_KEY = 'security';
 
 export class AlephPersistentStorage {
   constructor(
+    /* eslint-disable-next-line no-unused-vars */
     private account: ETHAccount,
+    /* eslint-disable-next-line no-unused-vars */
     private subAccountClient: AuthenticatedAlephHttpClient,
   ) {}
 

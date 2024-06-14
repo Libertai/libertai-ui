@@ -15,7 +15,7 @@
         v-model="createPersona"
         :base-persona="basePersonaCreate"
         title="Create persona"
-        @savePersona="
+        @save-persona="
           (persona) => {
             personasStore.personas.push({ ...persona, allowEdit: true, hidden: false, id: uuidv4() });
           }
@@ -24,7 +24,7 @@
       <persona-dialog
         v-model="editPersona"
         :base-persona="personasStore.persona"
-        @savePersona="
+        @save-persona="
           (persona) => {
             personasStore.persona = persona;
 

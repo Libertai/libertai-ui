@@ -30,7 +30,7 @@
               be used as a substitute for professional advice. The accuracy and reliability of the chat bot's responses cannot
               be guaranteed. Users should exercise their own judgment and discretion when interacting with the chat bot and
               its personas. By using this chat bot, you acknowledge and agree to these terms."
-          @sendMessage="sendMessage"
+          @send-message="sendMessage"
         />
       </div>
       <q-space />

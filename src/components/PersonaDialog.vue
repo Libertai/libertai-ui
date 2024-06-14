@@ -98,6 +98,7 @@ const props = defineProps({
   basePersona: {
     type: Object,
     required: false,
+    default: undefined,
   },
 });
 const emit = defineEmits(['savePersona']);

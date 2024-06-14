@@ -121,9 +121,9 @@
       <message-input
         ref="inputRef"
         v-model="inputTextRef"
-        :isLoading="isLoadingRef"
+        :is-loading="isLoadingRef"
         class="col"
-        @sendMessage="sendMessage"
+        @send-message="sendMessage"
       />
     </div>
 
@@ -141,7 +141,7 @@
     <!-- This should really not pass the ref, but it's a quick fix for now -->
     <q-dialog v-model="showKnowledgeUploaderRef" position="bottom">
       <KnowledgeStoreUploader
-        :chatRef="chatRef"
+        :chat-ref="chatRef"
         auto-upload
         label="Auto KnowledgeStoreUploader"
         multiple

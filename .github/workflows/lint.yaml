@@ -2,9 +2,9 @@ name: Lint
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
   pull_request:
-    branches: ["main"]
+    branches: [ "main" ]
 
 jobs:
   lint:
@@ -26,4 +26,4 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Lint
-        run: npm run lint
+        run: npm run lint:check
