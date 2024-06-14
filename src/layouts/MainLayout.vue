@@ -135,7 +135,7 @@
         </q-dialog>
       </q-list>
 
-      <q-item to="/persona">
+      <q-item to="/persona-management">
         <img :src="`icons/svg/robot${$q.dark.mode ? '_lighten' : ''}.svg`" alt="persona" />
 
         <q-item-section class="q-pl-sm">

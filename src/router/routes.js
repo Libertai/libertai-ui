@@ -28,7 +28,7 @@ const routes = [
         component: () => import('src/pages/KnowledgeBase.vue'),
       },
       {
-        path: 'persona',
+        path: 'persona-management',
         component: () => import('src/pages/PersonaManagement.vue'),
       },
     ],
