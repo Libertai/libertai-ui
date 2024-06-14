@@ -16,7 +16,7 @@
 
         <div class="row q-gutter-x-sm">
           <q-btn
-            v-if="!account.active"
+            v-if="!account.isConnected.value"
             :class="$q.screen.gt.sm ? '' : 'float-right q-pa-sm'"
             :icon="`img:icons/svg/star${$q.dark.mode ? '_lighten' : ''}.svg`"
             :label="$q.screen.gt.sm ? 'Earn Points' : ''"
@@ -33,13 +33,13 @@
             :text-color="$q.screen.gt.sm ? 'white' : 'black'"
             :to="{
               name: 'points-detail',
-              params: { address: account.address },
+              params: { address: account.address.value },
             }"
             no-caps
             rounded
             unelevated
           >
-            <span :key="account.address"
+            <span :key="account.address.value"
               >{{ addressPoints.toFixed(0) }} <span v-if="$q.screen.gt.sm">Points</span></span
             >
           </q-btn>
@@ -179,8 +179,7 @@ import { storeToRefs } from 'pinia';
 
 // Import State
 import { useChatsStore } from 'stores/chats-store';
-import { useAccountStore } from 'stores/account';
-import { usePoints } from 'src/stores/points';
+import { usePointsStore } from 'src/stores/points';
 import { useRoute, useRouter } from 'vue-router';
 
 // Import Components
@@ -188,6 +187,7 @@ import AccountButton from 'src/components/AccountButton.vue';
 import ToggleTheme from 'src/components/ToggleTheme.vue';
 import ModelSelector from 'src/components/ModelSelector.vue';
 import UserSettingsDialog from 'components/UserSettingsDialog.vue';
+import { useAccount } from '@wagmi/vue';
 
 const leftDrawerOpen = ref(false);
 // Control whether the advanced persona customization is shown
@@ -198,8 +198,9 @@ const deleteChatId = ref(null);
 
 // Setup Stores
 const chatsStore = useChatsStore();
-const account = useAccountStore();
-const points = usePoints();
+const points = usePointsStore();
+
+const account = useAccount();
 
 const router = useRouter();
 const route = useRoute();
@@ -208,8 +209,8 @@ const route = useRoute();
 const { chats } = storeToRefs(chatsStore);
 
 const addressPoints = computed(() => {
-  if (account.active) {
-    return points.getAddressRealtimePoints(account.address);
+  if (account.isConnected.value) {
+    return points.getAddressRealtimePoints(account.address.value);
   } else {
     return 0;
   }

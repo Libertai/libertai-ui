@@ -64,14 +64,16 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { usePoints } from '../stores/points';
-import { useAccountStore } from '../stores/account';
+import { usePointsStore } from 'stores/points';
 import { ethers } from 'ethers';
+import { useAccount } from '@wagmi/vue';
 
 const route = useRoute();
 const router = useRouter();
-const points = usePoints();
-const account = useAccountStore();
+const points = usePointsStore();
+
+const account = useAccount();
+
 // got address as an address part from vue router
 const address = ref(ethers.utils.getAddress(route.params.address));
 let interval = null;
@@ -79,7 +81,7 @@ let interval = null;
 onMounted(async () => {
   if (Object.keys(points.points).length === 0) {
     await points.update();
-    await updatePoints();
+    updatePoints();
   }
   interval = setInterval(() => {
     updatePoints();
@@ -97,10 +99,10 @@ watch(
   },
 );
 watch(
-  () => account.address,
+  () => account.address.value,
   async (newAddress, oldAddress) => {
-    if (oldAddress == address.value) {
-      router.push({
+    if (oldAddress === address.value) {
+      await router.push({
         name: 'points-detail',
         params: { address: newAddress },
       });
@@ -111,8 +113,8 @@ watch(
 const currentPendingPoints = ref(0);
 const hourlyRate = ref(0);
 
-async function updatePoints() {
-  const pendingInfo = await points.getAddressRealtimePendingPointsInfo(address.value);
+function updatePoints() {
+  const pendingInfo = points.getAddressRealtimePendingPointsInfo(address.value);
   hourlyRate.value = pendingInfo.hourlyRate;
   currentPendingPoints.value = pendingInfo.pending;
 }

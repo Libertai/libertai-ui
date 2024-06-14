@@ -30,7 +30,7 @@ module.exports = configure(function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['utils'],
+    boot: ['utils', 'wagmi'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss', 'tailwind.css'],
@@ -63,6 +63,9 @@ module.exports = configure(function (/* ctx */) {
           viteConf.build.commonjsOptions = {};
         }
         viteConf.build.commonjsOptions.transformMixedEsModules = true;
+
+        viteConf.build.target = 'esnext';
+        viteConf.optimizeDeps = { esbuildOptions: { target: 'esnext' } };
 
         if (viteConf.plugins === undefined) {
           viteConf.plugins = [];

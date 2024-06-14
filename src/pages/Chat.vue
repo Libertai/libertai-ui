@@ -167,7 +167,6 @@ import { LlamaCppApiEngine } from '@libertai/libertai-js';
 import { useChatsStore } from 'src/stores/chats-store';
 import { useModelsStore } from 'src/stores/models-store';
 import { useKnowledgeStore } from 'src/stores/knowledge-store';
-import { useAccountStore } from 'src/stores/account';
 import { usePersonasStore } from 'stores/personas-store';
 
 // Components
@@ -176,13 +175,13 @@ import MessageInput from 'src/components/MessageInput.vue';
 import axios from 'axios';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
 import { useSettingsStore } from 'stores/settings';
+import { useAccount } from '@wagmi/vue';
 
 const $q = useQuasar();
 const route = useRoute();
 const router = useRouter();
 
 // App state
-const account = useAccountStore();
 const chatsStore = useChatsStore();
 const modelsStore = useModelsStore();
 const knowledgeStore = useKnowledgeStore();
@@ -199,6 +198,8 @@ const enableEditRef = ref(false);
 const enableKnowledgeRef = ref(false);
 const showKnowledgeUploaderRef = ref(false);
 const attachmentsRef = ref([]);
+
+const account = useAccount();
 
 // Chat specific state
 const chatRef = ref();
@@ -457,7 +458,7 @@ async function sendMessage(content) {
 // Set a chat by its ID
 async function setChat(chatId) {
   // This is annoying but we need to set whether the user is connected
-  enableKnowledgeRef.value = account.active;
+  enableKnowledgeRef.value = account.isConnected.value;
 
   // Load the chat from the store and set it
   chatRef.value = await chatsStore.readChat(chatId);

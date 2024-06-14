@@ -2,6 +2,8 @@ import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
 import { ETHAccount, getAccountFromProvider, importAccountFromPrivateKey } from '@aleph-sdk/ethereum';
 import web3 from 'web3';
 import { ItemType } from '@aleph-sdk/message';
+import { signMessage } from '@wagmi/core';
+import { config } from 'src/config/wagmi';
 
 const MESSAGE = 'LibertAI';
 const AGGREGATE_KEY = 'libertai-chat-ui';
@@ -15,8 +17,8 @@ export class AlephPersistentStorage {
     private subAccountClient: AuthenticatedAlephHttpClient,
   ) {}
 
-  static async initialize(signer: any) {
-    const hash = await signer.signMessage(MESSAGE);
+  static async initialize() {
+    const hash = await signMessage(config, { message: MESSAGE });
     const privateKey = web3.utils.sha3(hash);
 
     if (privateKey === undefined) {
@@ -24,7 +26,6 @@ export class AlephPersistentStorage {
       return undefined;
     }
     const subAccount = importAccountFromPrivateKey(privateKey);
-    // @ts-expect-error
     const account = await getAccountFromProvider(window.ethereum);
     const accountClient = new AuthenticatedAlephHttpClient(account);
     const subAccountClient = new AuthenticatedAlephHttpClient(subAccount);

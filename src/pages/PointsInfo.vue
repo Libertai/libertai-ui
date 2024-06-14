@@ -112,10 +112,10 @@
 
 <script setup>
 import { nextTick, onMounted, ref } from 'vue';
-import { usePoints } from '../stores/points';
+import { usePointsStore } from '../stores/points';
 import { ethers } from 'ethers';
 
-const points = usePoints();
+const points = usePointsStore();
 const address = ref('');
 onMounted(async () => {
   if (Object.keys(points.points).length === 0) {
