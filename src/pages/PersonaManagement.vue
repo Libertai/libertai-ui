@@ -38,7 +38,9 @@
         "
       />
 
-      <q-btn disabled="" icon="img:icons/svg/import.svg" label="Import persona" no-caps rounded unelevated />
+      <q-btn disabled="" icon="img:icons/svg/import.svg" label="Import persona" no-caps rounded unelevated>
+        <q-tooltip>Soon for token holders</q-tooltip>
+      </q-btn>
     </div>
 
     <div class="tw-grid tw-grid-cols-1 md:tw-grid-cols-2 xl:tw-grid-cols-3 tw-gap-y-4 tw-gap-x-4">
@@ -64,7 +66,7 @@
             <q-tooltip>New chat</q-tooltip>
           </q-btn>
 
-          <q-btn unelevated @click="startEditingPersona(persona)">
+          <q-btn :disabled="!persona.allowEdit" unelevated @click="startEditingPersona(persona)">
             <q-icon size="sm">
               <img :src="`icons/svg/settings.svg`" alt="settings" />
             </q-icon>
@@ -75,7 +77,7 @@
             <q-icon size="sm">
               <img alt="export" src="/icons/svg/download.svg" />
             </q-icon>
-            <q-tooltip>Export</q-tooltip>
+            <q-tooltip>Export (soon for token holders)</q-tooltip>
           </q-btn>
 
           <q-btn v-if="persona.allowEdit" unelevated @click="deletePersona(persona)">

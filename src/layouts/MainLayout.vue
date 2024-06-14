@@ -50,12 +50,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      class="flex-grow fit"
-      show-if-above
-      style="display: flex; flex-direction: column"
-    >
+    <q-drawer v-model="leftDrawerOpen" class="flex-grow fit tw-flex tw-flex-col" show-if-above>
       <!-- image link with the logo -->
       <q-item class="q-mb-md text-left" clickable to="/">
         <img :src="`icons/svg/libertai_full${$q.dark.mode ? '_lighten' : ''}.svg`" alt="Libertai" />
