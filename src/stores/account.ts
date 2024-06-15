@@ -4,15 +4,20 @@ import { useSettingsStore } from 'stores/settings';
 
 export const useAccountStore = defineStore('account', {
   state: () => ({
-    alephStorage: null,
+    alephStorage: null as AlephPersistentStorage | null,
   }),
   actions: {
     async initAlephStorage() {
       const settingsStore = useSettingsStore();
 
-      this.alephStorage = await AlephPersistentStorage.initialize();
+      const alephStorage = await AlephPersistentStorage.initialize();
+      if (!alephStorage) {
+        return;
+      }
+
+      this.alephStorage = alephStorage;
       const settingsOnAleph = await this.alephStorage.fetch();
-      settingsStore.update(settingsOnAleph ?? {});
+      await settingsStore.update(settingsOnAleph ?? {});
     },
 
     disconnect() {

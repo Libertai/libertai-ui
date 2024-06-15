@@ -12,10 +12,10 @@
     <q-list>
       <q-item
         v-for="model in modelsStore.models"
-        :key="model.id"
+        :key="model.name"
         v-close-popup
         clickable
-        @click="modelsStore.setModel(model)"
+        @click="modelsStore.selectedModel = model"
       >
         <q-item-section>
           <q-item-label>
