@@ -38,7 +38,7 @@
         "
       />
 
-      <q-btn disabled="" icon="img:icons/svg/import.svg" label="Import persona" no-caps rounded unelevated>
+      <q-btn disabled icon="img:icons/svg/import.svg" label="Import persona" no-caps rounded unelevated>
         <q-tooltip>Soon for token holders</q-tooltip>
       </q-btn>
     </div>
@@ -98,7 +98,7 @@
             unelevated
             @click="
               () => {
-                basePersonaCreate = persona;
+                basePersonaCreate = JSON.parse(JSON.stringify(persona));
                 createPersona = true;
               }
             "

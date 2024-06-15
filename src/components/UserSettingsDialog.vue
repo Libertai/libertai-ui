@@ -15,37 +15,7 @@
 
       <q-card-section horizontal>
         <q-card-section class="tw-my-auto">
-          <q-avatar @click="$refs.userAvatarUpload.click()">
-            <input
-              ref="userAvatarUpload"
-              accept="image/*"
-              hidden
-              type="file"
-              @change="
-                async (event) => {
-                  const file = event.target.files[0];
-                  if (!file) {
-                    return;
-                  }
-                  if (accountStore.alephStorage === null) {
-                    $q.notify({
-                      message: 'Connect your wallet to upload an avatar',
-                      color: 'red',
-                    });
-                    return;
-                  }
-                  const uploadedFileMessage = await accountStore.alephStorage.uploadFile(file);
-                  console.log(uploadedFileMessage);
-                  avatar = {
-                    item_hash: uploadedFileMessage.item_hash,
-                    ipfs_hash: uploadedFileMessage.content.item_hash,
-                  };
-                }
-              "
-            />
-
-            <img :src="getPersonaAvatarUrl(avatar.ipfs_hash)" alt="avatar" />
-          </q-avatar>
+          <aleph-avatar :ipfs-hash="avatar.ipfs_hash" @edit-avatar="(newAvatar) => (avatar = newAvatar)" />
         </q-card-section>
         <q-card-section>
           <span>Your name</span>
@@ -76,11 +46,9 @@
 <script setup>
 import { useSettingsStore } from 'stores/settings';
 import { ref, toRef, watch } from 'vue';
-import { useAccountStore } from 'stores/account';
-import { getPersonaAvatarUrl } from 'src/utils/personas';
+import AlephAvatar from 'components/AlephAvatar.vue';
 
 const settingsStore = useSettingsStore();
-const accountStore = useAccountStore();
 
 // Form values
 const username = ref(settingsStore.username);

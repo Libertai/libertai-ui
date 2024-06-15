@@ -15,36 +15,7 @@
 
       <q-card-section horizontal>
         <q-card-section class="tw-my-auto">
-          <q-avatar @click="$refs.avatarUpload.click()">
-            <input
-              ref="avatarUpload"
-              accept="image/*"
-              hidden
-              type="file"
-              @change="
-                async (event) => {
-                  const file = event.target.files[0];
-                  if (!file) {
-                    return;
-                  }
-                  if (accountStore.alephStorage === null) {
-                    $q.notify({
-                      message: 'Connect your wallet to upload an avatar',
-                      color: 'red',
-                    });
-                    return;
-                  }
-                  const uploadedFileMessage = await accountStore.alephStorage.uploadFile(file);
-                  avatar = {
-                    item_hash: uploadedFileMessage.item_hash,
-                    ipfs_hash: uploadedFileMessage.content.item_hash,
-                  };
-                }
-              "
-            />
-
-            <img :src="getPersonaAvatarUrl(avatar.ipfs_hash)" alt="avatar" />
-          </q-avatar>
+          <aleph-avatar :ipfs-hash="avatar.ipfs_hash" @edit-avatar="(newAvatar) => (avatar = newAvatar)" />
         </q-card-section>
         <q-card-section>
           <span>Persona name</span>
@@ -85,10 +56,7 @@
 
 <script setup>
 import { ref, toRaw, watch } from 'vue';
-import { useAccountStore } from 'stores/account';
-import { getPersonaAvatarUrl } from 'src/utils/personas';
-
-const accountStore = useAccountStore();
+import AlephAvatar from 'components/AlephAvatar.vue';
 
 const props = defineProps({
   title: {

@@ -5,7 +5,7 @@ import { defaultPersonas, Persona } from '../utils/personas';
 export const usePersonasStore = defineStore('personas', {
   state: () => ({
     personas: JSON.parse(JSON.stringify(defaultPersonas)) as Persona[],
-    persona: { ...defaultPersonas[0] } as Persona,
+    persona: JSON.parse(JSON.stringify(defaultPersonas[0])) as Persona,
   }),
   getters: {
     // @ts-expect-error
