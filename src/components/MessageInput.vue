@@ -30,7 +30,7 @@
   </q-input>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref } from 'vue';
 
 const props = defineProps({
@@ -46,7 +46,7 @@ const props = defineProps({
 
 const emit = defineEmits(['sendMessage']);
 const model = ref('');
-const sendMessage = (event) => {
+const sendMessage = (event: any) => {
   if (event.shiftKey) {
     return;
   }

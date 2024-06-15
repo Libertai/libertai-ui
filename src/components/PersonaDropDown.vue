@@ -31,13 +31,13 @@
   </q-btn-dropdown>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { usePersonasStore } from 'stores/personas-store';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
 
 const personasStore = usePersonasStore();
 
-function setPersona(id) {
-  personasStore.persona = personasStore.personas.find((persona) => persona.id === id);
+function setPersona(id: string) {
+  personasStore.persona = personasStore.personas.find((persona) => persona.id === id)!;
 }
 </script>

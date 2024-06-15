@@ -7,7 +7,7 @@
   />
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { useSettingsStore } from 'stores/settings';
 import { ref, toRef, watch } from 'vue';
 import { useQuasar } from 'quasar';

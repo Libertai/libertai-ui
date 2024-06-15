@@ -67,7 +67,7 @@
       <q-list class="q-mt-md" style="flex-grow: 1">
         <q-scroll-area style="height: 100%; min-height: 100px" visible>
           <q-item
-            v-for="chat of chats.slice().reverse()"
+            v-for="chat of (chats as any[]).slice().reverse()"
             :key="chat.id"
             :to="`/chat/${chat.id}`"
             class="q-mx-md rounded-borders q-py-md q-my-md item-history"
@@ -129,7 +129,7 @@
                 rounded
                 text-color="dark-mode-text"
               />
-              <q-btn v-close-popup color="primary" label="Confirm" rounded @click="deleteChat(deleteChatId)" />
+              <q-btn v-close-popup color="primary" label="Confirm" rounded @click="deleteChat(deleteChatId!)" />
             </q-card-actions>
           </q-card>
         </q-dialog>
@@ -173,7 +173,7 @@
   </q-layout>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { computed, nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
@@ -184,17 +184,17 @@ import { useRoute, useRouter } from 'vue-router';
 
 // Import Components
 import AccountButton from 'src/components/AccountButton.vue';
-import ToggleTheme from 'src/components/ToggleTheme.vue';
 import ModelSelector from 'src/components/ModelSelector.vue';
 import UserSettingsDialog from 'components/UserSettingsDialog.vue';
 import { useAccount } from '@wagmi/vue';
+import ToggleTheme from 'components/ToggleTheme.vue';
 
 const leftDrawerOpen = ref(false);
 // Control whether the advanced persona customization is shown
 const showUserSettingsDialog = ref(false);
 
 const deleteChatConfirmAction = ref(false);
-const deleteChatId = ref(null);
+const deleteChatId = ref<string | null>(null);
 
 // Setup Stores
 const chatsStore = useChatsStore();
@@ -217,16 +217,16 @@ const addressPoints = computed(() => {
 });
 
 // Delete a chat
-async function deleteChat(chat_id) {
-  await chatsStore.deleteChat(chat_id);
-  if (route.params?.id == chat_id) {
+async function deleteChat(chatId: string) {
+  await chatsStore.deleteChat(chatId);
+  if (route.params?.id === chatId) {
     nextTick(() => router.push('/new'));
   }
 }
 
-async function deleteChatConfirm(chat_id) {
+async function deleteChatConfirm(chatId: string) {
   deleteChatConfirmAction.value = true;
-  deleteChatId.value = chat_id;
+  deleteChatId.value = chatId;
 }
 
 function toggleLeftDrawer() {
