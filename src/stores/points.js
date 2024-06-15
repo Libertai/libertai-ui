@@ -17,7 +17,6 @@ export const usePointsStore = defineStore('points', {
       boosted_addresses: [],
     },
   }),
-  getters: {},
   actions: {
     // any amount of arguments, return a promise or not
     async update() {

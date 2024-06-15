@@ -19,11 +19,11 @@
             v-if="!account.isConnected.value"
             :class="$q.screen.gt.sm ? '' : 'float-right q-pa-sm'"
             :icon="`img:icons/svg/star${$q.dark.mode ? '_lighten' : ''}.svg`"
-            :label="$q.screen.gt.sm ? 'Earn Points' : ''"
+            :label="$q.screen.gt.sm ? 'Earn $LTAI' : ''"
             no-caps
             rounded
             text-color="primary"
-            to="/points"
+            to="/tokens"
             unelevated
           />
           <q-btn
@@ -32,7 +32,7 @@
             :icon="$q.screen.gt.sm ? undefined : 'img:icons/svg/star.svg'"
             :text-color="$q.screen.gt.sm ? 'white' : 'black'"
             :to="{
-              name: 'points-detail',
+              name: 'tokens-detail',
               params: { address: account.address.value },
             }"
             no-caps
@@ -40,7 +40,7 @@
             unelevated
           >
             <span :key="account.address.value"
-              >{{ addressPoints.toFixed(0) }} <span v-if="$q.screen.gt.sm">Points</span></span
+              >{{ addressPoints.toFixed(0) }} <span v-if="$q.screen.gt.sm">$LTAI</span></span
             >
           </q-btn>
           <!-- model selector -->
