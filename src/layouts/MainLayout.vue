@@ -179,7 +179,7 @@ import { storeToRefs } from 'pinia';
 
 // Import State
 import { useChatsStore } from 'stores/chats-store';
-import { usePointsStore } from 'src/stores/points';
+import { usePointsStore } from 'stores/points';
 import { useRoute, useRouter } from 'vue-router';
 
 // Import Components

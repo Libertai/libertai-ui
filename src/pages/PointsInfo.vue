@@ -112,7 +112,7 @@
 
 <script setup>
 import { nextTick, onMounted, ref } from 'vue';
-import { usePointsStore } from '../stores/points';
+import { usePointsStore } from 'stores/points';
 import { ethers } from 'ethers';
 
 const points = usePointsStore();

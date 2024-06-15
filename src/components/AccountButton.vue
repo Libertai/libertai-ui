@@ -47,7 +47,6 @@
 
 <script lang="ts" setup>
 import { useAccountStore } from 'stores/account';
-import { usePointsStore } from 'stores/points';
 import { useAccount, useConnect, useDisconnect } from '@wagmi/vue';
 import { injected } from '@wagmi/connectors';
 import { watchAccount } from '@wagmi/vue/actions';
@@ -55,30 +54,24 @@ import { config } from 'src/config/wagmi';
 import { watchEffect } from 'vue';
 
 const accountStore = useAccountStore();
-const pointsStore = usePointsStore();
 
 const account = useAccount();
 const { connect } = useConnect();
 const { disconnect } = useDisconnect();
 
-const onAccountChange = async () => {
-  await accountStore.initAlephStorage();
-  await pointsStore.update();
-};
-
 if (account.isConnected.value) {
-  onAccountChange();
+  accountStore.onAccountChange();
 }
 
 watchEffect((onCleanup) => {
   const unwatch = watchAccount(config, {
     async onChange(newAccount) {
       if (newAccount.address === undefined) {
-        accountStore.disconnect();
+        accountStore.onDisconnect();
         return;
       }
 
-      await onAccountChange();
+      await accountStore.onAccountChange();
     },
   });
   onCleanup(unwatch);
