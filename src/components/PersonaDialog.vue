@@ -54,7 +54,7 @@
   </q-dialog>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref, toRaw, watch } from 'vue';
 import AlephAvatar from 'components/AlephAvatar.vue';
 

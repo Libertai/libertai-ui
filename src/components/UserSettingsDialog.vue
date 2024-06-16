@@ -43,9 +43,9 @@
   </q-dialog>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { useSettingsStore } from 'stores/settings';
-import { ref, toRef, watch } from 'vue';
+import { ref, toRaw, toRef, watch } from 'vue';
 import AlephAvatar from 'components/AlephAvatar.vue';
 
 const settingsStore = useSettingsStore();

@@ -16,7 +16,7 @@
         :base-persona="basePersonaCreate"
         title="Create persona"
         @save-persona="
-          (persona) => {
+          (persona: Persona) => {
             personasStore.personas.push({ ...persona, allowEdit: true, hidden: false, id: uuidv4() });
           }
         "
@@ -25,7 +25,7 @@
         v-model="editPersona"
         :base-persona="personasStore.persona"
         @save-persona="
-          (persona) => {
+          (persona: Persona) => {
             personasStore.persona = persona;
 
             personasStore.personas = personasStore.personas.map((userPersona) => {
@@ -116,11 +116,11 @@
 
 <script lang="ts" setup>
 import { usePersonasStore } from 'stores/personas-store';
-import PersonaDialog from 'components/PersonaDialog.vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import { getPersonaAvatarUrl, Persona } from 'src/utils/personas';
+import PersonaDialog from 'src/components/PersonaDialog.vue';
 
 const personasStore = usePersonasStore();
 const router = useRouter();
