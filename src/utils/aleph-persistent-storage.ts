@@ -6,7 +6,7 @@ import { signMessage } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
 
 const MESSAGE = 'LibertAI';
-const AGGREGATE_KEY = 'libertai-chat-ui';
+const LIBERTAI_KEY = 'libertai-chat-ui';
 const SECURITY_AGGREGATE_KEY = 'security';
 
 export class AlephPersistentStorage {
@@ -49,7 +49,7 @@ export class AlephPersistentStorage {
           (authorization: any) =>
             authorization.address === subAccount.address &&
             authorization.types.includes('AGGREGATE') &&
-            authorization.aggregate_keys.includes(AGGREGATE_KEY),
+            authorization.aggregate_keys.includes(LIBERTAI_KEY),
         )
       ) {
         await accountClient.createAggregate({
@@ -60,7 +60,7 @@ export class AlephPersistentStorage {
               {
                 address: subAccount.address,
                 types: ['AGGREGATE'],
-                aggregate_keys: [AGGREGATE_KEY],
+                aggregate_keys: [LIBERTAI_KEY],
               },
             ],
           },
@@ -75,7 +75,7 @@ export class AlephPersistentStorage {
             {
               address: subAccount.address,
               types: ['AGGREGATE'],
-              aggregate_keys: [AGGREGATE_KEY],
+              aggregate_keys: [LIBERTAI_KEY],
             },
           ],
         },
@@ -86,9 +86,10 @@ export class AlephPersistentStorage {
   async save(content: object) {
     try {
       const message = await this.subAccountClient.createAggregate({
-        key: AGGREGATE_KEY,
+        key: LIBERTAI_KEY,
         content,
         address: this.account.address,
+        channel: LIBERTAI_KEY,
       });
       console.log(`Data saved on Aleph with hash ${message.item_hash}`);
     } catch (error) {
@@ -98,7 +99,7 @@ export class AlephPersistentStorage {
 
   async fetch() {
     try {
-      const settings = await this.subAccountClient.fetchAggregate(this.account.address, AGGREGATE_KEY);
+      const settings = await this.subAccountClient.fetchAggregate(this.account.address, LIBERTAI_KEY);
       return settings;
     } catch (error) {
       console.error(`Fetching settings from Aleph failed: ${error}`);
@@ -107,7 +108,11 @@ export class AlephPersistentStorage {
   }
 
   async uploadFile(file: File) {
-    const message = await this.subAccountClient.createStore({ fileObject: file, storageEngine: ItemType.ipfs });
+    const message = await this.subAccountClient.createStore({
+      fileObject: file,
+      storageEngine: ItemType.ipfs,
+      channel: LIBERTAI_KEY,
+    });
     return message;
   }
 }
