@@ -458,7 +458,7 @@ async function sendMessage(content) {
 // Set a chat by its ID
 async function setChat(chatId) {
   // This is annoying but we need to set whether the user is connected
-  enableKnowledgeRef.value = account.isConnected.value;
+  //enableKnowledgeRef.value = account.isConnected.value;
 
   // Load the chat from the store and set it
   chatRef.value = await chatsStore.readChat(chatId);
