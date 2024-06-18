@@ -12,10 +12,10 @@
           <!-- Display the avatar of the user or the AI -->
           <q-item-section avatar>
             <q-avatar v-if="message.role == usernameRef">
-              <img src="avatars/00057-2093295138.png" />
+              <img :src="getPersonaAvatarUrl(settingsStore.avatar.ipfs_hash)" alt="user" />
             </q-avatar>
             <q-avatar v-else>
-              <img :src="personaRef.avatarUrl" />
+              <img :src="getPersonaAvatarUrl(personaRef.avatar.ipfs_hash)" alt="AI" />
             </q-avatar>
           </q-item-section>
           <!-- Edit message popup -- triggered on click if the edit mode is enabled -->
@@ -65,7 +65,7 @@
           <div class="absolute dyn-container chat-toolbar">
             <!-- Allow regenerating the last message from the AI if fully completed -->
             <q-btn
-              v-if="!isLoadingRef && message_index == messagesRef.length - 1"
+              v-if="!isLoadingRef && message_index === messagesRef.length - 1"
               dense
               flat
               icon="refresh"
@@ -121,9 +121,9 @@
       <message-input
         ref="inputRef"
         v-model="inputTextRef"
-        :isLoading="isLoadingRef"
+        :is-loading="isLoadingRef"
         class="col"
-        @sendMessage="sendMessage"
+        @send-message="sendMessage"
       />
     </div>
 
@@ -141,7 +141,7 @@
     <!-- This should really not pass the ref, but it's a quick fix for now -->
     <q-dialog v-model="showKnowledgeUploaderRef" position="bottom">
       <KnowledgeStoreUploader
-        :chatRef="chatRef"
+        :chat-ref="chatRef"
         auto-upload
         label="Auto KnowledgeStoreUploader"
         multiple
@@ -154,7 +154,7 @@
 
 <script setup>
 import 'highlight.js/styles/devibeans.css';
-import { copyToClipboard, useQuasar, date } from 'quasar';
+import { copyToClipboard, date, useQuasar } from 'quasar';
 import { nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -165,26 +165,28 @@ import { LlamaCppApiEngine } from '@libertai/libertai-js';
 
 // Local state
 import { useChatsStore } from 'src/stores/chats-store';
-import { useModelsStore } from 'src/stores/models-store';
+import { useModelsStore } from 'stores/models-store';
 import { useKnowledgeStore } from 'src/stores/knowledge-store';
-import { useAccountStore } from 'src/stores/account';
-import { usePersonasStore } from 'src/stores/personas-store';
+import { usePersonasStore } from 'stores/personas-store';
 
 // Components
 import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
 import MessageInput from 'src/components/MessageInput.vue';
 import axios from 'axios';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
+import { useSettingsStore } from 'stores/settings';
+import { useAccount } from '@wagmi/vue';
 
 const $q = useQuasar();
 const route = useRoute();
 const router = useRouter();
 
 // App state
-const account = useAccountStore();
 const chatsStore = useChatsStore();
 const modelsStore = useModelsStore();
 const knowledgeStore = useKnowledgeStore();
 const personasStore = usePersonasStore();
+const settingsStore = useSettingsStore();
 
 // Local page state
 const inputTextRef = ref('');
@@ -196,6 +198,8 @@ const enableEditRef = ref(false);
 const enableKnowledgeRef = ref(false);
 const showKnowledgeUploaderRef = ref(false);
 const attachmentsRef = ref([]);
+
+const account = useAccount();
 
 // Chat specific state
 const chatRef = ref();
@@ -226,12 +230,12 @@ watch(
 );
 
 // Update whether we should show the knowledge uploader based on whether the user is connected
-watch(
-  () => account.active,
-  (active) => {
-    //enableKnowledgeRef.value = active;
-  },
-);
+// watch(
+//   () => account.active,
+//   (active) => {
+//     enableKnowledgeRef.value = active;
+//   },
+// );
 
 // Update the chat model when the selected model changes
 watch(
@@ -454,7 +458,7 @@ async function sendMessage(content) {
 // Set a chat by its ID
 async function setChat(chatId) {
   // This is annoying but we need to set whether the user is connected
-  enableKnowledgeRef.value = account.active;
+  enableKnowledgeRef.value = account.isConnected.value;
 
   // Load the chat from the store and set it
   chatRef.value = await chatsStore.readChat(chatId);
@@ -550,6 +554,7 @@ function openKnowledgeUploader() {
   showKnowledgeUploaderRef.value = true;
 }
 
+// TODO: Replace this by using dayjs
 function formatDate(d) {
   if (!d) d = new Date();
   const currentDate = new Date();
@@ -580,7 +585,7 @@ function formatDate(d) {
 </script>
 <style>
 /* Ensure message input expands to fill available space */
-.message-input {
+message-input {
   width: 100%; /* Adjust as needed to ensure proper sizing */
 }
 

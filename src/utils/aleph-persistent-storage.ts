@@ -1,20 +1,30 @@
 import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
-import { getAccountFromProvider, importAccountFromPrivateKey } from '@aleph-sdk/ethereum';
+import { ETHAccount, getAccountFromProvider, importAccountFromPrivateKey } from '@aleph-sdk/ethereum';
 import web3 from 'web3';
+import { ItemType } from '@aleph-sdk/message';
+import { signMessage } from '@wagmi/core';
+import { config } from 'src/config/wagmi';
 
 const MESSAGE = 'LibertAI';
-const AGGREGATE_KEY = 'libertai-chat-ui';
+const LIBERTAI_KEY = 'libertai-chat-ui';
 const SECURITY_AGGREGATE_KEY = 'security';
 
 export class AlephPersistentStorage {
-  constructor(account, subAccountClient) {
-    this.account = account;
-    this.subAccountClient = subAccountClient;
-  }
+  constructor(
+    /* eslint-disable-next-line no-unused-vars */
+    private account: ETHAccount,
+    /* eslint-disable-next-line no-unused-vars */
+    private subAccountClient: AuthenticatedAlephHttpClient,
+  ) {}
 
-  static async initialize(signer) {
-    const hash = await signer.signMessage(MESSAGE);
+  static async initialize() {
+    const hash = await signMessage(config, { message: MESSAGE });
     const privateKey = web3.utils.sha3(hash);
+
+    if (privateKey === undefined) {
+      console.error('Private key generation failed');
+      return undefined;
+    }
     const subAccount = importAccountFromPrivateKey(privateKey);
     const account = await getAccountFromProvider(window.ethereum);
     const accountClient = new AuthenticatedAlephHttpClient(account);
@@ -25,16 +35,21 @@ export class AlephPersistentStorage {
     return new AlephPersistentStorage(account, subAccountClient);
   }
 
-  static async getSecurityPermission(account, subAccount, accountClient) {
+  static async getSecurityPermission(
+    account: ETHAccount,
+    subAccount: ETHAccount,
+    accountClient: AuthenticatedAlephHttpClient,
+  ) {
     try {
-      const securitySettings = await accountClient.fetchAggregate(account.address, SECURITY_AGGREGATE_KEY);
+      // TODO: Add zod parsing
+      const securitySettings = (await accountClient.fetchAggregate(account.address, SECURITY_AGGREGATE_KEY)) as any;
 
       if (
         !securitySettings.authorizations.find(
-          (authorization) =>
+          (authorization: any) =>
             authorization.address === subAccount.address &&
             authorization.types.includes('AGGREGATE') &&
-            authorization.aggregate_keys.includes(AGGREGATE_KEY),
+            authorization.aggregate_keys.includes(LIBERTAI_KEY),
         )
       ) {
         await accountClient.createAggregate({
@@ -45,7 +60,7 @@ export class AlephPersistentStorage {
               {
                 address: subAccount.address,
                 types: ['AGGREGATE'],
-                aggregate_keys: [AGGREGATE_KEY],
+                aggregate_keys: [LIBERTAI_KEY],
               },
             ],
           },
@@ -60,7 +75,7 @@ export class AlephPersistentStorage {
             {
               address: subAccount.address,
               types: ['AGGREGATE'],
-              aggregate_keys: [AGGREGATE_KEY],
+              aggregate_keys: [LIBERTAI_KEY],
             },
           ],
         },
@@ -68,12 +83,13 @@ export class AlephPersistentStorage {
     }
   }
 
-  async save(content) {
+  async save(content: object) {
     try {
       const message = await this.subAccountClient.createAggregate({
-        key: AGGREGATE_KEY,
+        key: LIBERTAI_KEY,
         content,
         address: this.account.address,
+        channel: LIBERTAI_KEY,
       });
       console.log(`Data saved on Aleph with hash ${message.item_hash}`);
     } catch (error) {
@@ -83,11 +99,20 @@ export class AlephPersistentStorage {
 
   async fetch() {
     try {
-      const settings = await this.subAccountClient.fetchAggregate(this.account.address, AGGREGATE_KEY);
+      const settings = await this.subAccountClient.fetchAggregate(this.account.address, LIBERTAI_KEY);
       return settings;
     } catch (error) {
       console.error(`Fetching settings from Aleph failed: ${error}`);
       return undefined;
     }
+  }
+
+  async uploadFile(file: File) {
+    const message = await this.subAccountClient.createStore({
+      fileObject: file,
+      storageEngine: ItemType.ipfs,
+      channel: LIBERTAI_KEY,
+    });
+    return message;
   }
 }

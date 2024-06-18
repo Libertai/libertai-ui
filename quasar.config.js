@@ -22,16 +22,18 @@ module.exports = configure(function (/* ctx */) {
       errors: false,
     },
 
+    supportTS: true,
+
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
 
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['utils'],
+    boot: ['utils', 'wagmi'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
-    css: ['app.scss'],
+    css: ['app.scss', 'tailwind.css'],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
@@ -61,6 +63,9 @@ module.exports = configure(function (/* ctx */) {
           viteConf.build.commonjsOptions = {};
         }
         viteConf.build.commonjsOptions.transformMixedEsModules = true;
+
+        viteConf.build.target = 'esnext';
+        viteConf.optimizeDeps = { esbuildOptions: { target: 'esnext' } };
 
         if (viteConf.plugins === undefined) {
           viteConf.plugins = [];
@@ -92,7 +97,7 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
       // https: true
-      open: true, // opens browser window automatically
+      open: false, // opens browser window automatically
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework

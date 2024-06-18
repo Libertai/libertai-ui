@@ -1,13 +1,13 @@
 <template>
   <div style="display: inline-block">
     <q-btn
-      v-if="!account.active"
+      v-if="!account.isConnected.value"
       class="text-semibold border-primary-highlight gt-sm"
       color="primary"
       no-caps
       rounded
       unelevated
-      @click="eth_web3_login"
+      @click="connect({ connector: injected() })"
     >
       <q-icon class="text-dark" left size="xs">
         <img src="~assets/wallet.svg" />
@@ -16,7 +16,7 @@
     </q-btn>
     <q-btn-dropdown
       v-else
-      :label="`${account.address.slice(0, 4)}...${account.address.slice(-2)}`"
+      :label="`${account.address.value?.slice(0, 4)}...${account.address.value?.slice(-2)}`"
       class="border-primary-highlight gt-sm"
       icon="img:icons/svg/avatar.svg"
       no-caps
@@ -26,7 +26,7 @@
     >
       <div class="row no-wrap q-pa-md q-pt-none">
         <div class="column items-center">
-          <div class="text-small q-mb-xs">{{ account.address }}</div>
+          <div class="text-small q-mb-xs">{{ account.address.value }}</div>
 
           <q-btn
             v-close-popup
@@ -37,7 +37,7 @@
             rounded
             size="sm"
             unelevated
-            @click="account.disconnect"
+            @click="disconnect()"
           />
         </div>
       </div>
@@ -45,30 +45,35 @@
   </div>
 </template>
 
-<script setup>
-import { ethers } from 'ethers';
+<script lang="ts" setup>
 import { useAccountStore } from 'stores/account';
-import { usePoints } from 'stores/points';
+import { useAccount, useConnect, useDisconnect } from '@wagmi/vue';
+import { injected } from '@wagmi/connectors';
+import { watchAccount } from '@wagmi/vue/actions';
+import { config } from 'src/config/wagmi';
+import { watchEffect } from 'vue';
 
-const account = useAccountStore();
+const accountStore = useAccountStore();
 
-async function eth_web3_login() {
-  const points = usePoints();
-  if (window.ethereum) {
-    try {
-      // Request account access if needed
-      await window.ethereum.enable();
-      let provider = new ethers.providers.Web3Provider(window['ethereum'] || window.web3.currentProvider);
-      await account.setProvider(provider);
-      await points.update();
-    } catch (error) {
-      // User denied account access...
-    }
-  } else {
-    alert('No ethereum provider detected. Please install metamask or similar.');
-  }
-  if (!account.active) {
-    alert('Error getting web3 account');
-  }
+const account = useAccount();
+const { connect } = useConnect();
+const { disconnect } = useDisconnect();
+
+if (account.isConnected.value) {
+  accountStore.onAccountChange();
 }
+
+watchEffect((onCleanup) => {
+  const unwatch = watchAccount(config, {
+    async onChange(newAccount) {
+      if (newAccount.address === undefined) {
+        accountStore.onDisconnect();
+        return;
+      }
+
+      await accountStore.onAccountChange();
+    },
+  });
+  onCleanup(unwatch);
+});
 </script>

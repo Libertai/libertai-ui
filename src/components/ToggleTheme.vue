@@ -7,8 +7,8 @@
   />
 </template>
 
-<script setup>
-import { useSettingsStore } from 'src/stores/settings';
+<script lang="ts" setup>
+import { useSettingsStore } from 'stores/settings';
 import { ref, toRef, watch } from 'vue';
 import { useQuasar } from 'quasar';
 
@@ -20,6 +20,7 @@ $q.dark.set(settings.darkmode);
 // Update the theme when the store value changes (might be updated by Aleph settings fetching)
 watch(toRef(settings, 'darkmode'), () => {
   $q.dark.set(settings.darkmode);
+  darkmode.value = settings.darkmode;
 });
 
 watch(

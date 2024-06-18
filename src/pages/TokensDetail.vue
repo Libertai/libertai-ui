@@ -12,10 +12,9 @@
                 {{ address.slice(0, 10) }}...{{ address.slice(-10) }}
               </span>
             </p>
-            <div class="text-h4 text-bold q-pb-sm text-left">Your Libertai Points</div>
+            <div class="text-h4 text-bold q-pb-sm text-left">Your Libertai tokens</div>
             <p class="text-left">
-              Run aleph.im network nodes, stake ALEPH to continue earning Libertai points. New ways will be available
-              soon!
+              Run aleph.im network nodes, stake ALEPH to continue earning $LTAI. New ways will be available soon!
             </p>
           </q-card-section>
         </q-card>
@@ -23,9 +22,9 @@
           <q-card-section class="bg-purple-50 q-pa-xl row">
             <div class="text-h6 text-bold col-8 text-left">
               <q-avatar class="q-mr-sm">
-                <img src="icons/svg/libertai.svg" />
+                <img alt="libertai" src="/icons/svg/libertai.svg" />
               </q-avatar>
-              Total Points Received
+              Current $LTAI balance
             </div>
 
             <div class="col-4">
@@ -35,7 +34,7 @@
         </q-card>
         <q-card :class="$q.screen.gt.sm ? 'col-6 text-center column' : ' col-12 text-center'" flat>
           <q-card-section class="bg-purple-50 q-pa-xl">
-            <p class="text-h6 text-bold text-left">Pending Points</p>
+            <p class="text-h6 text-bold text-left">Pending $LTAI</p>
             <p class="q-py-md text-right">
               <span class="text-h4 text-bold rounded">{{ currentPendingPoints.toFixed(2) }}</span>
             </p>
@@ -43,18 +42,18 @@
         </q-card>
         <q-card :class="$q.screen.gt.sm ? 'col-6 text-center column' : ' col-12 text-center'" flat>
           <q-card-section class="bg-purple-50 q-pa-xl">
-            <p class="text-h6 text-bold text-left">36 Month estimated Points*</p>
+            <p class="text-h6 text-bold text-left">36 Month estimated $LTAI*</p>
             <p class="q-py-md text-right">
               <span class="text-h4 text-bold rounded">{{ ThreeYearsPoints.toFixed(2) }}</span>
             </p>
           </q-card-section>
         </q-card>
-        <p :class="$q.dark.mode ? 'text-white' : ''">You are getting {{ hourlyRate.toFixed(2) }} points per hour.</p>
+        <p :class="$q.dark.mode ? 'text-white' : ''">You are getting {{ hourlyRate.toFixed(2) }} $LTAI per hour.</p>
         <p class="text-grey text-center col-12">
           * Estimate only, and under current rules, if your participation stays at the same level. <br />
-          The availability of Libertai Points is subject to change without notice. We may suspend, modify, or terminate
-          the program at our sole discretion and without liability. Your participation does not guarantee that you will
-          receive any specific amount of points or tokens.
+          The availability of $LTAI tokens is subject to change without notice. We may suspend, modify, or terminate the
+          program at our sole discretion and without liability. Your participation does not guarantee that you will
+          receive any specific amount of tokens.
         </p>
       </div>
     </q-page>
@@ -64,14 +63,16 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { usePoints } from '../stores/points';
-import { useAccountStore } from '../stores/account';
+import { usePointsStore } from 'stores/points';
 import { ethers } from 'ethers';
+import { useAccount } from '@wagmi/vue';
 
 const route = useRoute();
 const router = useRouter();
-const points = usePoints();
-const account = useAccountStore();
+const points = usePointsStore();
+
+const account = useAccount();
+
 // got address as an address part from vue router
 const address = ref(ethers.utils.getAddress(route.params.address));
 let interval = null;
@@ -79,7 +80,7 @@ let interval = null;
 onMounted(async () => {
   if (Object.keys(points.points).length === 0) {
     await points.update();
-    await updatePoints();
+    updatePoints();
   }
   interval = setInterval(() => {
     updatePoints();
@@ -97,11 +98,11 @@ watch(
   },
 );
 watch(
-  () => account.address,
+  () => account.address.value,
   async (newAddress, oldAddress) => {
-    if (oldAddress == address.value) {
-      router.push({
-        name: 'points-detail',
+    if (oldAddress === address.value) {
+      await router.push({
+        name: 'tokens-detail',
         params: { address: newAddress },
       });
     }
@@ -111,8 +112,8 @@ watch(
 const currentPendingPoints = ref(0);
 const hourlyRate = ref(0);
 
-async function updatePoints() {
-  const pendingInfo = await points.getAddressRealtimePendingPointsInfo(address.value);
+function updatePoints() {
+  const pendingInfo = points.getAddressRealtimePendingPointsInfo(address.value);
   hourlyRate.value = pendingInfo.hourlyRate;
   currentPendingPoints.value = pendingInfo.pending;
 }

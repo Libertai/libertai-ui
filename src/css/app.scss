@@ -50,7 +50,7 @@
 }
 
 body {
-  font-family: 'mulish';
+  font-family: 'Mulish', serif;
 }
 
 /* Quasar */
@@ -96,9 +96,6 @@ body {
     background-color: $primary-dark !important;
   }
 
-  .engine-message {
-  }
-
   .message-content {
     color: $dark-text-color;
   }
@@ -131,6 +128,7 @@ body {
     color: $purple50 !important;
   }
 }
+
 /* Quasar */
 .q-tooltip {
   background-color: $primary;
@@ -149,9 +147,6 @@ body {
 .text-purple700,
 .text-purple-700 {
   color: $purple700 !important;
-}
-.font-mulish {
-  font-family: 'Mulish' !important;
 }
 
 .border-primary-highlight {
@@ -182,12 +177,17 @@ body {
   background-color: $purple50;
 }
 
+.bg-purple-700 {
+  background-color: $purple700;
+}
+
 .rounded {
   border-radius: 100px;
 }
 
 aside {
   border-right: 1px solid #d9d9d9;
+
   & .item-history {
     border: 1px solid #d9d9d9;
   }
@@ -223,6 +223,7 @@ input {
 .bull-date {
   color: $dark-text-color;
 }
+
 .bull-date::before {
   content: '● ';
   margin-left: 5px;

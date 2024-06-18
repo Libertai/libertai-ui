@@ -6,7 +6,7 @@
         <div :class="$q.screen.gt.sm ? 'col-4' : 'col-10'">
           <q-card class="my-card center text-center q-pa-md" flat>
             <q-avatar>
-              <img :src="personasStore.persona.avatarUrl" />
+              <img :src="getPersonaAvatarUrl(personasStore.persona.avatar.ipfs_hash)" alt="avatar" />
             </q-avatar>
 
             <q-card-section>
@@ -30,27 +30,28 @@
               be used as a substitute for professional advice. The accuracy and reliability of the chat bot's responses cannot
               be guaranteed. Users should exercise their own judgment and discretion when interacting with the chat bot and
               its personas. By using this chat bot, you acknowledge and agree to these terms."
-          @sendMessage="sendMessage"
+          @send-message="sendMessage"
         />
       </div>
       <q-space />
     </div>
   </q-page>
 </template>
-<script setup>
+<script lang="ts" setup>
 import { defaultChatTopic } from 'src/utils/chat';
 
 // Import State
-import { useModelsStore } from 'src/stores/models-store';
+import { useModelsStore } from 'stores/models-store';
 import { useChatsStore } from 'src/stores/chats-store';
-import { usePersonasStore } from 'src/stores/personas-store';
-import { useSettingsStore } from 'src/stores/settings';
+import { usePersonasStore } from 'stores/personas-store';
+import { useSettingsStore } from 'stores/settings';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 // Import components
 import MessageInput from 'src/components/MessageInput.vue';
 import PersonaDropDown from 'src/components/PersonaDropDown.vue';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
 
 const router = useRouter();
 
@@ -58,13 +59,9 @@ const router = useRouter();
 
 const modelsStore = useModelsStore();
 const chatsStore = useChatsStore();
-// TODO: We probably don't need to use a store for this
 const personasStore = usePersonasStore();
 
-const settings = useSettingsStore();
-// Our local page state
-
-const { username } = settings;
+const username = useSettingsStore().username;
 
 // Message input state
 const messageInputRef = ref('');
@@ -95,4 +92,3 @@ async function sendMessage() {
   router.push({ name: 'chat', params: { id: chat.id } });
 }
 </script>
-<style scoped></style>

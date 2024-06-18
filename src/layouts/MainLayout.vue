@@ -3,25 +3,27 @@
     <q-header class="bg-transparent q-mt-sm">
       <q-toolbar>
         <q-btn aria-label="Menu" color="primary" dense flat icon="menu" round @click="toggleLeftDrawer" />
-        <q-btn class="q-pa-xs" flat @click="editPersona = true">
+
+        <q-btn class="q-pa-xs" flat @click="showUserSettingsDialog = true">
           <q-icon size="xs">
-            <img :src="`icons/svg/settings${$q.dark.mode ? '_lighten' : ''}.svg`" />
+            <img :src="`icons/svg/settings${$q.dark.mode ? '_lighten' : ''}.svg`" alt="settings" />
           </q-icon>
         </q-btn>
-        <persona-dialog v-model="editPersona" />
+        <user-settings-dialog v-model="showUserSettingsDialog" />
+
         <toggle-theme />
         <q-space />
 
         <div class="row q-gutter-x-sm">
           <q-btn
-            v-if="!account.active"
+            v-if="!account.isConnected.value"
             :class="$q.screen.gt.sm ? '' : 'float-right q-pa-sm'"
             :icon="`img:icons/svg/star${$q.dark.mode ? '_lighten' : ''}.svg`"
-            :label="$q.screen.gt.sm ? 'Earn Points' : ''"
+            :label="$q.screen.gt.sm ? 'Earn $LTAI' : ''"
             no-caps
             rounded
             text-color="primary"
-            to="/points"
+            to="/tokens"
             unelevated
           />
           <q-btn
@@ -29,16 +31,16 @@
             :class="$q.screen.gt.sm ? 'btn-gradient' : 'float-right q-pa-sm'"
             :icon="$q.screen.gt.sm ? undefined : 'img:icons/svg/star.svg'"
             :text-color="$q.screen.gt.sm ? 'white' : 'black'"
-            :to="{
-              name: 'points-detail',
-              params: { address: account.address },
-            }"
             no-caps
             rounded
             unelevated
           >
-            <span :key="account.address"
-              >{{ addressPoints.toFixed(0) }} <span v-if="$q.screen.gt.sm">Points</span></span
+            <!--            :to="{-->
+            <!--              name: 'tokens-detail',-->
+            <!--              params: { address: account.address.value },-->
+            <!--            }"-->
+            <span :key="account.address.value"
+              >{{ accountStore.ltaiBalance.toFixed(0) }} <span v-if="$q.screen.gt.sm">$LTAI</span></span
             >
           </q-btn>
           <!-- model selector -->
@@ -48,28 +50,15 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      class="flex-grow fit"
-      show-if-above
-      style="display: flex; flex-direction: column"
-    >
+    <q-drawer v-model="leftDrawerOpen" class="flex-grow fit tw-flex tw-flex-col" show-if-above>
       <!-- image link with the logo -->
       <q-item class="q-mb-md text-left" clickable to="/">
         <img :src="`icons/svg/libertai_full${$q.dark.mode ? '_lighten' : ''}.svg`" alt="Libertai" />
       </q-item>
       <div class="q-mr-xl q-ml-md q-mt-md">
-        <q-btn
-          cclass="q-mx-xl q-my-xl border-primary-highlight text-semibold"
-          class="border-primary-highlight"
-          no-caps
-          rounded
-          text-color="dark-mode-text"
-          to="/new"
-          unelevated
-        >
+        <q-btn class="border-primary-highlight" no-caps rounded text-color="dark-mode-text" to="/new" unelevated>
           <q-icon class="text-dark" left size="xs">
-            <img src="icons/svg/chat-plus.svg" />
+            <img alt="new chat" src="/icons/svg/chat-plus.svg" />
           </q-icon>
           New Chat
         </q-btn>
@@ -78,7 +67,7 @@
       <q-list class="q-mt-md" style="flex-grow: 1">
         <q-scroll-area style="height: 100%; min-height: 100px" visible>
           <q-item
-            v-for="chat of chats.slice().reverse()"
+            v-for="chat of (chats as any[]).slice().reverse()"
             :key="chat.id"
             :to="`/chat/${chat.id}`"
             class="q-mx-md rounded-borders q-py-md q-my-md item-history"
@@ -133,46 +122,49 @@
             </q-card-section>
 
             <q-card-actions align="right">
-              <q-btn v-close-popup color="primary" flat label="Cancel" />
-              <q-btn v-close-popup color="primary" flat label="Confirm" @click="deleteChat(deleteChatId)" />
+              <q-btn
+                v-close-popup
+                class="border-primary-highlight"
+                label="Cancel"
+                rounded
+                text-color="dark-mode-text"
+              />
+              <q-btn v-close-popup color="primary" label="Confirm" rounded @click="deleteChat(deleteChatId!)" />
             </q-card-actions>
           </q-card>
         </q-dialog>
       </q-list>
+
+      <q-item to="/persona-management">
+        <img :src="`icons/svg/robot${$q.dark.mode ? '_lighten' : ''}.svg`" alt="persona" />
+
+        <q-item-section class="q-pl-sm">
+          <span>Persona management</span>
+        </q-item-section>
+      </q-item>
+
       <!-- socials and support links (follow us, support, disclaimer) -->
-      <q-list class="q-pt-md">
-        <q-item href="https://x.com/libertai_dai" target="_blank">
+      <q-list class="q-pt-md flex">
+        <q-item class="q-mx-auto" href="https://x.com/libertai_dai" target="_blank">
           <q-item-section avatar>
-            <img alt="Twitter - X" src="icons/twitter-x.svg" width="32px" />
-          </q-item-section>
-
-          <q-item-section>
-            <q-item-label> Follow us</q-item-label>
+            <img alt="Twitter - X" src="/icons/twitter-x.svg" width="32px" />
           </q-item-section>
         </q-item>
-        <q-item href="https://t.me/libertai" target="_blank">
+        <q-item class="q-mx-auto" href="https://t.me/libertai" target="_blank">
           <q-item-section avatar>
-            <img alt="Telegram" src="icons/telegram.svg" width="32px" />
-          </q-item-section>
-
-          <q-item-section>
-            <q-item-label> Chat with us</q-item-label>
+            <img alt="Telegram" src="/icons/telegram.svg" width="32px" />
           </q-item-section>
         </q-item>
-        <q-item href="https://aleph.im" target="_blank">
+        <q-item class="q-mx-auto" href="https://aleph.im" target="_blank">
           <q-item-section avatar>
-            <img alt="Aleph" src="icons/aleph.svg" width="32px" />
+            <img alt="Aleph" src="/icons/aleph.svg" width="32px" />
           </q-item-section>
-
-          <q-item-section>
-            <q-item-label> Build with us</q-item-label>
-          </q-item-section>
-        </q-item>
-        <!-- powered by aleph.im -->
-        <q-item clickable href="https://aleph.im" target="_blank">
-          <img :src="`icons/svg/powered-by${$q.dark.mode ? '_lighten' : ''}.svg`" alt="aleph.im" />
         </q-item>
       </q-list>
+      <!-- powered by aleph.im -->
+      <q-item clickable href="https://aleph.im" target="_blank">
+        <img :src="`icons/svg/powered-by${$q.dark.mode ? '_lighten' : ''}.svg`" alt="aleph.im" />
+      </q-item>
     </q-drawer>
 
     <q-page-container>
@@ -181,33 +173,36 @@
   </q-layout>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { computed, nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
 // Import State
-import { useChatsStore } from '../stores/chats-store';
-import { useAccountStore } from '../stores/account';
-import { usePoints } from 'src/stores/points';
+import { useChatsStore } from 'stores/chats-store';
+import { usePointsStore } from 'stores/points';
 import { useRoute, useRouter } from 'vue-router';
 
 // Import Components
 import AccountButton from 'src/components/AccountButton.vue';
-import PersonaDialog from 'src/components/PersonaDialog.vue';
-import ToggleTheme from 'src/components/ToggleTheme.vue';
 import ModelSelector from 'src/components/ModelSelector.vue';
+import UserSettingsDialog from 'components/UserSettingsDialog.vue';
+import { useAccount } from '@wagmi/vue';
+import ToggleTheme from 'components/ToggleTheme.vue';
+import { useAccountStore } from 'stores/account';
 
 const leftDrawerOpen = ref(false);
 // Control whether the advanced persona customization is shown
-const editPersona = ref(false);
+const showUserSettingsDialog = ref(false);
 
 const deleteChatConfirmAction = ref(false);
-const deleteChatId = ref(null);
+const deleteChatId = ref<string | null>(null);
 
 // Setup Stores
 const chatsStore = useChatsStore();
-const account = useAccountStore();
-const points = usePoints();
+const accountStore = useAccountStore();
+const points = usePointsStore();
+
+const account = useAccount();
 
 const router = useRouter();
 const route = useRoute();
@@ -216,24 +211,24 @@ const route = useRoute();
 const { chats } = storeToRefs(chatsStore);
 
 const addressPoints = computed(() => {
-  if (account.active) {
-    return points.getAddressRealtimePoints(account.address);
+  if (account.isConnected.value) {
+    return points.getAddressRealtimePoints(account.address.value);
   } else {
     return 0;
   }
 });
 
 // Delete a chat
-async function deleteChat(chat_id) {
-  await chatsStore.deleteChat(chat_id);
-  if (route.params?.id == chat_id) {
+async function deleteChat(chatId: string) {
+  await chatsStore.deleteChat(chatId);
+  if (route.params?.id === chatId) {
     nextTick(() => router.push('/new'));
   }
 }
 
-async function deleteChatConfirm(chat_id) {
+async function deleteChatConfirm(chatId: string) {
   deleteChatConfirmAction.value = true;
-  deleteChatId.value = chat_id;
+  deleteChatId.value = chatId;
 }
 
 function toggleLeftDrawer() {

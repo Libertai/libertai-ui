@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import { defaultModels } from '../utils/models.js';
+import { defaultModels } from '../utils/models.ts';
 
 export const useModelsStore = defineStore('models', {
   state: () => ({
@@ -8,11 +8,6 @@ export const useModelsStore = defineStore('models', {
     selectedModel: defaultModels[0],
   }),
   actions: {
-    // any amount of arguments, return a promise or not
-    setModel(model) {
-      // you can directly mutate the state
-      this.selectedModel = model;
-    },
     setModelByURL(modelUrl) {
       for (let model of defaultModels)
         if (model.apiUrl == modelUrl) {

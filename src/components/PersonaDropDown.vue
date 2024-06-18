@@ -1,17 +1,17 @@
 <template>
   <q-btn-dropdown
-    :icon="'img:' + personasStore.persona.avatarUrl"
+    :icon="'img:' + getPersonaAvatarUrl(personasStore.persona.avatar.ipfs_hash)"
     :label="personasStore.persona.name"
     class="no-shadow rounded-img personas-dropdown q-py-sm icon-md"
     dropdown-icon="img:icons/svg/chevron-down.svg"
     no-caps
     rounded
-    unelevated
     text-color="primary"
+    unelevated
   >
     <q-list>
       <q-item
-        v-for="persona of personasStore.personas"
+        v-for="persona of personasStore.shownPersonas"
         :key="persona.id"
         v-close-popup
         :name="persona.id"
@@ -19,7 +19,7 @@
         @click="setPersona(persona.id)"
       >
         <q-avatar class="q-mr-md" size="32px">
-          <img :src="persona.avatarUrl" />
+          <img :src="getPersonaAvatarUrl(persona.avatar.ipfs_hash)" alt="avatar" />
         </q-avatar>
         <q-item-section>
           <q-item-label>
@@ -31,12 +31,13 @@
   </q-btn-dropdown>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { usePersonasStore } from 'stores/personas-store';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
 
 const personasStore = usePersonasStore();
 
-function setPersona(id) {
-  personasStore.persona = personasStore.personas.find((persona) => persona.id === id);
+function setPersona(id: string) {
+  personasStore.persona = personasStore.personas.find((persona) => persona.id === id)!;
 }
 </script>
