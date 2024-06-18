@@ -3,10 +3,10 @@ import { AlephPersistentStorage } from 'src/utils/aleph-persistent-storage';
 import { useSettingsStore } from 'stores/settings';
 import { getAccount, getBalance } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
-import { baseSepolia } from '@wagmi/vue/chains';
+import { base } from '@wagmi/vue/chains';
 import { usePointsStore } from 'stores/points';
 
-const LTAI_BASE_SEPOLIA_ADDRESS = '0xC442C8969357925B3f35e276Cb0b58b0C0ddeE91';
+const LTAI_BASE_ADDRESS = '0xF8B1b47AA748F5C7b5D0e80C726a843913EB573a';
 
 export const useAccountStore = defineStore('account', {
   state: () => ({
@@ -44,9 +44,9 @@ export const useAccountStore = defineStore('account', {
       }
 
       const balance = await getBalance(config, {
-        address: '0x781Dfe7EE8700A7264A427E7f55082C5531a939D', // TODO: use real address
-        token: LTAI_BASE_SEPOLIA_ADDRESS,
-        chainId: baseSepolia.id,
+        address: account.address,
+        token: LTAI_BASE_ADDRESS,
+        chainId: base.id,
       });
 
       return Number(balance.formatted);

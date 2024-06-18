@@ -31,16 +31,16 @@
             :class="$q.screen.gt.sm ? 'btn-gradient' : 'float-right q-pa-sm'"
             :icon="$q.screen.gt.sm ? undefined : 'img:icons/svg/star.svg'"
             :text-color="$q.screen.gt.sm ? 'white' : 'black'"
-            :to="{
-              name: 'tokens-detail',
-              params: { address: account.address.value },
-            }"
             no-caps
             rounded
             unelevated
           >
+            <!--            :to="{-->
+            <!--              name: 'tokens-detail',-->
+            <!--              params: { address: account.address.value },-->
+            <!--            }"-->
             <span :key="account.address.value"
-              >{{ addressPoints.toFixed(0) }} <span v-if="$q.screen.gt.sm">$LTAI</span></span
+              >{{ accountStore.ltaiBalance.toFixed(0) }} <span v-if="$q.screen.gt.sm">$LTAI</span></span
             >
           </q-btn>
           <!-- model selector -->
@@ -188,6 +188,7 @@ import ModelSelector from 'src/components/ModelSelector.vue';
 import UserSettingsDialog from 'components/UserSettingsDialog.vue';
 import { useAccount } from '@wagmi/vue';
 import ToggleTheme from 'components/ToggleTheme.vue';
+import { useAccountStore } from 'stores/account';
 
 const leftDrawerOpen = ref(false);
 // Control whether the advanced persona customization is shown
@@ -198,6 +199,7 @@ const deleteChatId = ref<string | null>(null);
 
 // Setup Stores
 const chatsStore = useChatsStore();
+const accountStore = useAccountStore();
 const points = usePointsStore();
 
 const account = useAccount();
