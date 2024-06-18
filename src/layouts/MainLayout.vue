@@ -174,12 +174,11 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
 // Import State
 import { useChatsStore } from 'stores/chats-store';
-import { usePointsStore } from 'stores/points';
 import { useRoute, useRouter } from 'vue-router';
 
 // Import Components
@@ -200,7 +199,6 @@ const deleteChatId = ref<string | null>(null);
 // Setup Stores
 const chatsStore = useChatsStore();
 const accountStore = useAccountStore();
-const points = usePointsStore();
 
 const account = useAccount();
 
@@ -210,13 +208,13 @@ const route = useRoute();
 // Reference to the chat-store state
 const { chats } = storeToRefs(chatsStore);
 
-const addressPoints = computed(() => {
-  if (account.isConnected.value) {
-    return points.getAddressRealtimePoints(account.address.value);
-  } else {
-    return 0;
-  }
-});
+// const addressPoints = computed(() => {
+//   if (account.isConnected.value) {
+//     return points.getAddressRealtimePoints(account.address.value);
+//   } else {
+//     return 0;
+//   }
+// });
 
 // Delete a chat
 async function deleteChat(chatId: string) {
