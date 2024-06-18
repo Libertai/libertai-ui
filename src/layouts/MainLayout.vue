@@ -23,9 +23,9 @@
             no-caps
             rounded
             text-color="primary"
-            to="/tokens"
             unelevated
           />
+          <!--            to="/tokens"-->
           <q-btn
             v-else
             :class="$q.screen.gt.sm ? 'btn-gradient' : 'float-right q-pa-sm'"
