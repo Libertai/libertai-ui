@@ -60,34 +60,34 @@
 
         <div class="tw-grid tw-grid-cols-5 tw-gap-x-4 tw-w-40 tw-mx-auto">
           <q-btn unelevated @click="startChatWithPersona(persona)">
-            <q-icon size="sm">
+            <q-icon size="xs">
               <img alt="new chat" src="/icons/svg/chat.svg" />
             </q-icon>
             <q-tooltip>New chat</q-tooltip>
           </q-btn>
 
           <q-btn :disabled="!persona.allowEdit" unelevated @click="startEditingPersona(persona)">
-            <q-icon size="sm">
+            <q-icon size="xs">
               <img :src="`icons/svg/settings.svg`" alt="settings" />
             </q-icon>
             <q-tooltip>Edit persona</q-tooltip>
           </q-btn>
 
           <q-btn disabled unelevated>
-            <q-icon size="sm">
+            <q-icon size="xs">
               <img alt="export" src="/icons/svg/download.svg" />
             </q-icon>
             <q-tooltip>Export (soon for token holders)</q-tooltip>
           </q-btn>
 
           <q-btn v-if="persona.allowEdit" unelevated @click="deletePersona(persona)">
-            <q-icon size="sm">
+            <q-icon size="xs">
               <img alt="delete" src="/icons/svg/delete.svg" />
             </q-icon>
             <q-tooltip>Delete</q-tooltip>
           </q-btn>
           <q-btn v-else unelevated @click="reversePersonaVisibility(persona)">
-            <q-icon size="sm">
+            <q-icon size="xs">
               <img v-if="persona.hidden" alt="hide" src="/icons/svg/show.svg" />
               <img v-else alt="hide" src="/icons/svg/hide.svg" />
             </q-icon>
@@ -103,7 +103,7 @@
               }
             "
           >
-            <q-icon size="sm">
+            <q-icon size="xs">
               <img alt="duplicate" src="/icons/svg/duplicate.svg" />
             </q-icon>
             <q-tooltip>Duplicate</q-tooltip>
