@@ -1,5 +1,5 @@
 <template>
-  <div class="avatar-wrapper" @click="$refs.userAvatarUpload.click()">
+  <div class="avatar-wrapper" @click="($refs.userAvatarUpload as any).click()">
     <q-avatar>
       <input
         ref="userAvatarUpload"
@@ -8,7 +8,8 @@
         type="file"
         @change="
           async (event) => {
-            const file = event.target.files[0];
+            const target = event.target as HTMLInputElement;
+            const file = (target.files as FileList)[0];
             if (!file) {
               return;
             }
@@ -33,7 +34,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { getPersonaAvatarUrl } from 'src/utils/personas';
 import { useAccountStore } from 'stores/account';
 

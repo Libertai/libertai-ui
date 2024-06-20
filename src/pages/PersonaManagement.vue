@@ -38,8 +38,17 @@
         "
       />
 
-      <q-btn disabled icon="img:icons/svg/import.svg" label="Import persona" no-caps rounded unelevated>
-        <q-tooltip>Soon for token holders</q-tooltip>
+      <input ref="importPersonaUpload" accept="*.json" hidden type="file" @change="importPersona" />
+      <q-btn
+        :disabled="accountStore.ltaiBalance < 100"
+        icon="img:icons/svg/import.svg"
+        label="Import persona"
+        no-caps
+        rounded
+        unelevated
+        @click="($refs['importPersonaUpload'] as any).click()"
+      >
+        <q-tooltip v-if="tokenGatingMessage !== undefined">{{ `(${tokenGatingMessage})` }}</q-tooltip>
       </q-btn>
     </div>
 
@@ -73,11 +82,12 @@
             <q-tooltip>Edit persona</q-tooltip>
           </q-btn>
 
-          <q-btn disabled unelevated>
+          <q-btn :disabled="accountStore.ltaiBalance < 100" unelevated @click="exportPersona(persona)">
             <q-icon size="xs">
               <img alt="export" src="/icons/svg/download.svg" />
             </q-icon>
-            <q-tooltip>Export (soon for token holders)</q-tooltip>
+            <q-tooltip v-if="tokenGatingMessage === undefined">Export</q-tooltip>
+            <q-tooltip v-else>{{ `Export (${tokenGatingMessage})` }}</q-tooltip>
           </q-btn>
 
           <q-btn v-if="persona.allowEdit" unelevated @click="deletePersona(persona)">
@@ -94,15 +104,7 @@
             <q-tooltip>Hide</q-tooltip>
           </q-btn>
 
-          <q-btn
-            unelevated
-            @click="
-              () => {
-                basePersonaCreate = JSON.parse(JSON.stringify(persona));
-                createPersona = true;
-              }
-            "
-          >
+          <q-btn unelevated @click="duplicatePersona">
             <q-icon size="xs">
               <img alt="duplicate" src="/icons/svg/duplicate.svg" />
             </q-icon>
@@ -116,18 +118,26 @@
 
 <script lang="ts" setup>
 import { usePersonasStore } from 'stores/personas-store';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import { getPersonaAvatarUrl, Persona } from 'src/utils/personas';
 import PersonaDialog from 'src/components/PersonaDialog.vue';
+import { useAccountStore } from 'stores/account';
+import { exportFile } from 'quasar';
+import { getTokenGatingMessage } from 'src/utils/messages';
+import { z } from 'zod';
+import { BasePersonaDialogProp } from 'components/PersonaDialog.vue';
 
 const personasStore = usePersonasStore();
+const accountStore = useAccountStore();
 const router = useRouter();
 
 const createPersona = ref(false);
 const editPersona = ref(false);
-const basePersonaCreate = ref<Persona | undefined>(undefined);
+const basePersonaCreate = ref<BasePersonaDialogProp | undefined>(undefined);
+
+const tokenGatingMessage = computed(() => getTokenGatingMessage(accountStore.ltaiBalance, 100));
 
 const startChatWithPersona = (persona: Persona) => {
   personasStore.persona = persona;
@@ -137,6 +147,11 @@ const startChatWithPersona = (persona: Persona) => {
 const startEditingPersona = (persona: Persona) => {
   personasStore.persona = persona;
   editPersona.value = true;
+};
+
+const duplicatePersona = (persona: Persona) => {
+  basePersonaCreate.value = JSON.parse(JSON.stringify(persona));
+  createPersona.value = true;
 };
 
 const deletePersona = (persona: Persona) => {
@@ -153,6 +168,62 @@ const reversePersonaVisibility = (persona: Persona) => {
     }
     return userPersona;
   });
+};
+
+const personaExportImportSchema = z.object({
+  data: z.object({
+    description: z.string(),
+    name: z.string(),
+    avatar: z.union([
+      z.object({
+        item_hash: z.string(),
+        ipfs_hash: z.string(),
+      }),
+      z.string().url(),
+    ]),
+  }),
+});
+type PersonaExportImportSchema = z.infer<typeof personaExportImportSchema>;
+
+const exportPersona = (persona: Persona) => {
+  // Avoid breaking changes on this format as much as possible to avoid breaking import of already exported files
+  const jsonData: PersonaExportImportSchema = {
+    data: {
+      description: persona.description,
+      name: persona.name,
+      avatar: persona.avatar,
+    },
+  };
+
+  const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
+    type: 'application/json',
+  });
+
+  exportFile(`libertai_persona_${persona.name}.json`, blob);
+};
+
+const importPersona = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = (target.files as FileList)[0];
+
+  const reader = new FileReader();
+
+  reader.onload = (e) => {
+    const result = JSON.parse(e.target!.result as string);
+    const parsedFile = personaExportImportSchema.safeParse(result);
+
+    if (!parsedFile.success) {
+      console.error(parsedFile.error);
+      return;
+    }
+
+    const avatar = typeof parsedFile.data.data.avatar === 'string' ? undefined : parsedFile.data.data.avatar;
+    const personaData = { ...parsedFile.data.data, avatar };
+
+    basePersonaCreate.value = personaData;
+    createPersona.value = true;
+  };
+  reader.readAsText(file);
 };
 </script>
 
