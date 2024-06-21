@@ -47,7 +47,7 @@
           label="Confirm"
           rounded
           text-color="white"
-          @click="emit('savePersona', { ...basePersona, name, description, avatar: toRaw(avatar) })"
+          @click="emit('savePersona', { ...basePersona, name, description, avatar: toRaw(avatar), label: name })"
         />
       </q-card-section>
     </q-card>
@@ -102,9 +102,5 @@ watch(
       item_hash: '90db3237796d27118e0b9e21dae10a4b1179878f869cb6c0058d0d7c00b0440d',
       ipfs_hash: 'QmQMBfgnmuxcQ4kptR1oPE9guYxG13GpASjYVeFQSxNxjE',
     }),
-);
-watch(
-  () => name.value,
-  () => (props.basePersona.label = name.value),
 );
 </script>

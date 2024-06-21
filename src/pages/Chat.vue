@@ -175,7 +175,6 @@ import MessageInput from 'src/components/MessageInput.vue';
 import axios from 'axios';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
 import { useSettingsStore } from 'stores/settings';
-//import { useAccount } from '@wagmi/vue';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -198,8 +197,6 @@ const enableEditRef = ref(false);
 const enableKnowledgeRef = ref(false);
 const showKnowledgeUploaderRef = ref(false);
 const attachmentsRef = ref([]);
-
-//const account = useAccount();
 
 // Chat specific state
 const chatRef = ref();
