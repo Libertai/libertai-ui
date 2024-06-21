@@ -74,7 +74,6 @@ const emit = defineEmits(['savePersona']);
 // Form values
 // const username = ref(settingsStore.username);
 const name = ref(props.basePersona?.name ?? '');
-const label = ref(props.basePersona?.label ?? '');
 const description = ref(props.basePersona?.description ?? '');
 const avatar = ref(
   props.basePersona?.avatar ?? {
@@ -106,6 +105,6 @@ watch(
 );
 watch(
   () => name.value,
-  () => (props.basePersona.label = name.value)
+  () => (props.basePersona.label = name.value),
 );
 </script>
