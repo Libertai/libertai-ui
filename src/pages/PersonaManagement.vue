@@ -13,7 +13,7 @@
       />
       <persona-dialog
         v-model="createPersona"
-        :base-persona="basePersonaCreate"
+        v-model:base-persona="basePersonaCreate"
         title="Create persona"
         @save-persona="
           (persona: Persona) => {
@@ -23,7 +23,7 @@
       />
       <persona-dialog
         v-model="editPersona"
-        :base-persona="personasStore.persona"
+        v-model:base-persona="personasStore.persona"
         @save-persona="
           (persona: Persona) => {
             personasStore.persona = persona;
