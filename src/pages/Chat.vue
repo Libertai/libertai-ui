@@ -32,7 +32,7 @@
             </q-popup-edit>
             <!-- Display the role of the user or the AI -->
             <q-item-label class="text-semibold q-mb-md">
-              {{ message.role }}
+              {{ message.role.replace('assistant', 'Libertai Assistant (default)') }}
               <span class="bull-date">{{ formatDate(message.timestamp) }}</span>
             </q-item-label>
             <!-- Display any attachments -->

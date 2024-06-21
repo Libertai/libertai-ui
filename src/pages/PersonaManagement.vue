@@ -52,7 +52,7 @@
         <q-avatar class="tw-w-24 tw-h-24 tw-mx-auto">
           <img :src="getPersonaAvatarUrl(persona.avatar.ipfs_hash)" alt="avatar" />
         </q-avatar>
-        <q-card-section class="text-bold">{{ persona.name }}</q-card-section>
+        <q-card-section class="text-bold">{{ persona.label }}</q-card-section>
 
         <p class="persona-description">
           {{ persona.description }}

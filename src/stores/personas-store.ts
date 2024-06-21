@@ -25,6 +25,7 @@ export const usePersonasStore = defineStore('personas', {
           ...currentPersona,
           avatar: matchingDefault.avatar,
           name: matchingDefault.name,
+          label: matchingDefault.label,
           description: matchingDefault.description,
         };
       });

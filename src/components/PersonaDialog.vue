@@ -74,6 +74,7 @@ const emit = defineEmits(['savePersona']);
 // Form values
 // const username = ref(settingsStore.username);
 const name = ref(props.basePersona?.name ?? '');
+const label = ref(props.basePersona?.label ?? '');
 const description = ref(props.basePersona?.description ?? '');
 const avatar = ref(
   props.basePersona?.avatar ?? {
@@ -102,5 +103,9 @@ watch(
       item_hash: '90db3237796d27118e0b9e21dae10a4b1179878f869cb6c0058d0d7c00b0440d',
       ipfs_hash: 'QmQMBfgnmuxcQ4kptR1oPE9guYxG13GpASjYVeFQSxNxjE',
     }),
+);
+watch(
+  () => name.value,
+  () => (props.basePersona.label = name.value)
 );
 </script>
