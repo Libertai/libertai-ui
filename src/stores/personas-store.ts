@@ -14,9 +14,9 @@ export const usePersonasStore = defineStore('personas', {
   },
   actions: {
     refreshDefaultPersonas: () => {
-      const test = usePersonasStore();
+      const store = usePersonasStore();
 
-      test.personas = test.personas.map((currentPersona) => {
+      store.personas = store.personas.map((currentPersona) => {
         const matchingDefault = defaultPersonas.find((p) => currentPersona.id === p.id);
         if (!matchingDefault) {
           return currentPersona;
@@ -25,6 +25,7 @@ export const usePersonasStore = defineStore('personas', {
           ...currentPersona,
           avatar: matchingDefault.avatar,
           name: matchingDefault.name,
+          role: matchingDefault.role,
           description: matchingDefault.description,
         };
       });

@@ -6,6 +6,7 @@ export type Persona = {
     ipfs_hash: string;
   };
   name: string;
+  role: string;
   description: string;
   allowEdit: boolean;
   hidden: boolean;
@@ -18,7 +19,8 @@ export const defaultPersonas: Persona[] = [
       item_hash: '90db3237796d27118e0b9e21dae10a4b1179878f869cb6c0058d0d7c00b0440d',
       ipfs_hash: 'QmQMBfgnmuxcQ4kptR1oPE9guYxG13GpASjYVeFQSxNxjE',
     },
-    name: 'LibertAI Assistant (default)',
+    name: 'Libertai Assistant (default)',
+    role: 'assistant',
     description:
       "You're an {{char}} running on a decentralized LLM based on open-source models. " +
       'You operate on a libertai.io, an inference platform on top of the aleph.im decentralized cloud. ' +
@@ -35,6 +37,7 @@ export const defaultPersonas: Persona[] = [
       ipfs_hash: 'QmaKj7nrqUiYkRp2jWRqSuYkHxhPoTstSS4eyttUeEGxF8',
     },
     name: 'Donald Tromp',
+    role: 'Donald Tromp',
     description: 'You are an AI chatbot modeled after Donald Trump. You will try to mimic his personality and speech.',
     allowEdit: false,
     hidden: false,
@@ -46,6 +49,7 @@ export const defaultPersonas: Persona[] = [
       item_hash: 'b8d3e2e9d7652ecd63fba9714704c2abe126c138d7f09c218e1752f723b8460c',
     },
     name: 'AI-lon Musk',
+    role: 'AI-lon Musk',
     description: '{{char}} is an AI chatbot modeled after Elon Musk.',
     allowEdit: false,
     hidden: false,
@@ -57,6 +61,7 @@ export const defaultPersonas: Persona[] = [
       ipfs_hash: 'QmakkAkoBrKG85ZGtZeusAdU5uSTk8YfUFxq95XsoSXLqc',
     },
     name: 'Anna the Therapist',
+    role: 'Anna the Therapist',
     description:
       '{{char}} is a licensed psychotherapist that can help with all sorts of problems and issues. ' +
       '{{char}} understands she is not role-playing and is actually giving out a therapy session over chat. ' +
@@ -76,6 +81,7 @@ export const defaultPersonas: Persona[] = [
       ipfs_hash: 'QmbvvopwBVNBs6qzjdDoemzohFd9uZoW1sobgRHXXQRhWd',
     },
     name: 'Virtual Girlfriend',
+    role: 'Virtual Girlfriend',
     description:
       '{{char}} is a very understanding woman. ' +
       '{{char}} is an AGI designed to provide the best GF experience. ' +
@@ -90,6 +96,7 @@ export const defaultPersonas: Persona[] = [
       ipfs_hash: 'QmagY37o86RZXnusM5ThMwQgcyPvSAJCWRyKhf9RmhVH8h',
     },
     name: 'Virtual Boyfriend',
+    role: 'Virtual Boyfriend',
     description:
       '{{char}} is a very understanding man. ' +
       '{{char}} is an AGI designed to provide the best Boyfriend experience. ' +
