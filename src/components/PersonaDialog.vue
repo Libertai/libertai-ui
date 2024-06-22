@@ -47,7 +47,7 @@
           label="Confirm"
           rounded
           text-color="white"
-          @click="emit('savePersona', { ...basePersona, name, description, avatar: toRaw(avatar), label: name })"
+          @click="emit('savePersona', { ...basePersona, name, description, avatar: toRaw(avatar) })"
         />
       </q-card-section>
     </q-card>

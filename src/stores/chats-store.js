@@ -399,7 +399,7 @@ class ChatsStore {
   async appendModelResponse(chatId, responseContent, searchResults) {
     const chat = await this.readChat(chatId);
     const message = {
-      role: chat.persona.name,
+      role: chat.persona.role,
       content: responseContent,
       timestamp: new Date(),
       searchResults,

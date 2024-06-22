@@ -1,7 +1,7 @@
 <template>
   <q-btn-dropdown
     :icon="'img:' + getPersonaAvatarUrl(personasStore.persona.avatar.ipfs_hash)"
-    :label="personasStore.persona.label"
+    :label="personasStore.persona.name"
     class="no-shadow rounded-img personas-dropdown q-py-sm icon-md"
     dropdown-icon="img:icons/svg/chevron-down.svg"
     no-caps
@@ -23,7 +23,7 @@
         </q-avatar>
         <q-item-section>
           <q-item-label>
-            {{ persona.label }}
+            {{ persona.name }}
           </q-item-label>
         </q-item-section>
       </q-item>

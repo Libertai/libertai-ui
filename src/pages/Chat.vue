@@ -32,7 +32,7 @@
             </q-popup-edit>
             <!-- Display the role of the user or the AI -->
             <q-item-label class="text-semibold q-mb-md">
-              {{ message.role.replace('assistant', 'Libertai Assistant (default)') }}
+              {{ message.role }}
               <span class="bull-date">{{ formatDate(message.timestamp) }}</span>
             </q-item-label>
             <!-- Display any attachments -->
@@ -375,7 +375,7 @@ async function generatePersonaMessage() {
     for await (const output of inferenceEngine.generateAnswer(
       allMessages,
       model,
-      persona,
+      { ...persona, name: persona.role ?? persona.name },
       // Set the target to the user
       username,
       // set to false to disable logging

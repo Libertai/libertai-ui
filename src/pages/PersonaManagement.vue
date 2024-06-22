@@ -13,7 +13,7 @@
       />
       <persona-dialog
         v-model="createPersona"
-        v-model:base-persona="basePersonaCreate"
+        base-persona="basePersonaCreate"
         title="Create persona"
         @save-persona="
           (persona: Persona) => {
@@ -23,7 +23,7 @@
       />
       <persona-dialog
         v-model="editPersona"
-        v-model:base-persona="personasStore.persona"
+        base-persona="personasStore.persona"
         @save-persona="
           (persona: Persona) => {
             personasStore.persona = persona;
@@ -52,7 +52,7 @@
         <q-avatar class="tw-w-24 tw-h-24 tw-mx-auto">
           <img :src="getPersonaAvatarUrl(persona.avatar.ipfs_hash)" alt="avatar" />
         </q-avatar>
-        <q-card-section class="text-bold">{{ persona.label }}</q-card-section>
+        <q-card-section class="text-bold">{{ persona.name }}</q-card-section>
 
         <p class="persona-description">
           {{ persona.description }}
