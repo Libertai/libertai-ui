@@ -7,10 +7,10 @@
       no-caps
       rounded
       unelevated
-      @click="connect({ connector: injected() })"
+      @click="connect({ connector: config.connectors[0] })"
     >
       <q-icon class="text-dark" left size="xs">
-        <img src="~assets/wallet.svg" />
+        <img alt="wallet" src="~assets/wallet.svg" />
       </q-icon>
       Connect Wallet
     </q-btn>
@@ -48,7 +48,6 @@
 <script lang="ts" setup>
 import { useAccountStore } from 'stores/account';
 import { useAccount, useConnect, useDisconnect } from '@wagmi/vue';
-import { injected } from '@wagmi/connectors';
 import { watchAccount } from '@wagmi/vue/actions';
 import { config } from 'src/config/wagmi';
 import { watchEffect } from 'vue';
