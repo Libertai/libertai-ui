@@ -23,7 +23,7 @@
     "@aleph-sdk/client": "^1.0.6",
     "@aleph-sdk/ethereum": "^1.0.3",
     "@aleph-sdk/message": "^1.0.7",
-    "@libertai/libertai-js": "0.0.4",
+    "@libertai/libertai-js": "0.0.5",
     "@quasar/extras": "^1.16.11",
     "@tanstack/vue-query": "^5.45.0",
     "@wagmi/vue": "^0.0.18",
