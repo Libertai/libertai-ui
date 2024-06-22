@@ -6,7 +6,7 @@ export type Persona = {
     ipfs_hash: string;
   };
   name: string;
-  label: string;
+  role: string;
   description: string;
   allowEdit: boolean;
   hidden: boolean;
