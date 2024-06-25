@@ -94,9 +94,9 @@ export const defaultModels = [
     },
   },
 
-  // DeepSeek Coder (6.7B, developer)
+  // DeepSeek Coder V2 (6.7B, developer)
   {
-    name: 'DeepSeek Coder (6.7B, developer)',
+    name: 'DeepSeek Coder V2 (6.7B, developer)',
     ...modelDefaults,
     apiUrl:
       'https://curated.aleph.cloud/vm/b950fef19b109ef3770c89eb08a03b54016556c171b9a32475c085554b594c94/completion',
