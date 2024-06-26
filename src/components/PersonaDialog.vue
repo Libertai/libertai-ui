@@ -55,8 +55,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, toRaw, watch } from 'vue';
+import { PropType, ref, toRaw, watch } from 'vue';
 import AlephAvatar from 'components/AlephAvatar.vue';
+import { Persona } from 'src/utils/personas';
+
+export type BasePersonaDialogProp = Partial<Pick<Persona, 'name' | 'description' | 'avatar'>>;
 
 const props = defineProps({
   title: {
@@ -64,7 +67,7 @@ const props = defineProps({
     default: 'Customize persona',
   },
   basePersona: {
-    type: Object,
+    type: Object as PropType<Persona>,
     required: false,
     default: undefined,
   },

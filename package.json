@@ -42,7 +42,8 @@
     "viem": "^2.14.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0",
-    "web3": "^4.9.0"
+    "web3": "^4.9.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@quasar/app-vite": "^1.9.3",
