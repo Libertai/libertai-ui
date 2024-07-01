@@ -28,7 +28,7 @@
             </div>
 
             <div class="col-4">
-              <span class="text-h4 text-bold">{{ points.getAddressPoints(address).toFixed(2) }}</span>
+              <span class="text-h4 text-bold">{{ tokensStore.getAddressTokens(address).toFixed(2) }}</span>
             </div>
           </q-card-section>
         </q-card>
@@ -36,7 +36,9 @@
           <q-card-section class="bg-purple-50 q-pa-xl">
             <p class="text-h6 text-bold text-left">Pending $LTAI</p>
             <p class="q-py-md text-right">
-              <span class="text-h4 text-bold rounded">{{ currentPendingPoints.toFixed(2) }}</span>
+              <span class="text-h4 text-bold rounded">{{
+                tokensStore.getAddressPendingTokens(address).toFixed(2)
+              }}</span>
             </p>
           </q-card-section>
         </q-card>
@@ -44,11 +46,12 @@
           <q-card-section class="bg-purple-50 q-pa-xl">
             <p class="text-h6 text-bold text-left">36 Month estimated $LTAI*</p>
             <p class="q-py-md text-right">
-              <span class="text-h4 text-bold rounded">{{ ThreeYearsPoints.toFixed(2) }}</span>
+              <span class="text-h4 text-bold rounded">{{
+                tokensStore.getAddress3yrEstimatedTokens(address).toFixed(2)
+              }}</span>
             </p>
           </q-card-section>
         </q-card>
-        <p :class="$q.dark.mode ? 'text-white' : ''">You are getting {{ hourlyRate.toFixed(2) }} $LTAI per hour.</p>
         <p class="text-grey text-center col-12">
           * Estimate only, and under current rules, if your participation stays at the same level. <br />
           The availability of $LTAI tokens is subject to change without notice. We may suspend, modify, or terminate the
@@ -60,46 +63,37 @@
   </q-scroll-area>
 </template>
 
-<script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+<script lang="ts" setup>
+import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { usePointsStore } from 'stores/points';
+import { useTokensStore } from 'stores/tokens';
 import { ethers } from 'ethers';
 import { useAccount } from '@wagmi/vue';
 
 const route = useRoute();
 const router = useRouter();
-const points = usePointsStore();
+const tokensStore = useTokensStore();
 
 const account = useAccount();
 
 // got address as an address part from vue router
-const address = ref(ethers.utils.getAddress(route.params.address));
-let interval = null;
+const address = ref(ethers.utils.getAddress(route.params.address as string));
 
 onMounted(async () => {
-  if (Object.keys(points.points).length === 0) {
-    await points.update();
-    updatePoints();
+  if (Object.keys(tokensStore.tokens).length === 0) {
+    await tokensStore.update();
   }
-  interval = setInterval(() => {
-    updatePoints();
-  }, 1000);
-});
-
-onBeforeUnmount(() => {
-  clearInterval(interval);
 });
 
 watch(
-  () => route.params.address,
-  async (newAddress) => {
+  () => route.params.address as string,
+  async (newAddress: string) => {
     address.value = ethers.utils.getAddress(newAddress);
   },
 );
 watch(
-  () => account.address.value,
-  async (newAddress, oldAddress) => {
+  () => account.address.value as string,
+  async (newAddress: string, oldAddress: string) => {
     if (oldAddress === address.value) {
       await router.push({
         name: 'tokens-detail',
@@ -108,56 +102,4 @@ watch(
     }
   },
 );
-
-const currentPendingPoints = ref(0);
-const hourlyRate = ref(0);
-
-function updatePoints() {
-  const pendingInfo = points.getAddressRealtimePendingPointsInfo(address.value);
-  hourlyRate.value = pendingInfo.hourlyRate;
-  currentPendingPoints.value = pendingInfo.pending;
-}
-
-const ThreeYearsPoints = computed(() => {
-  const currentTime = Math.floor(Date.now() / 1000); // Get current timestamp in seconds
-  const pendingPoints = points.getAddressPendingPoints(address.value);
-  const currentPoints = points.getAddressPoints(address.value);
-  const firstTime = points.info.first_time;
-  const lastTime = points.info.last_time;
-  const pendingTime = points.info.pending_time;
-  const reward_start = points.info.reward_start;
-  const totalDuration = pendingTime - lastTime;
-  const currentTimeSinceStart = currentTime - reward_start;
-  const daily_decay = points.info.daily_decay;
-  const initial_ratio = points.info.ratio;
-
-  const current_decay = daily_decay ** (currentTimeSinceStart / 86400);
-  const current_ratio = initial_ratio * current_decay;
-  // we extrapolate on what would a 10 days distribution be
-  let current_base = ((pendingPoints / totalDuration) * 3600 * 24 * 10) / current_ratio;
-  if (current_base < 0) {
-    // something is fishy
-    current_base = ((currentPoints / (lastTime - firstTime)) * 3600 * 24 * 10) / current_ratio;
-  }
-
-  const distributions = (365 * 3) / 10;
-  let total = currentPoints;
-  for (let i = 0; i < distributions; i++) {
-    const time = reward_start + i * 10 * 24 * 3600;
-    // if time is less than last time, we pass
-    if (time < lastTime) {
-      continue;
-    }
-    // code in python:
-    // days_since_start = (reward_time - settings['reward_start_ts']) / 86400
-    // print(f"Processing rewards for {reward_time} ({days_since_start} days since start)")
-    // decay = settings['daily_decay'] ** int((reward_time - settings['reward_start_ts']) / 86400)
-
-    const days_since_start = (time - reward_start) / 86400;
-    const decay = daily_decay ** days_since_start;
-    const ratio = initial_ratio * decay;
-    total += current_base * ratio;
-  }
-  return total;
-});
 </script>

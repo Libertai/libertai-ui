@@ -23,22 +23,22 @@
             no-caps
             rounded
             text-color="primary"
+            to="/tokens"
             unelevated
           />
-          <!--            to="/tokens"-->
           <q-btn
             v-else
             :class="$q.screen.gt.sm ? 'btn-gradient' : 'float-right q-pa-sm'"
             :icon="$q.screen.gt.sm ? undefined : 'img:icons/svg/star.svg'"
             :text-color="$q.screen.gt.sm ? 'white' : 'black'"
+            :to="{
+              name: 'tokens-detail',
+              params: { address: account.address.value },
+            }"
             no-caps
             rounded
             unelevated
           >
-            <!--            :to="{-->
-            <!--              name: 'tokens-detail',-->
-            <!--              params: { address: account.address.value },-->
-            <!--            }"-->
             <span :key="account.address.value"
               >{{ accountStore.ltaiBalance.toFixed(0) }} <span v-if="$q.screen.gt.sm">$LTAI</span></span
             >

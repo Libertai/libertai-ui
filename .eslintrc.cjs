@@ -56,7 +56,7 @@ module.exports = {
   rules: {
     'prefer-promise-reject-errors': 'off',
 
-    'no-undef': 'warn',
+    'no-undef': 'off',
     'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
 
     // allow debugger during development only

@@ -88,7 +88,7 @@
               <template #hint>Enter an address to check if there are $LTAI tokens associated with it.</template>
             </q-input>
             <div v-if="addressVerifier(address) === true" class="text-h6 text-bold q-pa-lg">
-              <div v-if="points.getAddressPoints(address) === 0">
+              <div v-if="tokensStore.getAddressTokens(address) === 0">
                 You have no $LTAI so far. You can still earn $LTAI by staking ALEPH or running a node!
               </div>
               <div v-else>
@@ -110,20 +110,21 @@
   </q-scroll-area>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { nextTick, onMounted, ref } from 'vue';
-import { usePointsStore } from 'stores/points';
+import { useTokensStore } from 'stores/tokens';
 import { ethers } from 'ethers';
 
-const points = usePointsStore();
+const tokensStore = useTokensStore();
 const address = ref('');
+
 onMounted(async () => {
-  if (Object.keys(points.points).length === 0) {
-    points.update();
+  if (Object.keys(tokensStore.tokens).length === 0) {
+    await tokensStore.update();
   }
 });
 
-function addressVerifier(val) {
+function addressVerifier(val: string) {
   // Throws if a checksummed address is provided, but a
   // letter is the wrong case
   try {
@@ -139,5 +140,5 @@ function addressVerifier(val) {
   }
 }
 
-const addressRules = [(val) => (val && val.length > 0) || 'Please type something', addressVerifier];
+const addressRules = [(val: string) => (val && val.length > 0) || 'Please type something', addressVerifier];
 </script>

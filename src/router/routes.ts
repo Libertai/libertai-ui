@@ -16,12 +16,12 @@ const routes = [
         name: 'chat',
         component: () => import('pages/Chat.vue'),
       },
-      // { path: 'tokens', component: () => import('pages/TokensInfo.vue') },
-      // {
-      //   path: 'tokens/:address',
-      //   name: 'tokens-detail',
-      //   component: () => import('pages/TokensDetail.vue'),
-      // },
+      { path: 'tokens', component: () => import('pages/TokensInfo.vue') },
+      {
+        path: 'tokens/:address',
+        name: 'tokens-detail',
+        component: () => import('pages/TokensDetail.vue'),
+      },
       // knowledge db
       {
         path: 'knowledge-db',
