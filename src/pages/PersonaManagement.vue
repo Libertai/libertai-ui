@@ -104,7 +104,7 @@
             <q-tooltip>Hide</q-tooltip>
           </q-btn>
 
-          <q-btn unelevated @click="duplicatePersona">
+          <q-btn unelevated @click="duplicatePersona(persona)">
             <q-icon size="xs">
               <img alt="duplicate" src="/icons/svg/duplicate.svg" />
             </q-icon>
@@ -117,7 +117,7 @@
 </template>
 
 <script lang="ts" setup>
-import { usePersonasStore } from 'stores/personas-store';
+import { usePersonasStore } from 'stores/personas';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';

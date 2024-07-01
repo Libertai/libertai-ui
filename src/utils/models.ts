@@ -18,10 +18,16 @@ export const modelDefaults = {
   promptFormat: promptFormatDefaults,
 };
 
+type Model = {
+  name: string;
+  apiUrl: string;
+  premium: boolean;
+} & typeof modelDefaults;
+
 /*
  * Default Models Configuration
  */
-export const defaultModels = [
+export const defaultModels: Model[] = [
   // Mixtral
   {
     name: 'Nous Hermes 2 Pro (Llama 3 8B, fast)',
@@ -29,6 +35,7 @@ export const defaultModels = [
     apiUrl:
       'https://curated.aleph.cloud/vm/84df52ac4466d121ef3bb409bb14f315de7be4ce600e8948d71df6485aa5bcc3/completion',
     promptFormat: promptFormatDefaults,
+    premium: false,
   },
 
   // NeuralBeagle
@@ -48,6 +55,7 @@ export const defaultModels = [
     temperature: 0.8,
     // Set custom chatML settings
     promptFormat: promptFormatDefaults,
+    premium: false,
   },
 
   // Mixtral
@@ -57,6 +65,7 @@ export const defaultModels = [
     apiUrl:
       'https://curated.aleph.cloud/vm/cb6a4ae6bf93599b646aa54d4639152d6ea73eedc709ca547697c56608101fc7/completion',
     promptFormat: promptFormatDefaults,
+    premium: false,
   },
 
   // Nous Hermes 2
@@ -66,6 +75,7 @@ export const defaultModels = [
     apiUrl:
       'https://curated.aleph.cloud/vm/16a9f0f870c251719a0c63554cf02b6b8e4c2b4fee9987ddc3341a6507aef68d/completion',
     promptFormat: promptFormatDefaults,
+    premium: false,
   },
 
   // Llama 3 Instruct (70B, genius, slow)
@@ -92,6 +102,7 @@ export const defaultModels = [
       stopSequence: '<|eot_id|>',
       additionalStopSequences: ['<|eot_id|>', '<|endoftext|>', '<|'],
     },
+    premium: true,
   },
 
   // DeepSeek Coder V2 (6.7B, developer)
@@ -103,5 +114,6 @@ export const defaultModels = [
     // Allow a larger prompt length
     maxTokens: 16384,
     promptFormat: promptFormatDefaults,
+    premium: false,
   },
 ];

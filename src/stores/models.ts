@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-import { defaultModels } from '../utils/models.ts';
+import { defaultModels } from '../utils/models';
 
 export const useModelsStore = defineStore('models', {
   state: () => ({
@@ -8,9 +8,9 @@ export const useModelsStore = defineStore('models', {
     selectedModel: defaultModels[0],
   }),
   actions: {
-    setModelByURL(modelUrl) {
+    setModelByURL(modelUrl: string) {
       for (let model of defaultModels)
-        if (model.apiUrl == modelUrl) {
+        if (model.apiUrl === modelUrl) {
           this.selectedModel = model;
         }
     },

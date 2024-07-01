@@ -67,7 +67,7 @@ const props = defineProps({
     default: 'Customize persona',
   },
   basePersona: {
-    type: Object as PropType<Persona>,
+    type: Object as PropType<BasePersonaDialogProp>,
     required: false,
     default: undefined,
   },

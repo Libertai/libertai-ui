@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts" setup>
-import { usePersonasStore } from 'stores/personas-store';
+import { usePersonasStore } from 'stores/personas';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
 
 const personasStore = usePersonasStore();

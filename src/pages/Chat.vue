@@ -165,9 +165,9 @@ import { LlamaCppApiEngine } from '@libertai/libertai-js';
 
 // Local state
 import { useChatsStore } from 'src/stores/chats-store';
-import { useModelsStore } from 'stores/models-store';
+import { useModelsStore } from 'stores/models';
 import { useKnowledgeStore } from 'src/stores/knowledge-store';
-import { usePersonasStore } from 'stores/personas-store';
+import { usePersonasStore } from 'stores/personas';
 
 // Components
 import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
