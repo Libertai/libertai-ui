@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 import { onMounted } from 'vue';
-import { useChatsStore } from 'stores/chats-store';
+import { useChatsStore } from 'stores/chats';
 import { useKnowledgeStore } from 'stores/knowledge-store';
 
 const chatsStore = useChatsStore();

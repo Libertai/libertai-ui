@@ -4,12 +4,12 @@ export function createStore(name: string): LocalForage {
   return localforage.createInstance({ name });
 }
 
-export async function put(id: string, item: any, store: LocalForage): Promise<any> {
+export async function put<T>(id: string, item: T, store: LocalForage): Promise<T> {
   return store.setItem(id, item);
 }
 
-export async function get(id: string, store: LocalForage): Promise<any> {
-  const item = await store.getItem(id);
+export async function get<T>(id: string, store: LocalForage): Promise<T | null> {
+  const item = await store.getItem<T>(id);
   // Check if item is null
   if (item === null) {
     return null;

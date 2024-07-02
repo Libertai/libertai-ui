@@ -164,7 +164,7 @@ import { defaultChatTopic, inferChatTopic } from 'src/utils/chat';
 import { LlamaCppApiEngine } from '@libertai/libertai-js';
 
 // Local state
-import { useChatsStore } from 'src/stores/chats-store';
+import { useChatsStore } from 'stores/chats';
 import { useModelsStore } from 'stores/models';
 import { useKnowledgeStore } from 'src/stores/knowledge-store';
 import { usePersonasStore } from 'stores/personas';

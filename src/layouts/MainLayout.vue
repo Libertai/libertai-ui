@@ -178,7 +178,7 @@ import { nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
 // Import State
-import { useChatsStore } from 'stores/chats-store';
+import { useChatsStore } from 'stores/chats';
 import { useRoute, useRouter } from 'vue-router';
 
 // Import Components

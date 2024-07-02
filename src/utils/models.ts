@@ -1,3 +1,5 @@
+import { Model } from '@libertai/libertai-js';
+
 export const promptFormatDefaults = {
   userPrepend: '<|im_start|>',
   userAppend: '\n',
@@ -18,16 +20,12 @@ export const modelDefaults = {
   promptFormat: promptFormatDefaults,
 };
 
-type Model = {
-  name: string;
-  apiUrl: string;
-  premium: boolean;
-} & typeof modelDefaults;
+export type UIModel = Model & { premium: boolean };
 
 /*
  * Default Models Configuration
  */
-export const defaultModels: Model[] = [
+export const defaultModels: UIModel[] = [
   // Mixtral
   {
     name: 'Nous Hermes 2 Pro (Llama 3 8B, fast)',

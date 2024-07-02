@@ -1,9 +1,14 @@
 import { defineStore } from 'pinia';
 
-import { defaultModels } from '../utils/models';
+import { defaultModels, UIModel } from '../utils/models';
+
+type ModelsStoreState = {
+  models: UIModel[];
+  selectedModel: UIModel;
+};
 
 export const useModelsStore = defineStore('models', {
-  state: () => ({
+  state: (): ModelsStoreState => ({
     models: defaultModels,
     selectedModel: defaultModels[0],
   }),
