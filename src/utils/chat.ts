@@ -63,4 +63,5 @@ export async function inferChatTopic(input: string) {
     console.error('Error during completion:', error);
     throw Error('Could not infer chat topic: {error}');
   }
+  return '';
 }

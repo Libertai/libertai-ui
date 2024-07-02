@@ -10,7 +10,9 @@ import { Persona } from 'src/utils/personas';
 const CHATS_STORE_NAME = 'chats-store';
 const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
 
-type Chat = {
+export type UIMessage = Message & { stopped?: boolean; error?: any; searchResults?: any };
+
+export type Chat = {
   id: string;
   title: string;
   username: string;
@@ -18,7 +20,7 @@ type Chat = {
 
   model: Model;
   persona: Persona;
-  messages: Message[];
+  messages: UIMessage[]; // TODO: fix and use real message from SDK
   createdAt: Date;
 };
 
