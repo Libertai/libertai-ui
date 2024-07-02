@@ -1,6 +1,6 @@
 <template>
   <q-btn-dropdown
-    :label="modelsStore.selectedModel.name.substring(0, 12) + '..'"
+    :label="selectedModel.name.substring(0, 12) + '..'"
     class="text-semibold icon-md border-primary-highlight"
     color="primary"
     dropdown-icon="img:icons/svg/chevron-down_lighten.svg"
@@ -37,9 +37,12 @@ import { useModelsStore } from 'stores/models';
 import { useAccountStore } from 'stores/account';
 import { computed } from 'vue';
 import { getTokenGatingMessage } from 'src/utils/messages';
+import { storeToRefs } from 'pinia';
 
 const modelsStore = useModelsStore();
 const accountStore = useAccountStore();
+
+const { selectedModel } = storeToRefs(modelsStore);
 
 const tokenGatingMessage = computed(() => getTokenGatingMessage(accountStore.ltaiBalance, 100));
 </script>

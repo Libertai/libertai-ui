@@ -14,5 +14,11 @@ export const useModelsStore = defineStore('models', {
           this.selectedModel = model;
         }
     },
+    unselectPremiumModel() {
+      // Remove premium selected model
+      if (this.selectedModel.premium) {
+        this.selectedModel = this.models.find((model) => !model.premium)!;
+      }
+    },
   },
 });
