@@ -18,7 +18,7 @@
               <!-- If the document is selected, show the deletion icon -->
               <q-item-section v-if="selectedDocumentId === document.id" side>
                 <q-btn-group dense flat>
-                  <q-btn icon="delete" @click="removeSelectedDocument(document.id)" />
+                  <q-btn icon="delete" @click="removeSelectedDocument" />
                   <q-tooltip>Remove Document</q-tooltip>
                 </q-btn-group>
               </q-item-section>
@@ -30,11 +30,12 @@
   </q-layout>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import { Document } from '@libertai/libertai-js';
 
-import { useKnowledgeStore } from 'src/stores/knowledge-store';
+import { useKnowledgeStore } from 'stores/knowledge';
 
 const knowledgeStore = useKnowledgeStore();
 
@@ -49,7 +50,7 @@ const { documents } = storeToRefs(knowledgeStore);
 
 // Selected document
 // const selectedDocument = ref(null);
-const selectedDocumentId = ref(null);
+const selectedDocumentId = ref<string | null>(null);
 
 // Edited document object
 // const editedDocument = ref({ title: '', description: '' });
@@ -58,7 +59,7 @@ const selectedDocumentId = ref(null);
 // const formTitle = computed(() => (selectedDocument.value ? 'Edit Document' : 'Add Document'));
 
 // On row click event handler for the table
-function onRowClick(row) {
+function onRowClick(row: Document) {
   selectedDocumentId.value = row.id;
 }
 

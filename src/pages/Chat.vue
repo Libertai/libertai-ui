@@ -166,7 +166,7 @@ import { LlamaCppApiEngine, Message } from '@libertai/libertai-js';
 // Local state
 import { Chat, UIMessage, useChatsStore } from 'stores/chats';
 import { useModelsStore } from 'stores/models';
-import { useKnowledgeStore } from 'src/stores/knowledge-store';
+import { useKnowledgeStore } from 'stores/knowledge';
 import { usePersonasStore } from 'stores/personas';
 
 // Components
@@ -336,8 +336,8 @@ async function generatePersonaMessage() {
 
     // Expand all the messages to inline any compatible attachments
     const expandedMessages = messages
-      .map((message: UIMessage) => {
-        let ret = [];
+      .map((message: UIMessage): Message[] => {
+        const ret = [];
         // Push any attachments ahead of the message
         // if (message.attachments) {
         //   message.attachments.forEach((attachment) => {
@@ -376,16 +376,14 @@ async function generatePersonaMessage() {
       .flat();
 
     // Append the search results to the messages
-    const allMessages = [...expandedMessages, ...searchResultMessages];
+    const allMessages: Message[] = [...expandedMessages, ...searchResultMessages];
 
     // Generate a stream of responses from the AI
     for await (const output of inferenceEngine.generateAnswer(
       allMessages,
       model,
       { ...persona, name: persona.role ?? persona.name },
-      // Set the target to the user
       username,
-      // set to false to disable logging
       false,
     )) {
       let stopped = output.stopped;
