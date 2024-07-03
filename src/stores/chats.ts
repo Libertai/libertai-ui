@@ -5,7 +5,7 @@ import { defaultModels } from 'src/utils/models';
 import { chatTag } from 'src/utils/chat';
 import idb from 'src/utils/idb';
 import { Message, Model } from '@libertai/libertai-js';
-import { Persona } from 'src/utils/personas';
+import { UIPersona } from 'src/utils/personas';
 
 const CHATS_STORE_NAME = 'chats-store';
 const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
@@ -19,7 +19,7 @@ export type Chat = {
   tags: string[];
 
   model: Model;
-  persona: Persona;
+  persona: UIPersona; // TODO: fix and use real message from SDK
   messages: UIMessage[]; // TODO: fix and use real message from SDK
   createdAt: Date;
 };
@@ -75,7 +75,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       return await this.chatsStore.readChat(id);
     },
 
-    async createChat(title: string, username: string, model: Model, persona: Persona): Promise<Chat> {
+    async createChat(title: string, username: string, model: Model, persona: UIPersona): Promise<Chat> {
       const chat = await this.chatsStore.createChat(title, username, [], model, persona);
       const tag = chatTag(chat.id);
       await this.chatsStore.pushChatTag(chat.id, tag);
@@ -168,7 +168,7 @@ class ChatsStore {
     await Promise.all(updatedChats);
   }
 
-  async createChat(title: string, username: string, tags: string[], model: Model, persona: Persona) {
+  async createChat(title: string, username: string, tags: string[], model: Model, persona: UIPersona) {
     const id = uuidv4();
     const chat: Chat = {
       id,

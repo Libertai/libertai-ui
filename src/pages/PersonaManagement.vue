@@ -16,7 +16,7 @@
         :base-persona="basePersonaCreate"
         title="Create persona"
         @save-persona="
-          (persona: Persona) => {
+          (persona: UIPersona) => {
             personasStore.personas.push({ ...persona, allowEdit: true, hidden: false, id: uuidv4() });
           }
         "
@@ -25,7 +25,7 @@
         v-model="editPersona"
         :base-persona="personasStore.persona"
         @save-persona="
-          (persona: Persona) => {
+          (persona: UIPersona) => {
             personasStore.persona = persona;
 
             personasStore.personas = personasStore.personas.map((userPersona) => {
@@ -121,7 +121,7 @@ import { usePersonasStore } from 'stores/personas';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
-import { getPersonaAvatarUrl, Persona } from 'src/utils/personas';
+import { getPersonaAvatarUrl, UIPersona } from 'src/utils/personas';
 import PersonaDialog from 'src/components/PersonaDialog.vue';
 import { useAccountStore } from 'stores/account';
 import { exportFile } from 'quasar';
@@ -139,29 +139,29 @@ const basePersonaCreate = ref<BasePersonaDialogProp | undefined>(undefined);
 
 const tokenGatingMessage = computed(() => getTokenGatingMessage(accountStore.ltaiBalance, 100));
 
-const startChatWithPersona = (persona: Persona) => {
+const startChatWithPersona = (persona: UIPersona) => {
   personasStore.persona = persona;
   router.push('/new');
 };
 
-const startEditingPersona = (persona: Persona) => {
+const startEditingPersona = (persona: UIPersona) => {
   personasStore.persona = persona;
   editPersona.value = true;
 };
 
-const duplicatePersona = (persona: Persona) => {
+const duplicatePersona = (persona: UIPersona) => {
   basePersonaCreate.value = JSON.parse(JSON.stringify(persona));
   createPersona.value = true;
 };
 
-const deletePersona = (persona: Persona) => {
+const deletePersona = (persona: UIPersona) => {
   personasStore.personas = personasStore.personas.filter((userPersona) => userPersona.id !== persona.id);
   if (personasStore.persona.id === persona.id) {
     personasStore.persona = personasStore.personas.find((userPersona) => !userPersona.hidden)!;
   }
 };
 
-const reversePersonaVisibility = (persona: Persona) => {
+const reversePersonaVisibility = (persona: UIPersona) => {
   personasStore.personas = personasStore.personas.map((userPersona) => {
     if (userPersona.id === persona.id) {
       return { ...userPersona, hidden: !userPersona.hidden };
@@ -185,7 +185,7 @@ const personaExportImportSchema = z.object({
 });
 type PersonaExportImportSchema = z.infer<typeof personaExportImportSchema>;
 
-const exportPersona = (persona: Persona) => {
+const exportPersona = (persona: UIPersona) => {
   // Avoid breaking changes on this format as much as possible to avoid breaking import of already exported files
   const jsonData: PersonaExportImportSchema = {
     data: {

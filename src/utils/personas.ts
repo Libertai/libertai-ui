@@ -1,18 +1,18 @@
 // Configuration for base prompts for different types of chatbots
-export type Persona = {
+import { Persona } from '@libertai/libertai-js';
+
+export type UIPersona = Persona & {
   id: string;
   avatar: {
     item_hash: string;
     ipfs_hash: string;
   };
-  name: string;
   role: string;
-  description: string;
   allowEdit: boolean;
   hidden: boolean;
 };
 
-export const defaultPersonas: Persona[] = [
+export const defaultPersonas: UIPersona[] = [
   {
     id: '77d15394-d142-4e73-8251-48be48cee016',
     avatar: {
