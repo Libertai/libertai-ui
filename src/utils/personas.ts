@@ -7,7 +7,7 @@ export type UIPersona = Persona & {
     item_hash: string;
     ipfs_hash: string;
   };
-  role: string;
+  name: string;
   allowEdit: boolean;
   hidden: boolean;
 };

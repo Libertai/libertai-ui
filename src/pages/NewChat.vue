@@ -69,7 +69,6 @@ const messageInputRef = ref('');
 async function sendMessage() {
   let message = messageInputRef.value;
   if (message.length === 0) {
-    console.warn('page::NewChat::sendMessage: message is empty');
     return;
   }
 
@@ -89,6 +88,6 @@ async function sendMessage() {
   // Set the message to empty
   messageInputRef.value = '';
   // Navigate to the chat page
-  router.push({ name: 'chat', params: { id: chat.id } });
+  await router.push({ name: 'chat', params: { id: chat.id } });
 }
 </script>

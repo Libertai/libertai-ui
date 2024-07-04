@@ -382,7 +382,7 @@ async function generatePersonaMessage() {
     for await (const output of inferenceEngine.generateAnswer(
       allMessages,
       model,
-      { ...persona, name: persona.role ?? persona.name },
+      { ...persona, role: persona.role ?? persona.name }, // For backward-compatibility
       username,
       false,
     )) {
@@ -496,6 +496,7 @@ async function setChat(chatId: string) {
     return message;
   });
 
+  console.log(messages);
   // Set the selected model for the chat by its URL
   let modelApiUrl = chatRef.value.model.apiUrl;
   modelsStore.setModelByURL(modelApiUrl);

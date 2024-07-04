@@ -113,7 +113,7 @@
 <script lang="ts" setup>
 import { nextTick, onMounted, ref } from 'vue';
 import { useTokensStore } from 'stores/tokens';
-import { ethers } from 'ethers';
+import web3 from 'web3';
 
 const tokensStore = useTokensStore();
 const address = ref('');
@@ -128,12 +128,10 @@ function addressVerifier(val: string) {
   // Throws if a checksummed address is provided, but a
   // letter is the wrong case
   try {
-    const addr = ethers.utils.getAddress(val);
-    if (addr !== val) {
-      nextTick(() => {
-        address.value = addr;
-      });
-    }
+    const addr = web3.utils.toChecksumAddress(val);
+    nextTick(() => {
+      address.value = addr;
+    });
     return true;
   } catch (e) {
     return 'Invalid address';

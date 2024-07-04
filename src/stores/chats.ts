@@ -10,7 +10,8 @@ import { UIPersona } from 'src/utils/personas';
 const CHATS_STORE_NAME = 'chats-store';
 const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
 
-export type UIMessage = Message & { stopped?: boolean; error?: any; searchResults?: any };
+// TODO: clean this type and understand the added properties
+export type UIMessage = Message & { stopped?: boolean; error?: any; searchResults?: any; attachments?: any[] };
 
 export type Chat = {
   id: string;
@@ -19,8 +20,8 @@ export type Chat = {
   tags: string[];
 
   model: Model;
-  persona: UIPersona; // TODO: fix and use real message from SDK
-  messages: UIMessage[]; // TODO: fix and use real message from SDK
+  persona: UIPersona;
+  messages: UIMessage[];
   createdAt: Date;
 };
 
@@ -144,7 +145,7 @@ class ChatsStore {
     const updatedChats: Promise<Chat>[] = [];
 
     // Iterate over all chats and update the model if necessary
-    await this.store.iterate((chat: Chat, _key, _iterationNumber) => {
+    await this.store.iterate((chat: Chat) => {
       // Find the chat and model
       const apiUrl = chat.model.apiUrl;
       const matchingModel = models.find((m) => m.apiUrl === apiUrl);
@@ -228,9 +229,9 @@ class ChatsStore {
     await idb.put(chatId, chat, this.store);
   }
 
-  async appendUserMessage(chatId: string, messageContent: string, attachments: any[] | undefined) {
+  async appendUserMessage(chatId: string, messageContent: string, attachments?: any[]) {
     const chat = await this.readChat(chatId);
-    const message: Message & { attachments: any[] | undefined } = {
+    const message: UIMessage = {
       role: chat.username,
       content: messageContent,
       timestamp: new Date(),
@@ -243,7 +244,7 @@ class ChatsStore {
 
   async appendModelResponse(chatId: string, responseContent: string, searchResults: any) {
     const chat = await this.readChat(chatId);
-    const message: Message & { searchResults: any } = {
+    const message: UIMessage = {
       role: chat.persona.role,
       content: responseContent,
       timestamp: new Date(),
