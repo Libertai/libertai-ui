@@ -2,7 +2,7 @@ import { LlamaCppApiEngine } from '@libertai/libertai-js';
 
 import { modelDefaults, promptFormatDefaults } from './models';
 
-export function chatTag(id) {
+export function chatTag(id: string): string {
   return `chat-id-${id}`;
 }
 
@@ -17,6 +17,7 @@ const chatTopicModel = {
   ...modelDefaults,
   apiUrl: 'https://curated.aleph.cloud/vm/a8b6d895cfe757d4bc5db9ba30675b5031fe3189a99a14f13d5210c473220caf/completion',
   promptFormat: chatTopicPromptFormat,
+  name: 'Model',
 };
 
 const chatTopicPersona = {
@@ -45,15 +46,7 @@ const chatTopicExamples = [
   },
 ];
 
-/**
- * Infer the topic of a chat message using a sample of a text
- *
- * @async
- * @param {string} input - The text to infer the topic from
- * @returns {string} - The inferred topic
- * @throws {Error} - If the topic could not be inferred
- */
-export async function inferChatTopic(input) {
+export async function inferChatTopic(input: string) {
   const engine = new LlamaCppApiEngine();
   const message = {
     role: 'input',
@@ -70,4 +63,5 @@ export async function inferChatTopic(input) {
     console.error('Error during completion:', error);
     throw Error('Could not infer chat topic: {error}');
   }
+  return '';
 }

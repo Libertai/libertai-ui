@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia';
 
-import { defaultPersonas, Persona } from '../utils/personas';
+import { defaultPersonas, UIPersona } from '../utils/personas';
 
 export const usePersonasStore = defineStore('personas', {
   state: () => ({
-    personas: JSON.parse(JSON.stringify(defaultPersonas)) as Persona[],
-    persona: JSON.parse(JSON.stringify(defaultPersonas[0])) as Persona,
+    personas: JSON.parse(JSON.stringify(defaultPersonas)) as UIPersona[],
+    persona: JSON.parse(JSON.stringify(defaultPersonas[0])) as UIPersona,
   }),
   getters: {
     // @ts-expect-error

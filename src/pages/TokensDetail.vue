@@ -9,7 +9,7 @@
                 {{ address }}
               </span>
               <span v-else class="bg-purple-50 q-py-sm q-px-xl rounded text-bold">
-                {{ address.slice(0, 10) }}...{{ address.slice(-10) }}
+                {{ address?.slice(0, 10) }}...{{ address?.slice(-10) }}
               </span>
             </p>
             <div class="text-h4 text-bold q-pb-sm text-left">Your Libertai tokens</div>
@@ -28,7 +28,7 @@
             </div>
 
             <div class="col-4">
-              <span class="text-h4 text-bold">{{ tokensStore.getAddressTokens(address).toFixed(2) }}</span>
+              <span class="text-h4 text-bold">{{ tokensStore.getAddressTokens(address ?? '').toFixed(2) }}</span>
             </div>
           </q-card-section>
         </q-card>
@@ -37,7 +37,7 @@
             <p class="text-h6 text-bold text-left">Pending $LTAI</p>
             <p class="q-py-md text-right">
               <span class="text-h4 text-bold rounded">{{
-                tokensStore.getAddressPendingTokens(address).toFixed(2)
+                tokensStore.getAddressPendingTokens(address ?? '').toFixed(2)
               }}</span>
             </p>
           </q-card-section>
@@ -47,7 +47,7 @@
             <p class="text-h6 text-bold text-left">36 Month estimated $LTAI*</p>
             <p class="q-py-md text-right">
               <span class="text-h4 text-bold rounded">{{
-                tokensStore.getAddress3yrEstimatedTokens(address).toFixed(2)
+                tokensStore.getAddress3yrEstimatedTokens(address ?? '').toFixed(2)
               }}</span>
             </p>
           </q-card-section>
@@ -67,17 +67,19 @@
 import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useTokensStore } from 'stores/tokens';
-import { ethers } from 'ethers';
 import { useAccount } from '@wagmi/vue';
+import web3 from 'web3';
+import { useQuasar } from 'quasar';
 
 const route = useRoute();
 const router = useRouter();
 const tokensStore = useTokensStore();
 
 const account = useAccount();
+const $q = useQuasar();
 
 // got address as an address part from vue router
-const address = ref(ethers.utils.getAddress(route.params.address as string));
+const address = ref<string | null>(null);
 
 onMounted(async () => {
   if (Object.keys(tokensStore.tokens).length === 0) {
@@ -88,7 +90,18 @@ onMounted(async () => {
 watch(
   () => route.params.address as string,
   async (newAddress: string) => {
-    address.value = ethers.utils.getAddress(newAddress);
+    try {
+      address.value = web3.utils.toChecksumAddress(newAddress);
+    } catch (err) {
+      $q.notify({
+        message: 'Invalid address',
+        color: 'red',
+      });
+      router.push('/tokens');
+    }
+  },
+  {
+    immediate: true,
   },
 );
 watch(

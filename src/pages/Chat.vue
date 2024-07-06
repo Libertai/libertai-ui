@@ -3,10 +3,10 @@
     <div ref="scrollAreaRef" class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)">
       <!-- Display message history -->
       <q-list class="col-grow q-ma-xl">
-        <!-- Determine styling based on the role of the message (if it's the user or the AI) -->
+        <!-- TODO: find a key -->
+        <!-- eslint-disable-next-line vue/valid-v-for -->
         <q-item
           v-for="(message, message_index) in messagesRef"
-          :key="message.id"
           :class="`q-py-md q-my-md ${$q.screen.gt.sm ? 'q-mx-xl' : 'q-mx-sm'} items-start dyn-container chat-item rounded-borders ${$q.dark.mode ? '' : message.role == usernameRef ? 'bg-white' : 'bg-secondary'}`"
         >
           <!-- Display the avatar of the user or the AI -->
@@ -36,15 +36,15 @@
               <span class="bull-date">{{ formatDate(message.timestamp) }}</span>
             </q-item-label>
             <!-- Display any attachments -->
-            <q-item-label v-if="message.attachments && message.attachments.length > 0">
-              <q-chip
-                v-for="attachment in message.attachments"
-                :key="attachment.id"
-                class="q-mr-xs bg-primary text-white"
-              >
-                {{ attachment.title }}
-              </q-chip>
-            </q-item-label>
+            <!--            <q-item-label v-if="message.attachments && message.attachments.length > 0">-->
+            <!--              <q-chip-->
+            <!--                v-for="attachment in message.attachments"-->
+            <!--                :key="attachment.id"-->
+            <!--                class="q-mr-xs bg-primary text-white"-->
+            <!--              >-->
+            <!--                {{ attachment.title }}-->
+            <!--              </q-chip>-->
+            <!--            </q-item-label>-->
             <!-- Display the content of the message -->
             <q-item-label style="display: block">
               <MarkdownRenderer
@@ -57,7 +57,7 @@
               <!-- Display the error message if the message errored  on generate -->
               <span v-if="!!message.error" class="text-warning">
                 <q-tooltip>Error: {{ message.error.message }}</q-tooltip>
-                <q-icon name="warning" /> There has been an error, please <a @click="regenerateMessage()">retry</a>.
+                <q-icon name="warning" />There has been an error, please <a @click="regenerateMessage()">retry</a>.
               </span>
             </q-item-label>
           </q-item-section>
@@ -89,7 +89,7 @@
               dense
               flat
               size="sm"
-              @click="editMessage($refs['message-' + message_index][0])"
+              @click="editMessage($refs['message-' + message_index] as any[0])"
             >
               <q-tooltip>Edit</q-tooltip>
             </q-btn>
@@ -100,24 +100,24 @@
 
     <div class="row items-center q-mb-md q-mr-md">
       <!-- "+" icon for uploading files, shown only when knowledge search is enabled -->
-      <q-btn
-        v-if="enableKnowledgeRef"
-        class="cursor-pointer q-mr-sm"
-        flat
-        icon="add"
-        round
-        style="margin-left: 16px"
-        @click="openKnowledgeUploader"
-      />
+      <!--      <q-btn-->
+      <!--        v-if="enableKnowledgeRef"-->
+      <!--        class="cursor-pointer q-mr-sm"-->
+      <!--        flat-->
+      <!--        icon="add"-->
+      <!--        round-->
+      <!--        style="margin-left: 16px"-->
+      <!--        @click="openKnowledgeUploader"-->
+      <!--      />-->
 
-      <q-chip
-        v-for="attachment in attachmentsRef"
-        :key="attachment.id"
-        removable
-        @remove="removeAttachment(attachment)"
-      >
-        {{ attachment.title }}
-      </q-chip>
+      <!--      <q-chip-->
+      <!--        v-for="attachment in attachmentsRef"-->
+      <!--        :key="attachment.id"-->
+      <!--        removable-->
+      <!--        @remove="removeAttachment(attachment)"-->
+      <!--      >-->
+      <!--        {{ attachment.title }}-->
+      <!--      </q-chip>-->
       <message-input
         ref="inputRef"
         v-model="inputTextRef"
@@ -139,34 +139,34 @@
       </div>
     </div>-->
     <!-- This should really not pass the ref, but it's a quick fix for now -->
-    <q-dialog v-model="showKnowledgeUploaderRef" position="bottom">
-      <KnowledgeStoreUploader
-        :chat-ref="chatRef"
-        auto-upload
-        label="Auto KnowledgeStoreUploader"
-        multiple
-        url="http://localhost:4444/upload"
-        @attachment-added="addAttachment"
-      />
-    </q-dialog>
+    <!--    <q-dialog v-model="showKnowledgeUploaderRef" position="bottom">-->
+    <!--      <KnowledgeStoreUploader-->
+    <!--        :chat-ref="chatRef"-->
+    <!--        auto-upload-->
+    <!--        label="Auto KnowledgeStoreUploader"-->
+    <!--        multiple-->
+    <!--        url="http://localhost:4444/upload"-->
+    <!--        @attachment-added="addAttachment"-->
+    <!--      />-->
+    <!--    </q-dialog>-->
   </q-page>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import 'highlight.js/styles/devibeans.css';
-import { copyToClipboard, date, useQuasar } from 'quasar';
+import { copyToClipboard, date, DateUnitOptions, useQuasar } from 'quasar';
 import { nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { defaultChatTopic, inferChatTopic } from 'src/utils/chat';
 
 // LlamaCppApiEngine
-import { LlamaCppApiEngine } from '@libertai/libertai-js';
+import { LlamaCppApiEngine, Message } from '@libertai/libertai-js';
 
 // Local state
-import { useChatsStore } from 'src/stores/chats-store';
+import { Chat, UIMessage, useChatsStore } from 'stores/chats';
 import { useModelsStore } from 'stores/models';
-import { useKnowledgeStore } from 'src/stores/knowledge-store';
+import { useKnowledgeStore } from 'stores/knowledge';
 import { usePersonasStore } from 'stores/personas';
 
 // Components
@@ -192,17 +192,17 @@ const inputTextRef = ref('');
 const isLoadingRef = ref(false);
 const hasResetRef = ref(false);
 const inputRef = ref(null);
-const scrollAreaRef = ref(null);
+const scrollAreaRef = ref<HTMLDivElement>();
 const enableEditRef = ref(false);
-const enableKnowledgeRef = ref(false);
-const showKnowledgeUploaderRef = ref(false);
-const attachmentsRef = ref([]);
+// const enableKnowledgeRef = ref(false);
+// const showKnowledgeUploaderRef = ref(false);
+// const attachmentsRef = ref<any[]>([]);
 
 // Chat specific state
-const chatRef = ref();
+const chatRef = ref<Chat>();
 const personaRef = ref();
 const usernameRef = ref();
-const messagesRef = ref([]);
+const messagesRef = ref<UIMessage[]>([]);
 
 // Instance of an inference engine
 const inferenceEngine = new LlamaCppApiEngine();
@@ -214,13 +214,13 @@ onMounted(() => {
 
 /* Set chat on initial load */
 
-setChat(route.params.id);
+setChat(route.params.id as string);
 
 /* Watchers */
 
 // Update the chat when the route changes
 watch(
-  () => route.params.id,
+  () => route.params.id as string,
   async (newId) => {
     await setChat(newId);
   },
@@ -241,6 +241,9 @@ watch(
     // Ser / DeSer to ensure we have a fresh copy
     newModel = JSON.parse(JSON.stringify(newModel));
 
+    if (!chatRef.value) {
+      return;
+    }
     let chatModelApiUrl = chatRef.value.model.apiUrl;
     if (chatModelApiUrl !== newModel.apiUrl) {
       // We have a new model, so update local and stored state
@@ -255,27 +258,27 @@ watch(
 
 /* Helper functions */
 
-function addAttachment(attachmentEvent) {
-  let attachment = JSON.parse(JSON.stringify(attachmentEvent));
-  attachmentsRef.value.push(attachment);
-}
+// function addAttachment(attachmentEvent: AttachmentAddedEvent) {
+//   const attachment = JSON.parse(JSON.stringify(attachmentEvent));
+//   attachmentsRef.value.push(attachment);
+// }
 
-async function removeAttachment(attachment) {
-  // Remove the attachment from the knowledge store
-  await knowledgeStore.removeDocument(attachment.documentId);
-  let index = attachmentsRef.value.indexOf(attachment);
-  attachmentsRef.value.splice(index, 1);
-}
+// async function removeAttachment(attachment) {
+//   Remove the attachment from the knowledge store
+// await knowledgeStore.removeDocument(attachment.documentId);
+// let index = attachmentsRef.value.indexOf(attachment);
+// attachmentsRef.value.splice(index, 1);
+// }
 
 // Set the name of the chat based on the first sentence
-async function setChatName(first_sentence) {
+async function setChatName(first_sentence: string) {
   // Get our chat id
-  let chatId = chatRef.value.id;
+  let chatId = chatRef.value!.id;
   try {
     const title = await inferChatTopic(first_sentence);
     await chatsStore.updateChatTitle(chatId, title);
     // Update the chat title state
-    chatRef.value.title = title;
+    chatRef.value!.title = title;
   } catch (error) {
     console.error('pages::Chat.vue::setChatName - error', error);
   }
@@ -283,7 +286,7 @@ async function setChatName(first_sentence) {
 
 // Scroll to the bottom of the chat when new messages are added
 async function scrollBottom() {
-  scrollAreaRef.value.lastElementChild.scrollIntoView({
+  scrollAreaRef.value?.lastElementChild?.scrollIntoView({
     behavior: 'smooth',
     block: 'end',
   });
@@ -291,6 +294,10 @@ async function scrollBottom() {
 
 // Generate a new response from the AI
 async function generatePersonaMessage() {
+  if (chatRef.value === undefined) {
+    return;
+  }
+
   let chatId = chatRef.value.id;
   let chatTags = chatRef.value.tags;
   let messages = JSON.parse(JSON.stringify(messagesRef.value));
@@ -299,7 +306,7 @@ async function generatePersonaMessage() {
   let model = chatRef.value.model;
 
   // Create a new message to encapsulate our response
-  let response = {
+  let response: UIMessage = {
     role: persona.name,
     content: '',
     stopped: false,
@@ -318,7 +325,7 @@ async function generatePersonaMessage() {
     // NOTE: assuming last message is guaranteed to be non-empty and the user's last message
     // Get the last message from the user
     let lastMessage = messages[messages.length - 1];
-    let searchResultMessages = [];
+    let searchResultMessages: Message[] = [];
     let searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
     searchResults.forEach((result) => {
       searchResultMessages.push({
@@ -329,24 +336,24 @@ async function generatePersonaMessage() {
 
     // Expand all the messages to inline any compatible attachments
     const expandedMessages = messages
-      .map((message) => {
-        let ret = [];
+      .map((message: UIMessage): Message[] => {
+        const ret = [];
         // Push any attachments ahead of the message
-        if (message.attachments) {
-          message.attachments.forEach((attachment) => {
-            if (attachment.content) {
-              ret.push({
-                role: 'attachment',
-                content: `[${attachment.title}](${attachment.content})`,
-              });
-            } else if (attachment.documentId) {
-              ret.push({
-                role: 'attachment',
-                content: `[${attachment.title}](document-id-${attachment.documentId})`,
-              });
-            }
-          });
-        }
+        // if (message.attachments) {
+        //   message.attachments.forEach((attachment) => {
+        //     if (attachment.content) {
+        //       ret.push({
+        //         role: 'attachment',
+        //         content: `[${attachment.title}](${attachment.content})`,
+        //       });
+        //     } else if (attachment.documentId) {
+        //       ret.push({
+        //         role: 'attachment',
+        //         content: `[${attachment.title}](document-id-${attachment.documentId})`,
+        //       });
+        //     }
+        //   });
+        // }
 
         // Push what search results we found based on the message
         // TODO: this should probably be a more generic tool-call or llm-chain-link
@@ -355,7 +362,7 @@ async function generatePersonaMessage() {
         //  Really these search results should get attached to the message that
         //   lead to them being queried
         if (message.searchResults) {
-          message.searchResults.forEach((result) => {
+          message.searchResults.forEach((result: Message) => {
             ret.push({
               role: 'search-result',
               content: result.content,
@@ -369,16 +376,14 @@ async function generatePersonaMessage() {
       .flat();
 
     // Append the search results to the messages
-    const allMessages = [...expandedMessages, ...searchResultMessages];
+    const allMessages: Message[] = [...expandedMessages, ...searchResultMessages];
 
     // Generate a stream of responses from the AI
     for await (const output of inferenceEngine.generateAnswer(
       allMessages,
       model,
-      { ...persona, name: persona.role ?? persona.name },
-      // Set the target to the user
+      { ...persona, role: persona.role ?? persona.name }, // For backward-compatibility
       username,
-      // set to false to disable logging
       false,
     )) {
       let stopped = output.stopped;
@@ -410,6 +415,10 @@ async function generatePersonaMessage() {
 // TODO: arbitrary message regeneration
 // Regenerate the last message from the AI
 async function regenerateMessage() {
+  if (chatRef.value === undefined) {
+    return;
+  }
+
   // we discard the last message if it's from the AI, and regenerate
   const lastMessage = messagesRef.value[messagesRef.value.length - 1];
   if (lastMessage.role !== usernameRef.value) {
@@ -424,15 +433,19 @@ async function regenerateMessage() {
   await generatePersonaMessage();
 }
 
-async function sendMessage(content) {
+async function sendMessage(content: string) {
+  if (chatRef.value === undefined) {
+    return;
+  }
+
   let chatId = chatRef.value.id;
   let inputText = inputTextRef.value;
-  const attachments = JSON.parse(JSON.stringify(attachmentsRef.value));
+  // const attachments = JSON.parse(JSON.stringify(attachmentsRef.value));
 
   // Wipe the input text
   inputTextRef.value = '';
   // Wipe the attachments
-  attachmentsRef.value = [];
+  // attachmentsRef.value = [];
 
   nextTick(scrollBottom);
 
@@ -441,7 +454,7 @@ async function sendMessage(content) {
   if (content.trim() === '') return;
 
   // Append the new message to the chat history and push to local state
-  let newMessage = await chatsStore.appendUserMessage(chatId, inputText, attachments);
+  let newMessage = await chatsStore.appendUserMessage(chatId, inputText);
   messagesRef.value.push({ ...newMessage, stopped: true, error: null });
   chatRef.value.messages = messagesRef.value;
 
@@ -453,7 +466,7 @@ async function sendMessage(content) {
 }
 
 // Set a chat by its ID
-async function setChat(chatId) {
+async function setChat(chatId: string) {
   // This is annoying but we need to set whether the user is connected
   //enableKnowledgeRef.value = account.isConnected.value;
 
@@ -483,6 +496,7 @@ async function setChat(chatId) {
     return message;
   });
 
+  console.log(messages);
   // Set the selected model for the chat by its URL
   let modelApiUrl = chatRef.value.model.apiUrl;
   modelsStore.setModelByURL(modelApiUrl);
@@ -499,7 +513,7 @@ async function setChat(chatId) {
   // Set the chat title if it's not set
   if (title === defaultChatTopic || title === '') {
     // Set the chat name based on the first message
-    setChatName(messages[0].content);
+    await setChatName(messages[0].content);
   }
 
   // Determine if there are messages we need to respond to
@@ -510,29 +524,28 @@ async function setChat(chatId) {
   nextTick(scrollBottom);
 }
 
-async function updateChatMessageContent(messageIndex, content, initialContent) {
-  let chatId = chatRef.value.id;
+async function updateChatMessageContent(messageIndex: number, content: string, initialContent: string) {
+  let chatId = chatRef.value!.id;
   try {
     await chatsStore.updateChatMessageContent(chatId, messageIndex, content);
   } catch (error) {
     console.error('pages::Chat.vue::updateChatMessageContent - error', error);
     // Reset the content to the initial content
     messagesRef.value[messageIndex].content = initialContent;
-    // Alert the user
     $q.notify('Failed to update message content');
   }
 }
 
-async function copyMessage(message) {
+async function copyMessage(message: Message) {
   await copyToClipboard(message.content);
   $q.notify('Message copied to clipboard');
 }
 
-async function editMessage($message) {
+async function editMessage(message: any) {
   enableEditRef.value = true;
 
   setTimeout(() => {
-    $message.$el.click();
+    message.$el.click();
   }, 50);
 }
 
@@ -547,32 +560,32 @@ async function clearCookies() {
   hasResetRef.value = true;
 }
 
-function openKnowledgeUploader() {
-  showKnowledgeUploaderRef.value = true;
-}
+// function openKnowledgeUploader() {
+//   showKnowledgeUploaderRef.value = true;
+// }
 
 // TODO: Replace this by using dayjs
-function formatDate(d) {
+function formatDate(d: Date | undefined) {
   if (!d) d = new Date();
   const currentDate = new Date();
   const timeDiff = currentDate.getTime() / 1000 - d.getTime() / 1000;
 
-  let unit = 'hour';
+  let unit: DateUnitOptions = 'hours';
   let txtUnit = 'h';
   if (timeDiff < 60) {
-    unit = 'second';
+    unit = 'seconds';
     txtUnit = 's';
   } else if (timeDiff < 3600) {
-    unit = 'minute';
+    unit = 'minutes';
     txtUnit = 'm';
   } else if (timeDiff < 86400) {
-    unit = 'hour';
+    unit = 'hours';
     txtUnit = 'h';
   } else if (timeDiff < 2592000) {
-    unit = 'day';
+    unit = 'days';
     txtUnit = 'd';
   } else if (timeDiff > 2592000) {
-    unit = 'month';
+    unit = 'months';
     txtUnit = 'month';
   }
 

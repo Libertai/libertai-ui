@@ -42,7 +42,7 @@ import { defaultChatTopic } from 'src/utils/chat';
 
 // Import State
 import { useModelsStore } from 'stores/models';
-import { useChatsStore } from 'src/stores/chats-store';
+import { useChatsStore } from 'stores/chats';
 import { usePersonasStore } from 'stores/personas';
 import { useSettingsStore } from 'stores/settings';
 import { ref } from 'vue';
@@ -69,7 +69,6 @@ const messageInputRef = ref('');
 async function sendMessage() {
   let message = messageInputRef.value;
   if (message.length === 0) {
-    console.warn('page::NewChat::sendMessage: message is empty');
     return;
   }
 
@@ -89,6 +88,6 @@ async function sendMessage() {
   // Set the message to empty
   messageInputRef.value = '';
   // Navigate to the chat page
-  router.push({ name: 'chat', params: { id: chat.id } });
+  await router.push({ name: 'chat', params: { id: chat.id } });
 }
 </script>
