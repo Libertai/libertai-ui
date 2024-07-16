@@ -18,6 +18,7 @@ export const modelDefaults = {
   topP: 0.9,
   topK: 40,
   promptFormat: promptFormatDefaults,
+  withCredentials: true
 };
 
 export type UIModel = Model & { premium: boolean };
