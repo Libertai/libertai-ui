@@ -9,6 +9,15 @@ export const promptFormatDefaults = {
   additionalStopSequences: ['<|endoftext|>', '<|', '</|', '</assistant', '</user', '<im_end|>'],
 };
 
+export const promptFormatPhi = {
+  userPrepend: '<|',
+  userAppend: '|>',
+  logStart: '',
+  lineSeparator: '\n',
+  stopSequence: '<|end|>',
+  additionalStopSequences: ['<|endoftext|>', '<|', '</|'],
+};
+
 export const modelDefaults = {
   maxTokens: 8192,
   maxPredict: 15,
