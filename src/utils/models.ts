@@ -36,7 +36,18 @@ export type UIModel = Model & { premium: boolean };
  * Default Models Configuration
  */
 export const defaultModels: UIModel[] = [
-  // Mixtral
+  // // Developer
+  // {
+  //   name: 'Local',
+  //   ...modelDefaults,
+  //   apiUrl:
+  //     'http://localhost:5000/completion',
+  //   promptFormat: promptFormatDefaults,
+  //   premium: false,
+  //   withCredentials: false
+  // },
+
+  // Function call model
   {
     name: 'Nous Hermes 2 Pro (Llama 3 8B, fast)',
     ...modelDefaults,
@@ -46,15 +57,15 @@ export const defaultModels: UIModel[] = [
     premium: false,
   },
 
-  // NeuralBeagle
+  // Roleplay model
   {
-    name: 'NeuralBeagle (7B, fast)',
+    name: 'Roleplay (7B, fast)',
     ...modelDefaults,
     // Set our apiUrl
     apiUrl:
       'https://curated.aleph.cloud/vm/a8b6d895cfe757d4bc5db9ba30675b5031fe3189a99a14f13d5210c473220caf/completion',
     // Allow a larger prompt length
-    maxTokens: 16384,
+    maxTokens: 32768,
     // Set a minimum probability
     minP: 0.1,
     // Set a slightly higher top probability
