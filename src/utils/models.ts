@@ -67,6 +67,18 @@ export const defaultModels: UIModel[] = [
     premium: false,
   },
 
+  // Phi-3-mini
+  {
+    name: 'Phi-3-mini (3.8B, long context)',
+    ...modelDefaults,
+    apiUrl:
+      'https://curated.aleph.cloud/vm/ad482633bac1f1fae071fb3908c49ebe8d30e3dbeb047051a8ee1b206f2ef830/completion',
+    promptFormat: promptFormatPhi,
+    maxTokens: 131072,
+    premium: false,
+  },
+
+
   // Nous Hermes 2
   {
     name: 'Nous Hermes 2 (34B, smart)',
