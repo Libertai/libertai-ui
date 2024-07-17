@@ -23,6 +23,7 @@ const chatTopicModel = {
 const chatTopicPersona = {
   avatarUrl: 'https://this-is-a-fake-url.org',
   name: 'summary',
+  role: 'assistant',
   description:
     'You are a summary function provided with input. Provide an at most 5 word summary of the first sentence of the provided input for the purpose of determining menu item names',
 };
