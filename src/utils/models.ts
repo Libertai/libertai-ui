@@ -27,7 +27,7 @@ export const modelDefaults = {
   topP: 0.9,
   topK: 40,
   promptFormat: promptFormatDefaults,
-  withCredentials: true
+  withCredentials: true,
 };
 
 export type UIModel = Model & { premium: boolean };
@@ -97,7 +97,6 @@ export const defaultModels: UIModel[] = [
     maxTokens: 131072,
     premium: false,
   },
-
 
   // Nous Hermes 2
   {

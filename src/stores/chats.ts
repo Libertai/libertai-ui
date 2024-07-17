@@ -147,7 +147,7 @@ class ChatsStore {
     // Iterate over all chats and update the model if necessary
     await this.store.iterate((chat: Chat) => {
       // Find the chat and model
-      const apiUrl = chat.model.apiUrl;
+      const apiUrl = chat.model?.apiUrl;
       const matchingModel = models.find((m) => m.apiUrl === apiUrl);
 
       // Determine if the model has changed
