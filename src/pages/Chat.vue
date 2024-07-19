@@ -6,7 +6,7 @@
         <!-- TODO: find a key -->
         <!-- eslint-disable-next-line vue/valid-v-for -->
         <q-item
-          v-for="(message, message_index) in messagesRef"
+          v-for="(message, message_index) in chatRef!.messages"
           :class="`q-py-md q-my-md ${$q.screen.gt.sm ? 'q-mx-xl' : 'q-mx-sm'} items-start dyn-container chat-item rounded-borders ${$q.dark.mode ? '' : message.author === 'user' ? 'bg-white' : 'bg-secondary'}`"
         >
           <!-- Display the avatar of the user or the AI -->
@@ -67,7 +67,7 @@
           <div class="absolute dyn-container chat-toolbar">
             <!-- Allow regenerating the last message from the AI if fully completed -->
             <q-btn
-              v-if="!isLoadingRef && message_index === messagesRef.length - 1"
+              v-if="!isLoadingRef && message_index === chatRef!.messages.length - 1"
               dense
               flat
               icon="refresh"
@@ -202,7 +202,6 @@ const enableEditRef = ref(false);
 
 // Chat specific state
 const chatRef = ref<Chat>();
-const messagesRef = ref<UIMessage[]>([]);
 
 // Instance of an inference engine
 const inferenceEngine = new LlamaCppApiEngine();
@@ -301,7 +300,7 @@ async function generatePersonaMessage() {
   let chatId = chatRef.value.id;
   let chatTags = chatRef.value.tags;
   const username = chatRef.value.username;
-  let messages = JSON.parse(JSON.stringify(messagesRef.value));
+  const messages = JSON.parse(JSON.stringify(chatRef.value.messages));
   const persona = chatRef.value.persona;
   let model = chatRef.value.model;
 
@@ -314,9 +313,7 @@ async function generatePersonaMessage() {
     error: null,
   };
 
-  // And push it to the local state so that it renders
-  messagesRef.value = [...messagesRef.value, response];
-  chatRef.value.messages = messagesRef.value;
+  chatRef.value.messages = [...chatRef.value.messages, response];
 
   try {
     // Set loading state
@@ -397,7 +394,7 @@ async function generatePersonaMessage() {
       response.content = content;
       response.stopped = stopped;
 
-      messagesRef.value = [...messagesRef.value];
+      chatRef.value.messages = [...chatRef.value.messages];
       // Scroll to the bottom of the chat
       nextTick(scrollBottom);
     }
@@ -410,7 +407,7 @@ async function generatePersonaMessage() {
     // Done! update the local state to reflect the end of the process
     isLoadingRef.value = false;
     hasResetRef.value = false;
-    messagesRef.value = [...messagesRef.value];
+    chatRef.value.messages = [...chatRef.value.messages];
   }
 }
 
@@ -422,13 +419,12 @@ async function regenerateMessage() {
   }
 
   // we discard the last message if it's from the AI, and regenerate
-  const lastMessage = messagesRef.value[messagesRef.value.length - 1];
+  const messages = chatRef.value.messages;
+  const lastMessage = messages.at(-1)!;
   if (lastMessage.author !== 'user') {
     let chatId = chatRef.value.id;
     // Update the local state
-    messagesRef.value.pop();
-    messagesRef.value = [...messagesRef.value];
-    chatRef.value.messages = messagesRef.value;
+    chatRef.value.messages.pop();
     // Update the chat state
     await chatsStore.popChatMessages(chatId);
   }
@@ -440,8 +436,8 @@ async function sendMessage(content: string) {
     return;
   }
 
-  let chatId = chatRef.value.id;
-  let inputText = inputTextRef.value;
+  const chatId = chatRef.value.id;
+  const inputText = inputTextRef.value;
   // const attachments = JSON.parse(JSON.stringify(attachmentsRef.value));
 
   // Wipe the input text
@@ -457,8 +453,7 @@ async function sendMessage(content: string) {
 
   // Append the new message to the chat history and push to local state
   let newMessage = await chatsStore.appendUserMessage(chatId, inputText);
-  messagesRef.value.push({ ...newMessage, stopped: true, error: null });
-  chatRef.value.messages = messagesRef.value;
+  chatRef.value.messages.push({ ...newMessage, stopped: true, error: null });
 
   // Scroll to the bottom of the chat
   nextTick(scrollBottom);
@@ -473,42 +468,36 @@ async function setChat(chatId: string) {
   //enableKnowledgeRef.value = account.isConnected.value;
 
   // Load the chat from the store and set it
-  chatRef.value = await chatsStore.readChat(chatId);
-  if (!chatRef.value) {
+  const loadedChat = await chatsStore.readChat(chatId);
+  if (!loadedChat) {
     console.error('pages::Chat.vue::setChat - chat not found');
     await router.push({ name: 'new-chat' });
     return;
   }
 
-  personasStore.persona = chatRef.value.persona;
+  personasStore.persona = loadedChat.persona;
 
   // Extract the chat properties
-  const title = chatRef.value.title;
+  const title = loadedChat.title;
   // Load messages, mapping over with additional properties we need in the UI
-  let messages = chatRef.value.messages.map((message) => {
-    // Set stopped to true
-    message.stopped = true;
-    // Set error to null
-    message.error = null;
-    return message;
-  });
+  // TODO: these should already be there ?
+  loadedChat.messages = loadedChat.messages.map((message) => ({ ...message, stopped: true, error: null }));
 
   // Set the selected model for the chat by its URL
-  let modelApiUrl = chatRef.value.model.apiUrl;
+  const modelApiUrl = loadedChat.model.apiUrl;
   modelsStore.setModelByURL(modelApiUrl);
-
-  // Set the local messages state
-  messagesRef.value = messages;
 
   // Set the chat title if it's not set
   if (title === defaultChatTopic || title === '') {
     // Set the chat name based on the first message
-    await setChatName(messages[0].content);
+    await setChatName(loadedChat.messages[0].content);
   }
+
+  chatRef.value = loadedChat;
 
   // Determine if there are messages we need to respond to
   // NOTE: this is assuming all chats should be initiated by the user
-  if (messages.length % 2 === 1) {
+  if (loadedChat.messages.length % 2 === 1) {
     await generatePersonaMessage();
   }
   nextTick(scrollBottom);
@@ -521,7 +510,7 @@ async function updateChatMessageContent(messageIndex: number, content: string, i
   } catch (error) {
     console.error('pages::Chat.vue::updateChatMessageContent - error', error);
     // Reset the content to the initial content
-    messagesRef.value[messageIndex].content = initialContent;
+    chatRef.value!.messages[messageIndex].content = initialContent;
     $q.notify('Failed to update message content');
   }
 }
