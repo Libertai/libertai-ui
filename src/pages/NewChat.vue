@@ -67,21 +67,21 @@ const username = useSettingsStore().username;
 const messageInputRef = ref('');
 
 async function sendMessage() {
-  let message = messageInputRef.value;
+  const message = messageInputRef.value;
   if (message.length === 0) {
     return;
   }
 
   // Extract the values out of our relevant refs
-  let title = defaultChatTopic;
+  const title = defaultChatTopic;
   // NOTE: these are refs to the store, so we need to deep clone them
-  let model = JSON.parse(JSON.stringify(modelsStore.selectedModel));
-  let persona = JSON.parse(JSON.stringify(personasStore.persona));
+  const model = JSON.parse(JSON.stringify(modelsStore.selectedModel));
+  const persona = JSON.parse(JSON.stringify(personasStore.persona));
 
   // Reset the personas now that we have a deep clone of the selected persona
   //personasStore.personas = personasClone;
   // Creates the new chat
-  let chat = await chatsStore.createChat(title, username, model, persona);
+  const chat = await chatsStore.createChat(title, username, model, persona);
   // Append the first user message to the chat history
   await chatsStore.appendUserMessage(chat.id, message);
 

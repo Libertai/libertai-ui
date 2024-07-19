@@ -1,4 +1,4 @@
-import { LlamaCppApiEngine } from '@libertai/libertai-js';
+import { LlamaCppApiEngine, Message } from '@libertai/libertai-js';
 
 import { modelDefaults, promptFormatDefaults } from './models';
 
@@ -28,7 +28,7 @@ const chatTopicPersona = {
     'You are a summary function provided with input. Provide an at most 5 word summary of the first sentence of the provided input for the purpose of determining menu item names',
 };
 
-const chatTopicExamples = [
+const chatTopicExamples: Message[] = [
   {
     role: 'input',
     content: 'Hello, can you please write a short hello world code for me?',
@@ -49,7 +49,7 @@ const chatTopicExamples = [
 
 export async function inferChatTopic(input: string) {
   const engine = new LlamaCppApiEngine();
-  const message = {
+  const message: Message = {
     role: 'input',
     content: input,
   };

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="column align-items-center">
+  <q-page v-if="chatRef" class="column align-items-center">
     <div ref="scrollAreaRef" class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)">
       <!-- Display message history -->
       <q-list class="col-grow q-ma-xl">
@@ -166,7 +166,7 @@ import { defaultChatTopic, inferChatTopic } from 'src/utils/chat';
 import { LlamaCppApiEngine, Message } from '@libertai/libertai-js';
 
 // Local state
-import { Chat, UIMessage, useChatsStore } from 'stores/chats';
+import { useChatsStore } from 'stores/chats';
 import { useModelsStore } from 'stores/models';
 import { useKnowledgeStore } from 'stores/knowledge';
 import { usePersonasStore } from 'stores/personas';
@@ -177,6 +177,7 @@ import MessageInput from 'src/components/MessageInput.vue';
 import axios from 'axios';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
 import { useSettingsStore } from 'stores/settings';
+import { Chat, UIMessage } from 'src/types/chats';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -327,7 +328,6 @@ async function generatePersonaMessage() {
     let searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
     searchResults.forEach((result) => {
       searchResultMessages.push({
-        author: 'ai', // TODO: maybe another author here
         role: 'search-result',
         content: result.content,
       });
@@ -483,6 +483,8 @@ async function setChat(chatId: string) {
   // TODO: these should already be there ?
   loadedChat.messages = loadedChat.messages.map((message) => ({ ...message, stopped: true, error: null }));
 
+  chatRef.value = loadedChat;
+
   // Set the selected model for the chat by its URL
   const modelApiUrl = loadedChat.model.apiUrl;
   modelsStore.setModelByURL(modelApiUrl);
@@ -492,8 +494,6 @@ async function setChat(chatId: string) {
     // Set the chat name based on the first message
     await setChatName(loadedChat.messages[0].content);
   }
-
-  chatRef.value = loadedChat;
 
   // Determine if there are messages we need to respond to
   // NOTE: this is assuming all chats should be initiated by the user

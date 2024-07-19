@@ -4,28 +4,13 @@ import { defineStore } from 'pinia';
 import { defaultModels } from 'src/utils/models';
 import { chatTag } from 'src/utils/chat';
 import idb from 'src/utils/idb';
-import { Message, Model } from '@libertai/libertai-js';
-import { UIPersona } from 'src/utils/personas';
+import { Model } from '@libertai/libertai-js';
+import { chatsMigrations } from 'src/utils/migrations/chats';
+import { Chat, ChatMigration, MinimalChat, UIMessage } from 'src/types/chats';
+import { UIPersona } from 'src/types/personas';
 
 const CHATS_STORE_NAME = 'chats-store';
 const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
-
-// TODO: clean this type and understand the added properties
-export type UIMessage = Message & { stopped?: boolean; error?: any; searchResults?: any; attachments?: any[] };
-
-export type Chat = {
-  id: string;
-  title: string;
-  username: string;
-  tags: string[];
-
-  model: Model;
-  persona: UIPersona;
-  messages: UIMessage[];
-  createdAt: Date;
-};
-
-type MinimalChat = Pick<Chat, 'id' | 'title' | 'createdAt'> & Partial<Chat>;
 
 /**
  * Representation of an attachment:
@@ -53,23 +38,44 @@ type MinimalChat = Pick<Chat, 'id' | 'title' | 'createdAt'> & Partial<Chat>;
  */
 
 type ChatsStoreState = {
+  version: number;
   chatsStore: ChatsStore;
   chats: MinimalChat[];
 };
 
 export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
   state: (): ChatsStoreState => ({
+    // Current version of the migrations
+    version: 0, //  /!\ DO NOT UPDATE /!\, it should be done automatically when running migrations
+
     // Interface for our ChatsStore
     chatsStore: new ChatsStore(),
     // List of partials chats
     chats: [],
   }),
+  persist: {
+    paths: ['version'],
+  },
   actions: {
     async load() {
       // Update the models for all chats
       await this.chatsStore.updateModels(defaultModels);
       // Get the partial chats
       this.chats = await this.chatsStore.readChats();
+
+      try {
+        // Running migrations if needed
+        if (this.version < chatsMigrations.length) {
+          // Removing migrations already ran
+          const migrationsToRun = chatsMigrations.slice(this.version);
+          for (const migration of migrationsToRun) {
+            await this.chatsStore.runMigration(migration);
+          }
+        }
+        this.version = chatsMigrations.length;
+      } catch (error) {
+        console.error(`Chats: Running migrations starting from version ${this.version} failed: ${error}`);
+      }
     },
 
     async readChat(id: string) {
@@ -138,6 +144,17 @@ class ChatsStore {
   constructor() {
     // Initialize the localforage store
     this.store = idb.createStore(CHATS_STORE_NAME);
+  }
+
+  async runMigration(migration: ChatMigration) {
+    const updatedChats: Promise<Chat>[] = [];
+
+    await this.store.iterate((currentChat: Chat) => {
+      const newChat = migration(currentChat);
+      updatedChats.push(idb.put(currentChat.id, newChat, this.store));
+    });
+
+    await Promise.all(updatedChats);
   }
 
   async updateModels(models: Model[]) {
