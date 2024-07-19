@@ -7,15 +7,15 @@
         <!-- eslint-disable-next-line vue/valid-v-for -->
         <q-item
           v-for="(message, message_index) in messagesRef"
-          :class="`q-py-md q-my-md ${$q.screen.gt.sm ? 'q-mx-xl' : 'q-mx-sm'} items-start dyn-container chat-item rounded-borders ${$q.dark.mode ? '' : message.role == usernameRef ? 'bg-white' : 'bg-secondary'}`"
+          :class="`q-py-md q-my-md ${$q.screen.gt.sm ? 'q-mx-xl' : 'q-mx-sm'} items-start dyn-container chat-item rounded-borders ${$q.dark.mode ? '' : message.author === 'user' ? 'bg-white' : 'bg-secondary'}`"
         >
           <!-- Display the avatar of the user or the AI -->
           <q-item-section avatar>
-            <q-avatar v-if="message.role == usernameRef">
+            <q-avatar v-if="message.author === 'user'">
               <img :src="getPersonaAvatarUrl(settingsStore.avatar.ipfs_hash)" alt="user" />
             </q-avatar>
             <q-avatar v-else>
-              <img :src="getPersonaAvatarUrl(personaRef.avatar.ipfs_hash)" alt="AI" />
+              <img :src="getPersonaAvatarUrl(chatRef!.persona.avatar.ipfs_hash)" alt="AI" />
             </q-avatar>
           </q-item-section>
           <!-- Edit message popup -- triggered on click if the edit mode is enabled -->
@@ -30,9 +30,11 @@
               <strong>{{ message.role }}</strong>
               <q-input v-model="scope.value" autofocus autogrow counter dense />
             </q-popup-edit>
-            <!-- Display the role of the user or the AI -->
+            <!-- Display the name of the user or the AI -->
             <q-item-label class="text-semibold q-mb-md">
-              {{ message.role }}
+              <span v-if="message.author === 'user'">{{ chatRef?.username }}</span>
+              <span v-else>{{ chatRef?.persona.name }}</span>
+
               <span class="bull-date">{{ formatDate(message.timestamp) }}</span>
             </q-item-label>
             <!-- Display any attachments -->
@@ -48,7 +50,7 @@
             <!-- Display the content of the message -->
             <q-item-label style="display: block">
               <MarkdownRenderer
-                :class="message.role == usernameRef ? '' : 'message-content'"
+                :class="message.author === 'user' ? '' : 'message-content'"
                 :content="message.content"
                 breaks
               />
@@ -89,7 +91,7 @@
               dense
               flat
               size="sm"
-              @click="editMessage($refs['message-' + message_index][0] as any)"
+              @click="editMessage($refs['message-' + message_index] as any[0])"
             >
               <q-tooltip>Edit</q-tooltip>
             </q-btn>
@@ -200,8 +202,6 @@ const enableEditRef = ref(false);
 
 // Chat specific state
 const chatRef = ref<Chat>();
-const personaRef = ref();
-const usernameRef = ref();
 const messagesRef = ref<UIMessage[]>([]);
 
 // Instance of an inference engine
@@ -300,13 +300,14 @@ async function generatePersonaMessage() {
 
   let chatId = chatRef.value.id;
   let chatTags = chatRef.value.tags;
+  const username = chatRef.value.username;
   let messages = JSON.parse(JSON.stringify(messagesRef.value));
-  let persona = personaRef.value;
-  let username = usernameRef.value;
+  const persona = chatRef.value.persona;
   let model = chatRef.value.model;
 
   // Create a new message to encapsulate our response
   let response: UIMessage = {
+    author: 'ai',
     role: persona.name,
     content: '',
     stopped: false,
@@ -329,6 +330,7 @@ async function generatePersonaMessage() {
     let searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
     searchResults.forEach((result) => {
       searchResultMessages.push({
+        author: 'ai', // TODO: maybe another author here
         role: 'search-result',
         content: result.content,
       });
@@ -421,7 +423,7 @@ async function regenerateMessage() {
 
   // we discard the last message if it's from the AI, and regenerate
   const lastMessage = messagesRef.value[messagesRef.value.length - 1];
-  if (lastMessage.role !== usernameRef.value) {
+  if (lastMessage.author !== 'user') {
     let chatId = chatRef.value.id;
     // Update the local state
     messagesRef.value.pop();
@@ -479,14 +481,9 @@ async function setChat(chatId: string) {
   }
 
   personasStore.persona = chatRef.value.persona;
-  let persona = chatRef.value.persona;
-  watch(personasStore.persona, async (persona) => {
-    personaRef.value = persona;
-  });
 
   // Extract the chat properties
-  let title = chatRef.value.title;
-  let username = chatRef.value.username;
+  const title = chatRef.value.title;
   // Load messages, mapping over with additional properties we need in the UI
   let messages = chatRef.value.messages.map((message) => {
     // Set stopped to true
@@ -496,19 +493,12 @@ async function setChat(chatId: string) {
     return message;
   });
 
-  console.log(messages);
   // Set the selected model for the chat by its URL
   let modelApiUrl = chatRef.value.model.apiUrl;
   modelsStore.setModelByURL(modelApiUrl);
 
   // Set the local messages state
   messagesRef.value = messages;
-
-  // Set the local persona state
-  personaRef.value = persona;
-
-  // Set the local username state
-  usernameRef.value = username;
 
   // Set the chat title if it's not set
   if (title === defaultChatTopic || title === '') {
@@ -525,7 +515,7 @@ async function setChat(chatId: string) {
 }
 
 async function updateChatMessageContent(messageIndex: number, content: string, initialContent: string) {
-  let chatId = chatRef.value!.id;
+  const chatId = chatRef.value!.id;
   try {
     await chatsStore.updateChatMessageContent(chatId, messageIndex, content);
   } catch (error) {
@@ -623,7 +613,7 @@ code {
 
 .chat-item {
   .chat-toolbar {
-    right: 0px;
+    right: 0;
     bottom: 10px;
   }
 
@@ -636,7 +626,7 @@ code {
 @media (min-width: 600px) {
   .chat-item {
     .chat-toolbar {
-      right: 0px;
+      right: 0;
       top: 10px;
       bottom: auto;
       opacity: 0;

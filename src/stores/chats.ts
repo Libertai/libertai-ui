@@ -232,6 +232,7 @@ class ChatsStore {
   async appendUserMessage(chatId: string, messageContent: string, attachments?: any[]) {
     const chat = await this.readChat(chatId);
     const message: UIMessage = {
+      author: 'user',
       role: chat.username,
       content: messageContent,
       timestamp: new Date(),
@@ -245,6 +246,7 @@ class ChatsStore {
   async appendModelResponse(chatId: string, responseContent: string, searchResults: any) {
     const chat = await this.readChat(chatId);
     const message: UIMessage = {
+      author: 'ai',
       role: chat.persona.role,
       content: responseContent,
       timestamp: new Date(),
