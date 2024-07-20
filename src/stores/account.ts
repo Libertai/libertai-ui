@@ -25,9 +25,19 @@ export const useAccountStore = defineStore('account', {
     },
 
     async initAlephStorage() {
+      const account = getAccount(config);
       const settingsStore = useSettingsStore();
 
-      const alephStorage = await AlephPersistentStorage.initialize();
+      if (account.address === undefined) {
+        return;
+      }
+
+      const hash = settingsStore.signatureHash[account.address] ?? (await AlephPersistentStorage.signBaseMessage());
+      if (settingsStore.isSignatureHashStored) {
+        settingsStore.signatureHash[account.address] = hash;
+      }
+
+      const alephStorage = await AlephPersistentStorage.initialize(hash);
       if (!alephStorage) {
         return;
       }

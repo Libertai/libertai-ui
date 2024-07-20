@@ -4,6 +4,7 @@ import web3 from 'web3';
 import { ItemType } from '@aleph-sdk/message';
 import { signMessage } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
+import { SignMessageReturnType } from 'viem';
 
 const MESSAGE = 'LibertAI';
 const LIBERTAI_KEY = 'libertai-chat-ui';
@@ -17,8 +18,11 @@ export class AlephPersistentStorage {
     private subAccountClient: AuthenticatedAlephHttpClient,
   ) {}
 
-  static async initialize() {
-    const hash = await signMessage(config, { message: MESSAGE });
+  static async signBaseMessage() {
+    return signMessage(config, { message: MESSAGE });
+  }
+
+  static async initialize(hash: SignMessageReturnType) {
     const privateKey = web3.utils.sha3(hash);
 
     if (privateKey === undefined) {
