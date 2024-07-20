@@ -3,7 +3,6 @@
     <div ref="scrollAreaRef" class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)">
       <!-- Display message history -->
       <q-list class="col-grow q-ma-xl">
-        <!-- TODO: find a key -->
         <!-- eslint-disable-next-line vue/valid-v-for -->
         <q-item
           v-for="(message, message_index) in chatRef!.messages"
@@ -190,7 +189,6 @@ const settingsStore = useSettingsStore();
 // Local page state
 const inputTextRef = ref('');
 const isLoadingRef = ref(false);
-const hasResetRef = ref(false);
 const inputRef = ref(null);
 const scrollAreaRef = ref<HTMLDivElement>();
 const enableEditRef = ref(false);
@@ -313,7 +311,6 @@ async function generatePersonaMessage() {
   try {
     // Set loading state
     isLoadingRef.value = true;
-    hasResetRef.value = false;
 
     // NOTE: assuming last message is guaranteed to be non-empty and the user's last message
     // Get the last message from the user
@@ -400,7 +397,6 @@ async function generatePersonaMessage() {
   } finally {
     // Done! update the local state to reflect the end of the process
     isLoadingRef.value = false;
-    hasResetRef.value = false;
     chatRef.value.messages = [...chatRef.value.messages];
   }
 }
@@ -507,7 +503,7 @@ async function updateChatMessageContent(messageIndex: number, content: string, i
   }
 }
 
-async function copyMessage(message: Message) {
+async function copyMessage(message: UIMessage) {
   await copyToClipboard(message.content);
   $q.notify('Message copied to clipboard');
 }
@@ -527,8 +523,6 @@ async function clearCookies() {
   await axios.get('https://curated.aleph.cloud/change-pool', {
     withCredentials: true,
   });
-  // Set the reset flag
-  hasResetRef.value = true;
 }
 
 // function openKnowledgeUploader() {
