@@ -162,16 +162,13 @@ import { useRoute, useRouter } from 'vue-router';
 
 import { defaultChatTopic, inferChatTopic } from 'src/utils/chat';
 
-// LlamaCppApiEngine
 import { LlamaCppApiEngine, Message } from '@libertai/libertai-js';
 
-// Local state
 import { useChatsStore } from 'stores/chats';
 import { useModelsStore } from 'stores/models';
 import { useKnowledgeStore } from 'stores/knowledge';
 import { usePersonasStore } from 'stores/personas';
 
-// Components
 import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
 import MessageInput from 'src/components/MessageInput.vue';
 import axios from 'axios';
@@ -212,11 +209,8 @@ onMounted(() => {
   nextTick(clearCookies);
 });
 
-/* Set chat on initial load */
-
+// Set chat on initial load
 setChat(route.params.id as string);
-
-/* Watchers */
 
 // Update the chat when the route changes
 watch(
@@ -285,12 +279,12 @@ async function setChatName(first_sentence: string) {
 }
 
 // Scroll to the bottom of the chat when new messages are added
-async function scrollBottom() {
+const scrollBottom = () => {
   scrollAreaRef.value?.lastElementChild?.scrollIntoView({
     behavior: 'smooth',
     block: 'end',
   });
-}
+};
 
 // Generate a new response from the AI
 async function generatePersonaMessage() {
@@ -445,8 +439,6 @@ async function sendMessage(content: string) {
   // Wipe the attachments
   // attachmentsRef.value = [];
 
-  nextTick(scrollBottom);
-
   if (!content.trim()) return;
 
   if (content.trim() === '') return;
@@ -495,12 +487,12 @@ async function setChat(chatId: string) {
     await setChatName(loadedChat.messages[0].content);
   }
 
-  // Determine if there are messages we need to respond to
-  // NOTE: this is assuming all chats should be initiated by the user
-  if (loadedChat.messages.length % 2 === 1) {
+  // Determine if there is a message we need to respond to
+  const lastMessage = loadedChat.messages.at(-1);
+  if (lastMessage?.author === 'user') {
     await generatePersonaMessage();
   }
-  nextTick(scrollBottom);
+  scrollBottom();
 }
 
 async function updateChatMessageContent(messageIndex: number, content: string, initialContent: string) {
@@ -520,13 +512,13 @@ async function copyMessage(message: Message) {
   $q.notify('Message copied to clipboard');
 }
 
-async function editMessage(message: any) {
+const editMessage = (message: any) => {
   enableEditRef.value = true;
 
   setTimeout(() => {
     message.$el.click();
   }, 50);
-}
+};
 
 async function clearCookies() {
   // Clear the slots
