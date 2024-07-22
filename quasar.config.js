@@ -58,8 +58,8 @@ module.exports = configure(function (/* ctx */) {
       },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
-      extendViteConf(viteConf, { _isServer, _isClient }) {
-        if (viteConf.build.commonjsOptions == undefined) {
+      extendViteConf(viteConf) {
+        if (viteConf.build.commonjsOptions === undefined) {
           viteConf.build.commonjsOptions = {};
         }
         viteConf.build.commonjsOptions.transformMixedEsModules = true;
@@ -211,7 +211,7 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
     bex: {
-      contentScripts: ['my-content-script'],
+      contentScripts: [],
 
       // extendBexScriptsConf (esbuildConf) {}
       // extendBexManifestJson (json) {}

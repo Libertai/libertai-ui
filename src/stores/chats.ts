@@ -8,6 +8,7 @@ import { Model } from '@libertai/libertai-js';
 import { chatsMigrations } from 'src/utils/migrations/chats';
 import { Chat, ChatMigration, MinimalChat, UIMessage } from 'src/types/chats';
 import { UIPersona } from 'src/types/personas';
+import { LocalForage } from 'src/types/utils';
 
 const CHATS_STORE_NAME = 'chats-store';
 const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
