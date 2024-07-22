@@ -53,7 +53,7 @@
     <q-drawer v-model="leftDrawerOpen" class="flex-grow fit tw-flex tw-flex-col" show-if-above>
       <!-- image link with the logo -->
       <q-item class="q-mb-md text-left" clickable to="/">
-        <img :src="`icons/svg/libertai_full${$q.dark.mode ? '_lighten' : ''}.svg`" alt="Libertai" />
+        <img :src="`icons/svg/libertai_full${$q.dark.mode ? '_lighten' : ''}.svg`" alt="LibertAI" />
       </q-item>
       <div class="q-mr-xl q-ml-md q-mt-md">
         <q-btn class="border-primary-highlight" no-caps rounded text-color="dark-mode-text" to="/new" unelevated>

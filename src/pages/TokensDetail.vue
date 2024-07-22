@@ -12,7 +12,7 @@
                 {{ address?.slice(0, 10) }}...{{ address?.slice(-10) }}
               </span>
             </p>
-            <div class="text-h4 text-bold q-pb-sm text-left">Your Libertai tokens</div>
+            <div class="text-h4 text-bold q-pb-sm text-left">Your LibertAI tokens</div>
             <p class="text-left">
               Run aleph.im network nodes, stake ALEPH to continue earning $LTAI. New ways will be available soon!
             </p>

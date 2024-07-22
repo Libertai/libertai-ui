@@ -11,7 +11,7 @@
 
             <q-card-section>
               <div class="rounded-borders bg-secondary q-pa-md text-left text-light">
-                Hi I'm your Libertai assistant.<br />How can I assist you today?
+                Hi I'm your LibertAI assistant.<br />How can I assist you today?
               </div>
             </q-card-section>
             <q-card-section>

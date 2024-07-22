@@ -8,7 +8,7 @@ export const defaultPersonas: UIPersona[] = [
       item_hash: '90db3237796d27118e0b9e21dae10a4b1179878f869cb6c0058d0d7c00b0440d',
       ipfs_hash: 'QmQMBfgnmuxcQ4kptR1oPE9guYxG13GpASjYVeFQSxNxjE',
     },
-    name: 'Libertai Assistant (default)',
+    name: 'LibertAI Assistant (default)',
     role: 'assistant',
     description:
       "You're an {{char}} running on a decentralized LLM based on open-source models. " +
