@@ -22,7 +22,7 @@ export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
       const missingDocuments = defaultDocumentTitles.filter((title) => !documentTitles.includes(title));
       // Add missing documents
       const addedDocuments: Promise<Document>[] = [];
-      for (let title of missingDocuments) {
+      for (const title of missingDocuments) {
         const doc = defaultKnowledge.find((doc) => doc.title === title)!;
         let tags = doc.tags ? doc.tags : [];
         tags.push(DEFAULT_KNOWLEDGE_TAG);
