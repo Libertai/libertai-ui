@@ -4,7 +4,7 @@
       <div class="row tw-justify-center max-sm:tw-m-4 sm:tw-m-12">
         <q-card class="my-card center text-center q-pa-md" flat>
           <q-avatar>
-            <img :src="getPersonaAvatarUrl(personasStore.persona.avatar.ipfs_hash)" alt="avatar" />
+            <img :src="getPersonaAvatarUrl(selectedPersona.avatar.ipfs_hash)" alt="avatar" />
           </q-avatar>
 
           <q-card-section>
@@ -13,7 +13,16 @@
             </div>
           </q-card-section>
           <q-card-section>
-            <persona-drop-down />
+            <persona-dropdown
+              :selected-persona="selectedPersona"
+              @select-persona="(persona: UIPersona) => (selectedPersona = persona)"
+            />
+          </q-card-section>
+          <q-card-section>
+            <model-selector
+              :selected-model="selectedModel"
+              @select-model="(model: UIModel) => (selectedModel = model)"
+            />
           </q-card-section>
         </q-card>
       </div>
@@ -34,33 +43,49 @@
   </q-page>
 </template>
 <script lang="ts" setup>
-import { defaultChatTopic } from 'src/utils/chat';
-
-// Import State
+import { defaultChatTopic } from 'src/utils/chat'; // Import State
 import { useModelsStore } from 'stores/models';
 import { useChatsStore } from 'stores/chats';
 import { usePersonasStore } from 'stores/personas';
 import { useSettingsStore } from 'stores/settings';
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-
-// Import components
+import { ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router'; // Import components
 import MessageInput from 'src/components/MessageInput.vue';
-import PersonaDropDown from 'src/components/PersonaDropDown.vue';
+import PersonaDropdown from 'components/select/PersonaSelector.vue';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
+import ModelSelector from 'components/select/ModelSelector.vue';
+import { UIModel } from 'src/utils/models';
+import { UIPersona } from 'src/types/personas';
 
 const router = useRouter();
 
 // Stored State
-
 const modelsStore = useModelsStore();
 const chatsStore = useChatsStore();
 const personasStore = usePersonasStore();
 
 const username = useSettingsStore().username;
+const route = useRoute();
 
-// Message input state
+// Inputs
+const selectedModel = ref<UIModel>(modelsStore.models[0]);
+const selectedPersona = ref<UIPersona>(personasStore.personas[0]);
 const messageInputRef = ref('');
+
+watch(
+  () => route.query.persona as string | undefined,
+  (personaId: string | undefined) => {
+    if (personaId) {
+      const persona = personasStore.personas.find((p) => p.id === personaId);
+      if (persona) {
+        selectedPersona.value = persona;
+      }
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 
 async function sendMessage() {
   const message = messageInputRef.value;
@@ -71,10 +96,10 @@ async function sendMessage() {
   // Extract the values out of our relevant refs
   const title = defaultChatTopic;
   // NOTE: this is a ref to the store, so we need to deep clone it
-  const persona = JSON.parse(JSON.stringify(personasStore.persona));
+  const persona = JSON.parse(JSON.stringify(selectedPersona.value));
 
   // Creates the new chat
-  const chat = await chatsStore.createChat(title, username, modelsStore.selectedModel.id, persona);
+  const chat = await chatsStore.createChat(title, username, selectedModel.value.id, persona);
   // Append the first user message to the chat history
   await chatsStore.appendUserMessage(chat.id, message);
 

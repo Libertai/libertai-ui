@@ -5,7 +5,6 @@ import { getAccount, getBalance } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
 import { base } from '@wagmi/vue/chains';
 import { useTokensStore } from 'stores/tokens';
-import { useModelsStore } from 'stores/models';
 
 const LTAI_BASE_ADDRESS = '0xF8B1b47AA748F5C7b5D0e80C726a843913EB573a';
 
@@ -65,11 +64,8 @@ export const useAccountStore = defineStore('account', {
     },
 
     onDisconnect() {
-      const modelsStore = useModelsStore();
-
       this.alephStorage = null;
       this.ltaiBalance = 0;
-      modelsStore.unselectPremiumModel();
     },
   },
 });

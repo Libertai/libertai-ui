@@ -16,12 +16,12 @@
         v-close-popup
         :disable="model.premium && accountStore.ltaiBalance < 100"
         clickable
-        @click="modelsStore.selectedModel = model"
+        @click="emit('selectModel', model)"
       >
         <q-item-section>
           <q-item-label class="tw-flex tw-space-x-1">
             <span>{{ model.name }}</span>
-            <img v-if="model.premium" alt="premium" src="~assets/star.svg" width="16" />
+            <img v-if="model.premium" alt="premium" src="../../assets/star.svg" width="16" />
             <q-tooltip v-if="model.premium && accountStore.ltaiBalance < 100"
               >Premium model ({{ tokenGatingMessage }})
             </q-tooltip>
@@ -35,14 +35,21 @@
 <script lang="ts" setup>
 import { useModelsStore } from 'stores/models';
 import { useAccountStore } from 'stores/account';
-import { computed } from 'vue';
+import { computed, PropType } from 'vue';
 import { getTokenGatingMessage } from 'src/utils/messages';
-import { storeToRefs } from 'pinia';
+import { UIModel } from 'src/utils/models';
 
 const modelsStore = useModelsStore();
 const accountStore = useAccountStore();
 
-const { selectedModel } = storeToRefs(modelsStore);
+const { selectedModel } = defineProps({
+  selectedModel: {
+    type: Object as PropType<UIModel>,
+    required: true,
+  },
+});
+
+const emit = defineEmits<{ selectModel: [value: UIModel] }>();
 
 const tokenGatingMessage = computed(() => getTokenGatingMessage(accountStore.ltaiBalance, 100));
 </script>

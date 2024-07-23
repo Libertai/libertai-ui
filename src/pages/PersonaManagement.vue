@@ -23,11 +23,10 @@
       />
       <persona-dialog
         v-model="editPersona"
-        :base-persona="personasStore.persona"
+        :base-persona="selectedPersona"
         @save-persona="
           (persona: BasePersonaEdition) => {
-            const fullPersona: UIPersona = { ...personasStore.persona, ...persona };
-            personasStore.persona = fullPersona;
+            const fullPersona: UIPersona = { ...selectedPersona!, ...persona };
 
             personasStore.personas = personasStore.personas.map((userPersona) => {
               if (userPersona.id === fullPersona.id) {
@@ -136,17 +135,17 @@ const router = useRouter();
 
 const createPersona = ref(false);
 const editPersona = ref(false);
+const selectedPersona = ref<UIPersona | undefined>(undefined);
 const basePersonaCreate = ref<BasePersonaEdition | undefined>(undefined);
 
 const tokenGatingMessage = computed(() => getTokenGatingMessage(accountStore.ltaiBalance, 100));
 
 const startChatWithPersona = (persona: UIPersona) => {
-  personasStore.persona = persona;
-  router.push('/new');
+  router.push(`/new?persona=${persona.id}`);
 };
 
 const startEditingPersona = (persona: UIPersona) => {
-  personasStore.persona = persona;
+  selectedPersona.value = persona;
   editPersona.value = true;
 };
 
@@ -157,9 +156,6 @@ const duplicatePersona = (persona: UIPersona) => {
 
 const deletePersona = (persona: UIPersona) => {
   personasStore.personas = personasStore.personas.filter((userPersona) => userPersona.id !== persona.id);
-  if (personasStore.persona.id === persona.id) {
-    personasStore.persona = personasStore.personas.find((userPersona) => !userPersona.hidden)!;
-  }
 };
 
 const reversePersonaVisibility = (persona: UIPersona) => {

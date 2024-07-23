@@ -168,7 +168,6 @@ import { LlamaCppApiEngine, Message } from '@libertai/libertai-js';
 import { useChatsStore } from 'stores/chats';
 import { useModelsStore } from 'stores/models';
 import { useKnowledgeStore } from 'stores/knowledge';
-import { usePersonasStore } from 'stores/personas';
 
 import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
 import MessageInput from 'src/components/MessageInput.vue';
@@ -185,7 +184,6 @@ const router = useRouter();
 const chatsStore = useChatsStore();
 const modelsStore = useModelsStore();
 const knowledgeStore = useKnowledgeStore();
-const personasStore = usePersonasStore();
 const settingsStore = useSettingsStore();
 
 // Local page state
@@ -209,15 +207,13 @@ onMounted(() => {
   nextTick(clearCookies);
 });
 
-// Set chat on initial load
-setChat(route.params.id as string);
-
 // Update the chat when the route changes
 watch(
   () => route.params.id as string,
-  async (newId) => {
+  async (newId: string) => {
     await setChat(newId);
   },
+  { immediate: true },
 );
 
 // Update whether we should show the knowledge uploader based on whether the user is connected
@@ -443,8 +439,6 @@ async function setChat(chatId: string) {
     await router.push({ name: 'new-chat' });
     return;
   }
-
-  personasStore.persona = loadedChat.persona;
 
   // Extract the chat properties
   const title = loadedChat.title;
