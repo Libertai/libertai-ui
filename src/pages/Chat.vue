@@ -92,7 +92,7 @@
               dense
               flat
               size="sm"
-              @click="editMessage($refs['message-' + message_index] as any[0])"
+              @click="editMessage(($refs['message-' + message_index] as any)[0])"
             >
               <q-tooltip>Edit</q-tooltip>
             </q-btn>
@@ -228,28 +228,6 @@ watch(
 //   },
 // );
 
-// Update the chat model when the selected model changes
-watch(
-  () => modelsStore.selectedModel,
-  async (newModel) => {
-    // Ser / DeSer to ensure we have a fresh copy
-    newModel = JSON.parse(JSON.stringify(newModel));
-
-    if (!chatRef.value) {
-      return;
-    }
-    let chatModelApiUrl = chatRef.value.model.apiUrl;
-    if (chatModelApiUrl !== newModel.apiUrl) {
-      // We have a new model, so update local and stored state
-      chatRef.value.model = newModel;
-      await chatsStore.updateChatModel(chatRef.value.id, newModel);
-
-      // Send a notification
-      $q.notify(`Changing current chat model to ${newModel.name}`);
-    }
-  },
-);
-
 /* Helper functions */
 
 // function addAttachment(attachmentEvent: AttachmentAddedEvent) {
@@ -297,7 +275,14 @@ async function generatePersonaMessage() {
   const username = chatRef.value.username;
   const messages = JSON.parse(JSON.stringify(chatRef.value.messages));
   const persona = chatRef.value.persona;
-  const model = chatRef.value.model;
+
+  const modelId = chatRef.value.modelId;
+  const model = modelsStore.models.find((model) => model.id === modelId);
+
+  if (model === undefined) {
+    console.error('Model not available');
+    return;
+  }
 
   // Create a new message to encapsulate our response
   const response: UIMessage = {
@@ -448,13 +433,13 @@ async function sendMessage(content: string) {
 
 // Set a chat by its ID
 async function setChat(chatId: string) {
-  // This is annoying but we need to set whether the user is connected
+  // This is annoying, but we need to set whether the user is connected
   //enableKnowledgeRef.value = account.isConnected.value;
 
   // Load the chat from the store and set it
   const loadedChat = await chatsStore.readChat(chatId);
   if (!loadedChat) {
-    console.error('pages::Chat.vue::setChat - chat not found');
+    console.error('Chat not found');
     await router.push({ name: 'new-chat' });
     return;
   }
@@ -463,15 +448,11 @@ async function setChat(chatId: string) {
 
   // Extract the chat properties
   const title = loadedChat.title;
-  // Load messages, mapping over with additional properties we need in the UI
-  // TODO: these should already be there ?
+
+  // Load messages and remove potential previous errors
   loadedChat.messages = loadedChat.messages.map((message) => ({ ...message, stopped: true, error: null }));
 
   chatRef.value = loadedChat;
-
-  // Set the selected model for the chat by its URL
-  const modelApiUrl = loadedChat.model.apiUrl;
-  modelsStore.setModelByURL(modelApiUrl);
 
   // Set the chat title if it's not set
   if (title === defaultChatTopic || title === '') {

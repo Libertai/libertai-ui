@@ -1,4 +1,4 @@
-import { Message, Model } from '@libertai/libertai-js';
+import { Message } from '@libertai/libertai-js';
 import { UIPersona } from 'src/types/personas';
 
 // TODO: clean this type and understand the added properties
@@ -16,7 +16,7 @@ export type Chat = {
   username: string;
   tags: string[];
 
-  model: Model;
+  modelId?: string;
   persona: UIPersona;
   messages: UIMessage[];
   createdAt: Date;

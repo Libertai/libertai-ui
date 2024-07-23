@@ -30,7 +30,7 @@ export const modelDefaults = {
   withCredentials: true,
 };
 
-export type UIModel = Model & { premium: boolean };
+export type UIModel = Model & { id: string; premium: boolean };
 
 /*
  * Default Models Configuration
@@ -49,6 +49,7 @@ export const defaultModels: UIModel[] = [
 
   // Function call model
   {
+    id: 'c237ead6-165e-4725-af4f-a1b50b770e1e',
     name: 'Nous Hermes 2 Pro (Llama 3 8B, fast)',
     ...modelDefaults,
     apiUrl:
@@ -59,6 +60,7 @@ export const defaultModels: UIModel[] = [
 
   // Roleplay model
   {
+    id: 'a8ba5cfe-bd86-4f81-97fa-8f68300488b7',
     name: 'Roleplay (7B, fast)',
     ...modelDefaults,
     // Set our apiUrl
@@ -79,6 +81,7 @@ export const defaultModels: UIModel[] = [
 
   // Mixtral
   {
+    id: '068f9afc-281c-45b8-bea2-317d3c3bb469',
     name: 'Mixtral (8x7B MOE, smart)',
     ...modelDefaults,
     apiUrl:
@@ -89,6 +92,7 @@ export const defaultModels: UIModel[] = [
 
   // Phi-3-mini
   {
+    id: 'b253aacf-cbbc-4e46-8187-74bfd5398d78',
     name: 'Phi-3-mini (3.8B, long context)',
     ...modelDefaults,
     apiUrl:
@@ -100,6 +104,7 @@ export const defaultModels: UIModel[] = [
 
   // Nous Hermes 2
   {
+    id: '2f5219e5-d6e8-411a-b7a4-30dd3623e1e8',
     name: 'Nous Hermes 2 (34B, smart)',
     ...modelDefaults,
     apiUrl:
@@ -110,6 +115,7 @@ export const defaultModels: UIModel[] = [
 
   // Llama 3 Instruct (70B, genius, slow)
   {
+    id: '173ad7b5-4aa9-4ccd-8fdd-f8122499c2cb',
     name: 'Llama 3 Instruct (70B, genius, slow)',
     ...modelDefaults,
     // Set our apiUrl
@@ -137,6 +143,7 @@ export const defaultModels: UIModel[] = [
 
   // DeepSeek Coder V2 (6.7B, developer)
   {
+    id: 'c55a8d42-9f2f-4821-aa60-ee9ff8055e50',
     name: 'DeepSeek Coder V2 (6.7B, developer)',
     ...modelDefaults,
     apiUrl:

@@ -1,10 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { defineStore } from 'pinia';
-
-import { defaultModels } from 'src/utils/models';
 import { chatTag } from 'src/utils/chat';
 import idb from 'src/utils/idb';
-import { Model } from '@libertai/libertai-js';
 import { chatsMigrations } from 'src/utils/migrations/chats';
 import { Chat, ChatMigration, MinimalChat, UIMessage } from 'src/types/chats';
 import { UIPersona } from 'src/types/personas';
@@ -59,8 +56,6 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
   },
   actions: {
     async load() {
-      // Update the models for all chats
-      await this.chatsStore.updateModels(defaultModels);
       // Get the partial chats
       this.chats = await this.chatsStore.readChats();
 
@@ -83,8 +78,8 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       return await this.chatsStore.readChat(id);
     },
 
-    async createChat(title: string, username: string, model: Model, persona: UIPersona): Promise<Chat> {
-      const chat = await this.chatsStore.createChat(title, username, [], model, persona);
+    async createChat(title: string, username: string, modelId: string, persona: UIPersona): Promise<Chat> {
+      const chat = await this.chatsStore.createChat(title, username, [], modelId, persona);
       const tag = chatTag(chat.id);
       await this.chatsStore.pushChatTag(chat.id, tag);
       this.chats.push(chat);
@@ -97,17 +92,6 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       this.chats = this.chats.map((chat) => {
         if (chat.id === chatId) {
           chat.title = title;
-        }
-        return chat;
-      });
-    },
-
-    async updateChatModel(chatId: string, model: Model) {
-      await this.chatsStore.updateChat(chatId, { model });
-      // Update the partial chats
-      this.chats = this.chats.map((chat) => {
-        if (chat.id === chatId) {
-          chat.model = model;
         }
         return chat;
       });
@@ -158,43 +142,14 @@ class ChatsStore {
     await Promise.all(updatedChats);
   }
 
-  async updateModels(models: Model[]) {
-    // Create an array for the updates we will resolve
-    const updatedChats: Promise<Chat>[] = [];
-
-    // Iterate over all chats and update the model if necessary
-    await this.store.iterate((chat: Chat) => {
-      // Find the chat and model
-      const apiUrl = chat.model?.apiUrl;
-      const matchingModel = models.find((m) => m.apiUrl === apiUrl);
-
-      // Determine if the model has changed
-      let changed = false;
-      if (matchingModel) {
-        // Do a deep comparison of the models
-        if (matchingModel !== chat.model) {
-          chat.model = matchingModel;
-          changed = true;
-        }
-      }
-
-      // If the model has changed, update the chat
-      if (changed) {
-        updatedChats.push(idb.put(chat.id, chat, this.store));
-      }
-    });
-
-    await Promise.all(updatedChats);
-  }
-
-  async createChat(title: string, username: string, tags: string[], model: Model, persona: UIPersona) {
+  async createChat(title: string, username: string, tags: string[], modelId: string, persona: UIPersona) {
     const id = uuidv4();
     const chat: Chat = {
       id,
       title,
       tags,
       username,
-      model,
+      modelId,
       persona,
       messages: [],
       createdAt: new Date(),
@@ -204,7 +159,7 @@ class ChatsStore {
 
   async readChats(): Promise<MinimalChat[]> {
     const result: MinimalChat[] = [];
-    await this.store.iterate((value: Chat, _key) => {
+    await this.store.iterate((value: Chat) => {
       const chat = value;
       const partialChat = {
         id: chat.id,

@@ -1,25 +1,21 @@
 <template>
-  <q-page class="align-items-center" style="display: flex; flex-direction: column">
+  <q-page class="align-items-center tw-flex tw-flex-col">
     <div class="q-pb-xl">
-      <div :class="$q.screen.gt.sm ? 'row q-ma-xl' : 'row qm-ma-md'">
-        <div class="col"></div>
-        <div :class="$q.screen.gt.sm ? 'col-4' : 'col-10'">
-          <q-card class="my-card center text-center q-pa-md" flat>
-            <q-avatar>
-              <img :src="getPersonaAvatarUrl(personasStore.persona.avatar.ipfs_hash)" alt="avatar" />
-            </q-avatar>
+      <div class="row tw-justify-center max-sm:tw-m-4 sm:tw-m-12">
+        <q-card class="my-card center text-center q-pa-md" flat>
+          <q-avatar>
+            <img :src="getPersonaAvatarUrl(personasStore.persona.avatar.ipfs_hash)" alt="avatar" />
+          </q-avatar>
 
-            <q-card-section>
-              <div class="rounded-borders bg-secondary q-pa-md text-left text-light">
-                Hi I'm your LibertAI assistant.<br />How can I assist you today?
-              </div>
-            </q-card-section>
-            <q-card-section>
-              <persona-drop-down />
-            </q-card-section>
-          </q-card>
-        </div>
-        <div class="col"></div>
+          <q-card-section>
+            <div class="rounded-borders bg-secondary q-pa-md text-center text-light">
+              Hi I'm your LibertAI assistant.<br />How can I assist you today?
+            </div>
+          </q-card-section>
+          <q-card-section>
+            <persona-drop-down />
+          </q-card-section>
+        </q-card>
       </div>
       <div class="fixed-bottom absolute q-mb-xl q-pb-xs">
         <message-input
@@ -74,14 +70,11 @@ async function sendMessage() {
 
   // Extract the values out of our relevant refs
   const title = defaultChatTopic;
-  // NOTE: these are refs to the store, so we need to deep clone them
-  const model = JSON.parse(JSON.stringify(modelsStore.selectedModel));
+  // NOTE: this is a ref to the store, so we need to deep clone it
   const persona = JSON.parse(JSON.stringify(personasStore.persona));
 
-  // Reset the personas now that we have a deep clone of the selected persona
-  //personasStore.personas = personasClone;
   // Creates the new chat
-  const chat = await chatsStore.createChat(title, username, model, persona);
+  const chat = await chatsStore.createChat(title, username, modelsStore.selectedModel.id, persona);
   // Append the first user message to the chat history
   await chatsStore.appendUserMessage(chat.id, message);
 
