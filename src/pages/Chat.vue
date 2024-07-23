@@ -292,17 +292,17 @@ async function generatePersonaMessage() {
     return;
   }
 
-  let chatId = chatRef.value.id;
-  let chatTags = chatRef.value.tags;
+  const chatId = chatRef.value.id;
+  const chatTags = chatRef.value.tags;
   const username = chatRef.value.username;
   const messages = JSON.parse(JSON.stringify(chatRef.value.messages));
   const persona = chatRef.value.persona;
-  let model = chatRef.value.model;
+  const model = chatRef.value.model;
 
   // Create a new message to encapsulate our response
-  let response: UIMessage = {
+  const response: UIMessage = {
     author: 'ai',
-    role: persona.name,
+    role: persona.role,
     content: '',
     stopped: false,
     error: null,
@@ -316,9 +316,9 @@ async function generatePersonaMessage() {
 
     // NOTE: assuming last message is guaranteed to be non-empty and the user's last message
     // Get the last message from the user
-    let lastMessage = messages[messages.length - 1];
-    let searchResultMessages: Message[] = [];
-    let searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
+    const lastMessage = messages[messages.length - 1];
+    const searchResultMessages: Message[] = [];
+    const searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
     searchResults.forEach((result) => {
       searchResultMessages.push({
         role: 'search-result',
@@ -371,14 +371,8 @@ async function generatePersonaMessage() {
     const allMessages: Message[] = [...expandedMessages, ...searchResultMessages];
 
     // Generate a stream of responses from the AI
-    for await (const output of inferenceEngine.generateAnswer(
-      allMessages,
-      model,
-      { ...persona, role: persona.role ?? persona.name }, // For backward-compatibility
-      username,
-      false,
-    )) {
-      let stopped = output.stopped;
+    for await (const output of inferenceEngine.generateAnswer(allMessages, model, persona, username, false)) {
+      const stopped = output.stopped;
       let content = output.content;
       if (!stopped) {
         content += ' *[writing ...]*';

@@ -16,7 +16,7 @@
         :base-persona="basePersonaCreate"
         title="Create persona"
         @save-persona="
-          (persona: UIPersona) => {
+          (persona: BasePersonaEdition) => {
             personasStore.personas.push({ ...persona, allowEdit: true, hidden: false, id: uuidv4() });
           }
         "
@@ -25,12 +25,13 @@
         v-model="editPersona"
         :base-persona="personasStore.persona"
         @save-persona="
-          (persona: UIPersona) => {
-            personasStore.persona = persona;
+          (persona: BasePersonaEdition) => {
+            const fullPersona: UIPersona = { ...personasStore.persona, ...persona };
+            personasStore.persona = fullPersona;
 
             personasStore.personas = personasStore.personas.map((userPersona) => {
-              if (userPersona.id === persona.id) {
-                return persona;
+              if (userPersona.id === fullPersona.id) {
+                return fullPersona;
               }
               return userPersona;
             });
@@ -48,7 +49,7 @@
         unelevated
         @click="($refs['importPersonaUpload'] as any).click()"
       >
-        <q-tooltip v-if="tokenGatingMessage !== undefined">{{ `(${tokenGatingMessage})` }}</q-tooltip>
+        <q-tooltip v-if="tokenGatingMessage !== undefined">{{ tokenGatingMessage }}</q-tooltip>
       </q-btn>
     </div>
 
@@ -127,8 +128,7 @@ import { useAccountStore } from 'stores/account';
 import { exportFile } from 'quasar';
 import { getTokenGatingMessage } from 'src/utils/messages';
 import { z } from 'zod';
-import { BasePersonaDialogProp } from 'components/PersonaDialog.vue';
-import { UIPersona } from 'src/types/personas';
+import { BasePersonaEdition, UIPersona } from 'src/types/personas';
 
 const personasStore = usePersonasStore();
 const accountStore = useAccountStore();
@@ -136,7 +136,7 @@ const router = useRouter();
 
 const createPersona = ref(false);
 const editPersona = ref(false);
-const basePersonaCreate = ref<BasePersonaDialogProp | undefined>(undefined);
+const basePersonaCreate = ref<BasePersonaEdition | undefined>(undefined);
 
 const tokenGatingMessage = computed(() => getTokenGatingMessage(accountStore.ltaiBalance, 100));
 
@@ -175,13 +175,11 @@ const personaExportImportSchema = z.object({
   data: z.object({
     description: z.string(),
     name: z.string(),
-    avatar: z.union([
-      z.object({
-        item_hash: z.string(),
-        ipfs_hash: z.string(),
-      }),
-      z.string().url(),
-    ]),
+    role: z.string(),
+    avatar: z.object({
+      item_hash: z.string(),
+      ipfs_hash: z.string(),
+    }),
   }),
 });
 type PersonaExportImportSchema = z.infer<typeof personaExportImportSchema>;
@@ -192,6 +190,7 @@ const exportPersona = (persona: UIPersona) => {
     data: {
       description: persona.description,
       name: persona.name,
+      role: persona.role,
       avatar: persona.avatar,
     },
   };
@@ -218,9 +217,7 @@ const importPersona = (event: Event) => {
       return;
     }
 
-    const avatar = typeof parsedFile.data.data.avatar === 'string' ? undefined : parsedFile.data.data.avatar;
-
-    basePersonaCreate.value = { ...parsedFile.data.data, avatar };
+    basePersonaCreate.value = parsedFile.data.data;
     createPersona.value = true;
   };
   reader.readAsText(file);
