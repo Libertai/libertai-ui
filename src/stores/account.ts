@@ -44,7 +44,8 @@ export const useAccountStore = defineStore('account', {
 
       this.alephStorage = alephStorage;
       const settingsOnAleph = await this.alephStorage.fetch();
-      await settingsStore.update(settingsOnAleph ?? {});
+      const saveOnAleph = !settingsOnAleph;
+      await settingsStore.update(settingsOnAleph ?? {}, saveOnAleph);
     },
 
     async getLTAIBalance(): Promise<number> {
