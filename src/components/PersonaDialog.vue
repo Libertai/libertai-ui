@@ -57,7 +57,7 @@
 <script lang="ts" setup>
 import { PropType, ref, toRaw, watch } from 'vue';
 import AlephAvatar from 'components/AlephAvatar.vue';
-import { UIPersona } from 'src/utils/personas';
+import { UIPersona } from 'src/types/personas';
 
 export type BasePersonaDialogProp = Partial<Pick<UIPersona, 'name' | 'description' | 'avatar'>>;
 

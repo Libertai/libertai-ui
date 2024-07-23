@@ -24,7 +24,9 @@
               v-slot="scope"
               v-model="message.content"
               auto-save
-              @save="(v, iV) => updateChatMessageContent(message_index, v, iV)"
+              @save="
+                (value: string, initialValue: string) => updateChatMessageContent(message_index, value, initialValue)
+              "
             >
               <strong>{{ message.role }}</strong>
               <q-input v-model="scope.value" autofocus autogrow counter dense />

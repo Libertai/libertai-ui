@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 
-import { defaultPersonas, UIPersona } from '../utils/personas';
+import { defaultPersonas } from '../utils/personas';
+import { UIPersona } from 'src/types/personas';
 
 export const usePersonasStore = defineStore('personas', {
   state: () => ({

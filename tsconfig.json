@@ -2,7 +2,8 @@
   "extends": "@quasar/app-vite/tsconfig-preset",
   "compilerOptions": {
     "baseUrl": ".",
-    "target": "ESNext"
+    "target": "ESNext",
+    "skipLibCheck": true
   },
   "exclude": [
     "./dist",
