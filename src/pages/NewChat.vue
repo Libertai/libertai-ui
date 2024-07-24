@@ -90,12 +90,11 @@ async function sendMessage({ content, attachments }: SendMessageParams) {
   const title = defaultChatTopic;
   // NOTE: this is a ref to the store, so we need to deep clone it
   const persona = JSON.parse(JSON.stringify(selectedPersona.value));
-  const parsedAttachments = JSON.parse(JSON.stringify(attachments));
 
   // Creates the new chat
   const chat = await chatsStore.createChat(title, username, selectedModel.value.id, persona);
   // Append the first user message to the chat history
-  await chatsStore.appendUserMessage(chat.id, content, parsedAttachments);
+  await chatsStore.appendUserMessage(chat.id, content, attachments);
 
   // Navigate to the chat page
   await router.push({ name: 'chat', params: { id: chat.id } });

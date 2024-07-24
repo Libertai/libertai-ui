@@ -33,6 +33,8 @@ export const processFile = async (file: File): Promise<MessageAttachment> => {
     throw error;
   }
 
+  // TODO: throw error if file is too big
+
   return { title, content: extractedText, type, id: uuidv4() };
 };
 

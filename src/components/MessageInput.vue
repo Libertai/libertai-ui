@@ -29,7 +29,9 @@
           icon="img:icons/svg/attachment.svg"
           round
           @click="($refs.messageAttachmentsUpload as any).click()"
-        />
+        >
+          <q-tooltip>Add attachments</q-tooltip>
+        </q-btn>
       </template>
       <template #append>
         <!--<q-btn round dense flat icon="img:icons/mic.svg" @click="sendMessage" color="" class="" />-->
@@ -41,6 +43,7 @@
       </template>
     </q-input>
     <!-- Hidden attachments upload -->
+    <!-- TODO: Handle new attachments and removal of attachments-->
     <input
       ref="messageAttachmentsUpload"
       accept=".txt,.md,.pdf"
@@ -87,19 +90,20 @@ const processMessageAttachments = async (event: any) => {
   attachments.value = attachmentsData;
 };
 
-const sendMessage = (event: any) => {
-  if (event.shiftKey) {
+const sendMessage = (event: Event | KeyboardEvent) => {
+  if ((event as KeyboardEvent).shiftKey) {
     return;
   }
   event.preventDefault();
 
   const content = message.value;
+  const attachmentsData = JSON.parse(JSON.stringify(attachments.value));
 
   if (content.trim() === '' || content.length === 0) {
     return;
   }
 
-  emit('sendMessage', { content, attachments: attachments.value });
+  emit('sendMessage', { content, attachments: attachmentsData });
 
   // Wipe the values
   message.value = '';

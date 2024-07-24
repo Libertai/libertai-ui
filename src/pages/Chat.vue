@@ -5,8 +5,8 @@
       <q-list class="col-grow q-ma-xl">
         <!-- eslint-disable-next-line vue/valid-v-for -->
         <q-item
-          v-for="(message, message_index) in chatRef!.messages"
-          :class="`q-py-md q-my-md ${$q.screen.gt.sm ? 'q-mx-xl' : 'q-mx-sm'} items-start dyn-container chat-item rounded-borders ${$q.dark.mode ? '' : message.author === 'user' ? 'bg-white' : 'bg-secondary'}`"
+          v-for="(message, message_index) in chatRef.messages"
+          :class="`q-py-md q-my-md max-sm:tw-mx-2 sm:tw-mx-12 items-start dyn-container chat-item rounded-borders ${$q.dark.mode ? '' : message.author === 'user' ? 'bg-white' : 'bg-secondary'}`"
         >
           <!-- Display the avatar of the user or the AI -->
           <q-item-section avatar>
@@ -14,7 +14,7 @@
               <img :src="getPersonaAvatarUrl(settingsStore.avatar.ipfs_hash)" alt="user" />
             </q-avatar>
             <q-avatar v-else>
-              <img :src="getPersonaAvatarUrl(chatRef!.persona.avatar.ipfs_hash)" alt="AI" />
+              <img :src="getPersonaAvatarUrl(chatRef.persona.avatar.ipfs_hash)" alt="AI" />
             </q-avatar>
           </q-item-section>
           <!-- Edit message popup -- triggered on click if the edit mode is enabled -->
@@ -33,8 +33,8 @@
             </q-popup-edit>
             <!-- Display the name of the user or the AI -->
             <q-item-label class="text-semibold q-mb-md">
-              <span v-if="message.author === 'user'">{{ chatRef?.username }}</span>
-              <span v-else>{{ chatRef?.persona.name }}</span>
+              <span v-if="message.author === 'user'">{{ chatRef.username }}</span>
+              <span v-else>{{ chatRef.persona.name }}</span>
 
               <span class="bull-date">{{ formatDate(message.timestamp) }}</span>
             </q-item-label>
@@ -101,40 +101,10 @@
       </q-list>
     </div>
 
-    <div class="row items-center q-mb-md q-mr-md">
-      <!-- "+" icon for uploading files, shown only when knowledge search is enabled -->
-      <!--      <q-btn-->
-      <!--        v-if="enableKnowledgeRef"-->
-      <!--        class="cursor-pointer q-mr-sm"-->
-      <!--        flat-->
-      <!--        icon="add"-->
-      <!--        round-->
-      <!--        style="margin-left: 16px"-->
-      <!--        @click="openKnowledgeUploader"-->
-      <!--      />-->
-
-      <!--      <q-chip-->
-      <!--        v-for="attachment in attachmentsRef"-->
-      <!--        :key="attachment.id"-->
-      <!--        removable-->
-      <!--        @remove="removeAttachment(attachment)"-->
-      <!--      >-->
-      <!--        {{ attachment.title }}-->
-      <!--      </q-chip>-->
+    <div class="q-mb-md q-mr-md">
       <message-input :is-loading="isLoadingRef" class="col" @send-message="sendMessage" />
     </div>
 
-    <!-- Enable edit mode -->
-    <!--<div class="fixed-bottom-right q-mb-md q-mr-md" style="z-index: 10">
-      <div class="q-gutter-x-md" style="display: flex; align-items: center; justify-content: flex-end">
-        <q-checkbox v-model="enableEditRef" left-label>
-          <q-tooltip anchor="top right" class="bg-primary" self="bottom right">
-            When this is activated, just click on a message to start editing it.
-          </q-tooltip>
-          Enable edits
-        </q-checkbox>
-      </div>
-    </div>-->
     <!-- This should really not pass the ref, but it's a quick fix for now -->
     <!--    <q-dialog v-model="showKnowledgeUploaderRef" position="bottom">-->
     <!--      <KnowledgeStoreUploader-->
@@ -184,9 +154,7 @@ const settingsStore = useSettingsStore();
 const isLoadingRef = ref(false);
 const scrollAreaRef = ref<HTMLDivElement>();
 const enableEditRef = ref(false);
-// const enableKnowledgeRef = ref(false);
 // const showKnowledgeUploaderRef = ref(false);
-// const attachmentsRef = ref<any[]>([]);
 
 // Chat specific state
 const chatRef = ref<Chat>();
@@ -208,27 +176,7 @@ watch(
   { immediate: true },
 );
 
-// Update whether we should show the knowledge uploader based on whether the user is connected
-// watch(
-//   () => account.active,
-//   (active) => {
-//     enableKnowledgeRef.value = active;
-//   },
-// );
-
 /* Helper functions */
-
-// function addAttachment(attachmentEvent: AttachmentAddedEvent) {
-//   const attachment = JSON.parse(JSON.stringify(attachmentEvent));
-//   attachmentsRef.value.push(attachment);
-// }
-
-// async function removeAttachment(attachment) {
-//   Remove the attachment from the knowledge store
-// await knowledgeStore.removeDocument(attachment.documentId);
-// let index = attachmentsRef.value.indexOf(attachment);
-// attachmentsRef.value.splice(index, 1);
-// }
 
 // Set the name of the chat based on the first sentence
 async function setChatName(first_sentence: string) {
@@ -396,10 +344,9 @@ async function sendMessage({ content, attachments }: SendMessageParams) {
   }
 
   const chatId = chatRef.value.id;
-  const parsedAttachments = JSON.parse(JSON.stringify(attachments));
 
   // Append the new message to the chat history and push to local state
-  const newMessage = await chatsStore.appendUserMessage(chatId, content, parsedAttachments);
+  const newMessage = await chatsStore.appendUserMessage(chatId, content, attachments);
   chatRef.value.messages.push({ ...newMessage, stopped: true, error: null });
 
   // Scroll to the bottom of the chat
@@ -411,9 +358,6 @@ async function sendMessage({ content, attachments }: SendMessageParams) {
 
 // Set a chat by its ID
 async function setChat(chatId: string) {
-  // This is annoying, but we need to set whether the user is connected
-  //enableKnowledgeRef.value = account.isConnected.value;
-
   // Load the chat from the store and set it
   const loadedChat = await chatsStore.readChat(chatId);
   if (!loadedChat) {
