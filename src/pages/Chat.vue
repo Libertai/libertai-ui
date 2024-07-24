@@ -303,7 +303,7 @@ async function generatePersonaMessage() {
     const expandedMessages = messages
       .map((message: UIMessage): Message[] => {
         const ret = [];
-        // Push any attachments ahead of the message
+        // Push any attachments as messages ahead of the message itself
         message.attachments?.forEach((attachment) => {
           if (attachment.content) {
             ret.push({
@@ -333,6 +333,7 @@ async function generatePersonaMessage() {
         //     });
         //   });
         // }
+
         // Push the message itself
         ret.push(message);
         return ret;

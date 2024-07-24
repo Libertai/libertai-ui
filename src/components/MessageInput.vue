@@ -41,13 +41,19 @@
       </template>
     </q-input>
     <!-- Hidden attachments upload -->
-    <input ref="messageAttachmentsUpload" accept=".txt" hidden type="file" @change="processMessageAttachments" />
+    <input
+      ref="messageAttachmentsUpload"
+      accept=".txt,.md,.pdf"
+      hidden
+      type="file"
+      @change="processMessageAttachments"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { processFile } from 'src/utils/file';
+import { processFile } from 'src/utils/attachments';
 import { MessageAttachment, SendMessageParams } from 'src/types/chats';
 
 const props = defineProps({

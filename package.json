@@ -33,6 +33,8 @@
     "localforage": "^1.10.0",
     "marked": "^12.0.2",
     "marked-highlight": "^2.1.3",
+    "mime": "^4.0.4",
+    "pdfjs-dist": "^4.4.168",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
     "quasar": "^2.16.6",
