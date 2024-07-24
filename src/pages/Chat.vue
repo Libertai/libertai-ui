@@ -39,15 +39,15 @@
               <span class="bull-date">{{ formatDate(message.timestamp) }}</span>
             </q-item-label>
             <!-- Display any attachments -->
-            <!--            <q-item-label v-if="message.attachments && message.attachments.length > 0">-->
-            <!--              <q-chip-->
-            <!--                v-for="attachment in message.attachments"-->
-            <!--                :key="attachment.id"-->
-            <!--                class="q-mr-xs bg-primary text-white"-->
-            <!--              >-->
-            <!--                {{ attachment.title }}-->
-            <!--              </q-chip>-->
-            <!--            </q-item-label>-->
+            <q-item-label v-if="message.attachments && message.attachments.length > 0">
+              <q-chip
+                v-for="attachment in message.attachments"
+                :key="attachment.id"
+                class="q-mr-xs bg-primary text-white"
+              >
+                {{ attachment.title }}
+              </q-chip>
+            </q-item-label>
             <!-- Display the content of the message -->
             <q-item-label style="display: block">
               <MarkdownRenderer
@@ -121,13 +121,7 @@
       <!--      >-->
       <!--        {{ attachment.title }}-->
       <!--      </q-chip>-->
-      <message-input
-        ref="inputRef"
-        v-model="inputTextRef"
-        :is-loading="isLoadingRef"
-        class="col"
-        @send-message="sendMessage"
-      />
+      <message-input :is-loading="isLoadingRef" class="col" @send-message="sendMessage" />
     </div>
 
     <!-- Enable edit mode -->
@@ -174,7 +168,7 @@ import MessageInput from 'src/components/MessageInput.vue';
 import axios from 'axios';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
 import { useSettingsStore } from 'stores/settings';
-import { Chat, UIMessage } from 'src/types/chats';
+import { Chat, SendMessageParams, UIMessage } from 'src/types/chats';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -187,9 +181,7 @@ const knowledgeStore = useKnowledgeStore();
 const settingsStore = useSettingsStore();
 
 // Local page state
-const inputTextRef = ref('');
 const isLoadingRef = ref(false);
-const inputRef = ref(null);
 const scrollAreaRef = ref<HTMLDivElement>();
 const enableEditRef = ref(false);
 // const enableKnowledgeRef = ref(false);
@@ -312,21 +304,20 @@ async function generatePersonaMessage() {
       .map((message: UIMessage): Message[] => {
         const ret = [];
         // Push any attachments ahead of the message
-        // if (message.attachments) {
-        //   message.attachments.forEach((attachment) => {
-        //     if (attachment.content) {
-        //       ret.push({
-        //         role: 'attachment',
-        //         content: `[${attachment.title}](${attachment.content})`,
-        //       });
-        //     } else if (attachment.documentId) {
-        //       ret.push({
-        //         role: 'attachment',
-        //         content: `[${attachment.title}](document-id-${attachment.documentId})`,
-        //       });
-        //     }
-        //   });
-        // }
+        message.attachments?.forEach((attachment) => {
+          if (attachment.content) {
+            ret.push({
+              role: 'attachment',
+              content: `[${attachment.title}](${attachment.content})`,
+            });
+          }
+          // else if (attachment.documentId) {
+          //   ret.push({
+          //     role: 'attachment',
+          //     content: `[${attachment.title}](document-id-${attachment.documentId})`,
+          //   });
+          // }
+        });
 
         // Push what search results we found based on the message
         // TODO: this should probably be a more generic tool-call or llm-chain-link
@@ -334,14 +325,14 @@ async function generatePersonaMessage() {
         // TODO: I should probably write these below messages in the log
         //  Really these search results should get attached to the message that
         //   lead to them being queried
-        if (message.searchResults) {
-          message.searchResults.forEach((result: Message) => {
-            ret.push({
-              role: 'search-result',
-              content: result.content,
-            });
-          });
-        }
+        // if (message.searchResults) {
+        //   message.searchResults.forEach((result: Message) => {
+        //     ret.push({
+        //       role: 'search-result',
+        //       content: result.content,
+        //     });
+        //   });
+        // }
         // Push the message itself
         ret.push(message);
         return ret;
@@ -398,26 +389,16 @@ async function regenerateMessage() {
   await generatePersonaMessage();
 }
 
-async function sendMessage(content: string) {
+async function sendMessage({ content, attachments }: SendMessageParams) {
   if (chatRef.value === undefined) {
     return;
   }
 
   const chatId = chatRef.value.id;
-  const inputText = inputTextRef.value;
-  // const attachments = JSON.parse(JSON.stringify(attachmentsRef.value));
-
-  // Wipe the input text
-  inputTextRef.value = '';
-  // Wipe the attachments
-  // attachmentsRef.value = [];
-
-  if (!content.trim()) return;
-
-  if (content.trim() === '') return;
+  const parsedAttachments = JSON.parse(JSON.stringify(attachments));
 
   // Append the new message to the chat history and push to local state
-  let newMessage = await chatsStore.appendUserMessage(chatId, inputText);
+  const newMessage = await chatsStore.appendUserMessage(chatId, content, parsedAttachments);
   chatRef.value.messages.push({ ...newMessage, stopped: true, error: null });
 
   // Scroll to the bottom of the chat

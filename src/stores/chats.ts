@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { chatTag } from 'src/utils/chat';
 import idb from 'src/utils/idb';
 import { chatsMigrations } from 'src/utils/migrations/chats';
-import { Chat, ChatMigration, MinimalChat, UIMessage } from 'src/types/chats';
+import { Chat, ChatMigration, MessageAttachment, MinimalChat, UIMessage } from 'src/types/chats';
 import { UIPersona } from 'src/types/personas';
 import { LocalForage } from 'src/types/utils';
 
@@ -108,7 +108,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       return await this.chatsStore.popChatMessages(chatId);
     },
 
-    async appendUserMessage(chatId: string, message: string, attachments: any[] | undefined = undefined) {
+    async appendUserMessage(chatId: string, message: string, attachments?: MessageAttachment[]) {
       return await this.chatsStore.appendUserMessage(chatId, message, attachments);
     },
 
@@ -202,7 +202,7 @@ class ChatsStore {
     await idb.put(chatId, chat, this.store);
   }
 
-  async appendUserMessage(chatId: string, messageContent: string, attachments?: any[]) {
+  async appendUserMessage(chatId: string, messageContent: string, attachments?: MessageAttachment[]) {
     const chat = await this.readChat(chatId);
     const message: UIMessage = {
       author: 'user',
