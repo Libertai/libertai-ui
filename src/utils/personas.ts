@@ -1,17 +1,6 @@
+import { UIPersona } from 'src/types/personas';
+
 // Configuration for base prompts for different types of chatbots
-import { Persona } from '@libertai/libertai-js';
-
-export type UIPersona = Persona & {
-  id: string;
-  avatar: {
-    item_hash: string;
-    ipfs_hash: string;
-  };
-  name: string;
-  allowEdit: boolean;
-  hidden: boolean;
-};
-
 export const defaultPersonas: UIPersona[] = [
   {
     id: '77d15394-d142-4e73-8251-48be48cee016',
@@ -19,7 +8,7 @@ export const defaultPersonas: UIPersona[] = [
       item_hash: '90db3237796d27118e0b9e21dae10a4b1179878f869cb6c0058d0d7c00b0440d',
       ipfs_hash: 'QmQMBfgnmuxcQ4kptR1oPE9guYxG13GpASjYVeFQSxNxjE',
     },
-    name: 'Libertai Assistant (default)',
+    name: 'LibertAI Assistant (default)',
     role: 'assistant',
     description:
       "You're an {{char}} running on a decentralized LLM based on open-source models. " +
@@ -37,7 +26,7 @@ export const defaultPersonas: UIPersona[] = [
       ipfs_hash: 'QmaKj7nrqUiYkRp2jWRqSuYkHxhPoTstSS4eyttUeEGxF8',
     },
     name: 'Donald Tromp',
-    role: 'Donald Tromp',
+    role: 'Donald Trump',
     description: 'You are an AI chatbot modeled after Donald Trump. You will try to mimic his personality and speech.',
     allowEdit: false,
     hidden: false,
@@ -61,7 +50,7 @@ export const defaultPersonas: UIPersona[] = [
       ipfs_hash: 'QmakkAkoBrKG85ZGtZeusAdU5uSTk8YfUFxq95XsoSXLqc',
     },
     name: 'Anna the Therapist',
-    role: 'Anna the Therapist',
+    role: 'Anna',
     description:
       '{{char}} is a licensed psychotherapist that can help with all sorts of problems and issues. ' +
       '{{char}} understands she is not role-playing and is actually giving out a therapy session over chat. ' +

@@ -5,7 +5,6 @@ import { getAccount, getBalance } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
 import { base } from '@wagmi/vue/chains';
 import { useTokensStore } from 'stores/tokens';
-import { useModelsStore } from 'stores/models';
 
 const LTAI_BASE_ADDRESS = '0xF8B1b47AA748F5C7b5D0e80C726a843913EB573a';
 
@@ -25,16 +24,27 @@ export const useAccountStore = defineStore('account', {
     },
 
     async initAlephStorage() {
+      const account = getAccount(config);
       const settingsStore = useSettingsStore();
 
-      const alephStorage = await AlephPersistentStorage.initialize();
+      if (account.address === undefined) {
+        return;
+      }
+
+      const hash = settingsStore.signatureHash[account.address] ?? (await AlephPersistentStorage.signBaseMessage());
+      if (settingsStore.isSignatureHashStored) {
+        settingsStore.signatureHash[account.address] = hash;
+      }
+
+      const alephStorage = await AlephPersistentStorage.initialize(hash);
       if (!alephStorage) {
         return;
       }
 
       this.alephStorage = alephStorage;
       const settingsOnAleph = await this.alephStorage.fetch();
-      await settingsStore.update(settingsOnAleph ?? {});
+      const saveOnAleph = !settingsOnAleph;
+      await settingsStore.update(settingsOnAleph ?? {}, saveOnAleph);
     },
 
     async getLTAIBalance(): Promise<number> {
@@ -54,11 +64,8 @@ export const useAccountStore = defineStore('account', {
     },
 
     onDisconnect() {
-      const modelsStore = useModelsStore();
-
       this.alephStorage = null;
       this.ltaiBalance = 0;
-      modelsStore.unselectPremiumModel();
     },
   },
 });

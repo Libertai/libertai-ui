@@ -1,6 +1,6 @@
 <template>
   <q-scroll-area style="height: calc(100vh - 50px)">
-    <q-page class="flex flex-center text-purple-700 q-mx-md">
+    <q-page v-if="address" class="flex flex-center text-purple-700">
       <div class="row q-pa-xl q-col-gutter-md">
         <q-card class="col-12 text-center" flat>
           <q-card-section>
@@ -9,45 +9,45 @@
                 {{ address }}
               </span>
               <span v-else class="bg-purple-50 q-py-sm q-px-xl rounded text-bold">
-                {{ address?.slice(0, 10) }}...{{ address?.slice(-10) }}
+                {{ address.slice(0, 10) }}...{{ address.slice(-10) }}
               </span>
             </p>
-            <div class="text-h4 text-bold q-pb-sm text-left">Your Libertai tokens</div>
-            <p class="text-left">
+            <div class="text-h4 text-bold q-pb-sm text-center">Your LibertAI tokens</div>
+            <p class="text-center">
               Run aleph.im network nodes, stake ALEPH to continue earning $LTAI. New ways will be available soon!
             </p>
           </q-card-section>
         </q-card>
         <q-card class="col-12 column" flat>
-          <q-card-section class="bg-purple-50 q-pa-xl row">
-            <div class="text-h6 text-bold col-8 text-left">
+          <q-card-section class="bg-purple-50 q-pa-xl row text-bold max-lg:tw-text-center">
+            <div :class="`text-h6 lg:tw-text-left ${$q.screen.gt.sm ? 'col-8' : 'col-12'}`">
               <q-avatar class="q-mr-sm">
                 <img alt="libertai" src="/icons/svg/libertai.svg" />
               </q-avatar>
-              Current $LTAI balance
+              <span>Current $LTAI balance</span>
             </div>
 
-            <div class="col-4">
-              <span class="text-h4 text-bold">{{ tokensStore.getAddressTokens(address ?? '').toFixed(2) }}</span>
+            <div :class="`tw-py-4 ${$q.screen.gt.sm ? 'col-4 column text-right' : 'col-12'}`">
+              <span class="text-h4 text-bold">{{ tokensStore.getAddressTokens(address).toFixed(2) }}</span>
             </div>
           </q-card-section>
         </q-card>
-        <q-card :class="$q.screen.gt.sm ? 'col-6 text-center column' : ' col-12 text-center'" flat>
+        <q-card :class="$q.screen.gt.sm ? 'col-6 column' : 'col-12'" flat>
           <q-card-section class="bg-purple-50 q-pa-xl">
-            <p class="text-h6 text-bold text-left">Pending $LTAI</p>
-            <p class="q-py-md text-right">
+            <p class="text-h6 text-bold max-md:tw-text-center md:tw-text-left">Pending $LTAI</p>
+            <p class="q-py-md md:tw-text-right max-md:tw-text-center">
               <span class="text-h4 text-bold rounded">{{
-                tokensStore.getAddressPendingTokens(address ?? '').toFixed(2)
+                tokensStore.getAddressPendingTokens(address).toFixed(2)
               }}</span>
             </p>
           </q-card-section>
         </q-card>
-        <q-card :class="$q.screen.gt.sm ? 'col-6 text-center column' : ' col-12 text-center'" flat>
+        <q-card :class="$q.screen.gt.sm ? 'col-6 column' : 'col-12'" flat>
           <q-card-section class="bg-purple-50 q-pa-xl">
-            <p class="text-h6 text-bold text-left">36 Month estimated $LTAI*</p>
-            <p class="q-py-md text-right">
+            <p class="text-h6 text-bold md:tw-text-left max-md:tw-text-center">36 Month estimated $LTAI*</p>
+            <p class="q-py-md md:tw-text-right max-md:tw-text-center">
               <span class="text-h4 text-bold rounded">{{
-                tokensStore.getAddress3yrEstimatedTokens(address ?? '').toFixed(2)
+                tokensStore.getAddress3yrEstimatedTokens(address).toFixed(2)
               }}</span>
             </p>
           </q-card-section>

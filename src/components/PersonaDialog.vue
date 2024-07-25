@@ -23,10 +23,10 @@
         </q-card-section>
       </q-card-section>
 
-      <!--      <q-card-section>-->
-      <!--        <span>Your name</span>-->
-      <!--        <q-input v-model="username" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>-->
-      <!--      </q-card-section>-->
+      <q-card-section>
+        <span>Persona role</span>
+        <q-input v-model="role" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
+      </q-card-section>
       <q-card-section>
         <span>Persona Description</span>
         <q-input
@@ -47,7 +47,7 @@
           label="Confirm"
           rounded
           text-color="white"
-          @click="emit('savePersona', { ...basePersona, name, description, avatar: toRaw(avatar) })"
+          @click="emit('savePersona', { ...basePersona, name, role, description, avatar: toRaw(avatar) })"
         />
       </q-card-section>
     </q-card>
@@ -57,9 +57,7 @@
 <script lang="ts" setup>
 import { PropType, ref, toRaw, watch } from 'vue';
 import AlephAvatar from 'components/AlephAvatar.vue';
-import { UIPersona } from 'src/utils/personas';
-
-export type BasePersonaDialogProp = Partial<Pick<UIPersona, 'name' | 'description' | 'avatar'>>;
+import { BasePersonaEdition, defaultBasePersona } from 'src/types/personas';
 
 const props = defineProps({
   title: {
@@ -67,43 +65,33 @@ const props = defineProps({
     default: 'Customize persona',
   },
   basePersona: {
-    type: Object as PropType<BasePersonaDialogProp>,
+    type: Object as PropType<BasePersonaEdition>,
     required: false,
-    default: undefined,
+    default: defaultBasePersona,
   },
 });
-const emit = defineEmits(['savePersona']);
+const emit = defineEmits<{ savePersona: [value: BasePersonaEdition] }>();
 
 // Form values
-// const username = ref(settingsStore.username);
-const name = ref(props.basePersona?.name ?? '');
-const description = ref(props.basePersona?.description ?? '');
-const avatar = ref(
-  props.basePersona?.avatar ?? {
-    item_hash: '90db3237796d27118e0b9e21dae10a4b1179878f869cb6c0058d0d7c00b0440d',
-    ipfs_hash: 'QmQMBfgnmuxcQ4kptR1oPE9guYxG13GpASjYVeFQSxNxjE',
-  },
-);
-
-// Update the name input when the store changes  (might be updated by Aleph settings fetching)
-// watch(toRef(settingsStore, 'username'), () => {
-//   username.value = settingsStore.username;
-// });
+const name = ref(props.basePersona.name);
+const role = ref(props.basePersona.role);
+const description = ref(props.basePersona.description);
+const avatar = ref(props.basePersona.avatar);
 
 watch(
-  () => props.basePersona?.name,
-  () => (name.value = props.basePersona?.name ?? ''),
+  () => props.basePersona.name,
+  () => (name.value = props.basePersona.name),
 );
 watch(
-  () => props.basePersona?.description,
-  () => (description.value = props.basePersona?.description ?? ''),
+  () => props.basePersona.role,
+  () => (role.value = props.basePersona.role),
 );
 watch(
-  () => props.basePersona?.avatar,
-  () =>
-    (avatar.value = props.basePersona?.avatar ?? {
-      item_hash: '90db3237796d27118e0b9e21dae10a4b1179878f869cb6c0058d0d7c00b0440d',
-      ipfs_hash: 'QmQMBfgnmuxcQ4kptR1oPE9guYxG13GpASjYVeFQSxNxjE',
-    }),
+  () => props.basePersona.description,
+  () => (description.value = props.basePersona.description),
+);
+watch(
+  () => props.basePersona.avatar,
+  () => (avatar.value = props.basePersona.avatar),
 );
 </script>

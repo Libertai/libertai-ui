@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia';
 
-import { defaultPersonas, UIPersona } from '../utils/personas';
+import { defaultPersonas } from '../utils/personas';
+import { UIPersona } from 'src/types/personas';
 
 export const usePersonasStore = defineStore('personas', {
   state: () => ({
     personas: JSON.parse(JSON.stringify(defaultPersonas)) as UIPersona[],
-    persona: JSON.parse(JSON.stringify(defaultPersonas[0])) as UIPersona,
   }),
   getters: {
     // @ts-expect-error
@@ -32,7 +32,7 @@ export const usePersonasStore = defineStore('personas', {
     },
   },
   persist: {
-    paths: ['persona', 'personas'], // keys to persist
+    paths: ['personas'], // keys to persist
     afterRestore: (ctx) => {
       ctx.store.refreshDefaultPersonas();
     },

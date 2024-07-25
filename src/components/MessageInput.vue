@@ -3,7 +3,7 @@
     ref="input"
     v-model="model"
     :bottom-slots="props.hint !== ''"
-    :class="` ${$q.screen.gt.sm ? 'q-pa-lg' : 'q-pa-sm'}`"
+    :class="`${$q.screen.gt.sm ? 'q-pa-lg' : 'q-pa-sm'}`"
     :loading="isLoading"
     autofocus
     autogrow

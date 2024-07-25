@@ -1,0 +1,34 @@
+root: true
+
+parser: 'vue-eslint-parser'
+parserOptions:
+  parser: '@typescript-eslint/parser'
+
+env:
+  node: true
+  browser: true
+  'vue/setup-compiler-macros': true
+
+extends:
+  - 'eslint:recommended'
+
+  # Uncomment any of the lines below to choose desired strictness,
+  # but leave only one uncommented!
+  # See https://eslint.vuejs.org/rules/#available-rules
+  # "plugin:vue/vue3-essential",            # Priority A: Essential (Error Prevention)
+  # 'plugin:vue/vue3-strongly-recommended', # Priority B: Strongly Recommended (Improving Readability)
+  - 'plugin:vue/vue3-recommended'           # Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
+
+  # --- ONLY WHEN USING PRETTIER ---
+  # https://github.com/prettier/eslint-config-prettier#installation
+  # usage with Prettier, provided by 'eslint-config-prettier'.
+  - prettier
+
+plugins:
+  - vue
+
+rules:
+  'no-unused-vars': [ 'warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' } ]
+
+  'vue/multi-word-component-names': 'off'
+  'vue/no-v-html': 'off'

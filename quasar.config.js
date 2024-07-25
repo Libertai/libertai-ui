@@ -30,7 +30,7 @@ module.exports = configure(function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['utils', 'wagmi'],
+    boot: ['wagmi'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss', 'tailwind.css'],
@@ -58,8 +58,8 @@ module.exports = configure(function (/* ctx */) {
       },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
-      extendViteConf(viteConf, { _isServer, _isClient }) {
-        if (viteConf.build.commonjsOptions == undefined) {
+      extendViteConf(viteConf) {
+        if (viteConf.build.commonjsOptions === undefined) {
           viteConf.build.commonjsOptions = {};
         }
         viteConf.build.commonjsOptions.transformMixedEsModules = true;
@@ -91,7 +91,7 @@ module.exports = configure(function (/* ctx */) {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 
-      vitePlugins: [],
+      vitePlugins: [['vite-plugin-checker', { vueTsc: true }]],
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
@@ -211,7 +211,7 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
     bex: {
-      contentScripts: ['my-content-script'],
+      contentScripts: [],
 
       // extendBexScriptsConf (esbuildConf) {}
       // extendBexManifestJson (json) {}

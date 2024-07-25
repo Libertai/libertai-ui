@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from 'stores/account';
+import { SignMessageReturnType } from 'viem';
 
 type Settings = {
   darkmode: boolean;
@@ -8,7 +9,12 @@ type Settings = {
     item_hash: string;
     ipfs_hash: string;
   };
+  isSignatureHashStored: boolean;
+  // Address to hash (to support multiple accounts/wallets)
+  signatureHash: Record<string, SignMessageReturnType>;
 };
+
+type SettingsPersistedOnAleph = Omit<Settings, 'signatureHash'>;
 
 export const useSettingsStore = defineStore('settings', {
   state: (): Settings => ({
@@ -18,12 +24,15 @@ export const useSettingsStore = defineStore('settings', {
       item_hash: '3649c86b67d8bb45e0a6d7f7c06f860aebc10b322744ef15b797b707c65cc5fd',
       ipfs_hash: 'QmWxB29Jauxwypn2HrrNDyxG9D6h61ncc12jLfPR4aKybZ',
     },
+    isSignatureHashStored: false,
+    signatureHash: {},
   }),
   getters: {
-    currentPersistedSettings: (state): Settings => ({
+    currentAlephPersistedSettings: (state): SettingsPersistedOnAleph => ({
       darkmode: state.darkmode,
       username: state.username,
       avatar: state.avatar,
+      isSignatureHashStored: state.isSignatureHashStored,
     }),
   },
   actions: {
@@ -37,22 +46,27 @@ export const useSettingsStore = defineStore('settings', {
       if (newSettings.avatar !== undefined) {
         this.avatar = newSettings.avatar;
       }
+      if (newSettings.isSignatureHashStored !== undefined) {
+        this.isSignatureHashStored = newSettings.isSignatureHashStored;
+      }
+      if (newSettings.signatureHash !== undefined) {
+        this.signatureHash = newSettings.signatureHash;
+      }
 
       if (saveOnAleph) {
-        await this.persistOnAleph(this.currentPersistedSettings);
+        await this.persistOnAleph(this.currentAlephPersistedSettings);
       }
     },
 
-    async persistOnAleph(settings: Settings) {
+    async persistOnAleph(settings: SettingsPersistedOnAleph) {
       const account: any = useAccountStore();
 
       if (account.alephStorage !== null) {
-        account.alephStorage.save(settings);
+        await account.alephStorage.save(settings);
       }
     },
   },
   persist: {
-    //storage: sessionStorage | idb
-    paths: ['darkmode', 'username', 'avatar'], // key to persist
+    paths: ['darkmode', 'username', 'avatar', 'isSignatureHashStored', 'signatureHash'],
   },
 });

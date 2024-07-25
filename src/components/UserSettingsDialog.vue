@@ -23,6 +23,16 @@
         </q-card-section>
       </q-card-section>
 
+      <q-card-section horizontal>
+        <q-toggle
+          v-model="isSignatureHashStored"
+          checked-icon="check"
+          color="green"
+          label="Save the signature hash in your browser (unsafe)"
+          unchecked-icon="clear"
+        />
+      </q-card-section>
+
       <q-card-section class="text-primary" horizontal>
         <q-btn v-close-popup class="q-px-xl q-py-xs" label="Close" rounded />
         <q-space />
@@ -34,7 +44,7 @@
           text-color="white"
           @click="
             () => {
-              settingsStore.update({ username, avatar: toRaw(avatar) });
+              settingsStore.update({ username, avatar: toRaw(avatar), isSignatureHashStored });
             }
           "
         />
@@ -53,6 +63,7 @@ const settingsStore = useSettingsStore();
 // Form values
 const username = ref(settingsStore.username);
 const avatar = ref(settingsStore.avatar);
+const isSignatureHashStored = ref(settingsStore.isSignatureHashStored);
 
 // Update the inputs when the store changes (might be updated by Aleph settings fetching)
 watch(toRef(settingsStore, 'username'), () => {
@@ -60,5 +71,8 @@ watch(toRef(settingsStore, 'username'), () => {
 });
 watch(toRef(settingsStore, 'avatar'), () => {
   avatar.value = settingsStore.avatar;
+});
+watch(toRef(settingsStore, 'isSignatureHashStored'), () => {
+  isSignatureHashStored.value = settingsStore.isSignatureHashStored;
 });
 </script>

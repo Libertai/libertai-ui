@@ -1,31 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
 import { defineStore } from 'pinia';
-
-import { defaultModels } from 'src/utils/models';
 import { chatTag } from 'src/utils/chat';
 import idb from 'src/utils/idb';
-import { Message, Model } from '@libertai/libertai-js';
-import { UIPersona } from 'src/utils/personas';
+import { chatsMigrations } from 'src/utils/migrations/chats';
+import { Chat, ChatMigration, MinimalChat, UIMessage } from 'src/types/chats';
+import { UIPersona } from 'src/types/personas';
+import { LocalForage } from 'src/types/utils';
 
 const CHATS_STORE_NAME = 'chats-store';
 const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
-
-// TODO: clean this type and understand the added properties
-export type UIMessage = Message & { stopped?: boolean; error?: any; searchResults?: any; attachments?: any[] };
-
-export type Chat = {
-  id: string;
-  title: string;
-  username: string;
-  tags: string[];
-
-  model: Model;
-  persona: UIPersona;
-  messages: UIMessage[];
-  createdAt: Date;
-};
-
-type MinimalChat = Pick<Chat, 'id' | 'title' | 'createdAt'> & Partial<Chat>;
 
 /**
  * Representation of an attachment:
@@ -53,31 +36,50 @@ type MinimalChat = Pick<Chat, 'id' | 'title' | 'createdAt'> & Partial<Chat>;
  */
 
 type ChatsStoreState = {
+  version: number;
   chatsStore: ChatsStore;
   chats: MinimalChat[];
 };
 
 export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
   state: (): ChatsStoreState => ({
+    // Current version of the migrations
+    version: 0, //  /!\ DO NOT UPDATE /!\, it should be done automatically when running migrations
+
     // Interface for our ChatsStore
     chatsStore: new ChatsStore(),
     // List of partials chats
     chats: [],
   }),
+  persist: {
+    paths: ['version'],
+  },
   actions: {
     async load() {
-      // Update the models for all chats
-      await this.chatsStore.updateModels(defaultModels);
       // Get the partial chats
       this.chats = await this.chatsStore.readChats();
+
+      try {
+        // Running migrations if needed
+        if (this.version < chatsMigrations.length) {
+          // Removing migrations already ran
+          const migrationsToRun = chatsMigrations.slice(this.version);
+          for (const migration of migrationsToRun) {
+            await this.chatsStore.runMigration(migration);
+          }
+        }
+        this.version = chatsMigrations.length;
+      } catch (error) {
+        console.error(`Chats: Running migrations starting from version ${this.version} failed: ${error}`);
+      }
     },
 
     async readChat(id: string) {
       return await this.chatsStore.readChat(id);
     },
 
-    async createChat(title: string, username: string, model: Model, persona: UIPersona): Promise<Chat> {
-      const chat = await this.chatsStore.createChat(title, username, [], model, persona);
+    async createChat(title: string, username: string, modelId: string, persona: UIPersona): Promise<Chat> {
+      const chat = await this.chatsStore.createChat(title, username, [], modelId, persona);
       const tag = chatTag(chat.id);
       await this.chatsStore.pushChatTag(chat.id, tag);
       this.chats.push(chat);
@@ -90,17 +92,6 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       this.chats = this.chats.map((chat) => {
         if (chat.id === chatId) {
           chat.title = title;
-        }
-        return chat;
-      });
-    },
-
-    async updateChatModel(chatId: string, model: Model) {
-      await this.chatsStore.updateChat(chatId, { model });
-      // Update the partial chats
-      this.chats = this.chats.map((chat) => {
-        if (chat.id === chatId) {
-          chat.model = model;
         }
         return chat;
       });
@@ -140,43 +131,25 @@ class ChatsStore {
     this.store = idb.createStore(CHATS_STORE_NAME);
   }
 
-  async updateModels(models: Model[]) {
-    // Create an array for the updates we will resolve
+  async runMigration(migration: ChatMigration) {
     const updatedChats: Promise<Chat>[] = [];
 
-    // Iterate over all chats and update the model if necessary
-    await this.store.iterate((chat: Chat) => {
-      // Find the chat and model
-      const apiUrl = chat.model?.apiUrl;
-      const matchingModel = models.find((m) => m.apiUrl === apiUrl);
-
-      // Determine if the model has changed
-      let changed = false;
-      if (matchingModel) {
-        // Do a deep comparison of the models
-        if (matchingModel !== chat.model) {
-          chat.model = matchingModel;
-          changed = true;
-        }
-      }
-
-      // If the model has changed, update the chat
-      if (changed) {
-        updatedChats.push(idb.put(chat.id, chat, this.store));
-      }
+    await this.store.iterate((currentChat: Chat) => {
+      const newChat = migration(currentChat);
+      updatedChats.push(idb.put(currentChat.id, newChat, this.store));
     });
 
     await Promise.all(updatedChats);
   }
 
-  async createChat(title: string, username: string, tags: string[], model: Model, persona: UIPersona) {
+  async createChat(title: string, username: string, tags: string[], modelId: string, persona: UIPersona) {
     const id = uuidv4();
     const chat: Chat = {
       id,
       title,
       tags,
       username,
-      model,
+      modelId,
       persona,
       messages: [],
       createdAt: new Date(),
@@ -186,7 +159,7 @@ class ChatsStore {
 
   async readChats(): Promise<MinimalChat[]> {
     const result: MinimalChat[] = [];
-    await this.store.iterate((value: Chat, _key) => {
+    await this.store.iterate((value: Chat) => {
       const chat = value;
       const partialChat = {
         id: chat.id,
@@ -232,6 +205,7 @@ class ChatsStore {
   async appendUserMessage(chatId: string, messageContent: string, attachments?: any[]) {
     const chat = await this.readChat(chatId);
     const message: UIMessage = {
+      author: 'user',
       role: chat.username,
       content: messageContent,
       timestamp: new Date(),
@@ -245,6 +219,7 @@ class ChatsStore {
   async appendModelResponse(chatId: string, responseContent: string, searchResults: any) {
     const chat = await this.readChat(chatId);
     const message: UIMessage = {
+      author: 'ai',
       role: chat.persona.role,
       content: responseContent,
       timestamp: new Date(),

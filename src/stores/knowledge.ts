@@ -15,16 +15,16 @@ export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
     async load() {
       await this.knowledgeStore.load();
       await this.knowledgeStore.prune();
-      let defaultDocumentTitles = defaultKnowledge.map((doc) => doc.title);
+      const defaultDocumentTitles = defaultKnowledge.map((doc) => doc.title);
       const docs: Document[] = Array.from(this.knowledgeStore.documents.values());
       const documentTitles = docs.map((doc) => doc.title);
       // Check if default documents are already in the store
       const missingDocuments = defaultDocumentTitles.filter((title) => !documentTitles.includes(title));
       // Add missing documents
       const addedDocuments: Promise<Document>[] = [];
-      for (let title of missingDocuments) {
+      for (const title of missingDocuments) {
         const doc = defaultKnowledge.find((doc) => doc.title === title)!;
-        let tags = doc.tags ? doc.tags : [];
+        const tags = doc.tags ? doc.tags : [];
         tags.push(DEFAULT_KNOWLEDGE_TAG);
         addedDocuments.push(this.addDocument(doc.title, doc.content, tags));
         docs.push({ ...doc, id: uuidv4() });
@@ -32,8 +32,8 @@ export const useKnowledgeStore = defineStore(KNOWLEDGE_STORE_PINIA_KEY, {
       await Promise.all(addedDocuments);
       this.documents = docs;
     },
-    async addDocument(title: string, content: string, tags: string[] = []) {
-      let doc = await this.knowledgeStore.addDocument(title, content, tags);
+    async addDocument(title: string, content: string, tags: string[] = []): Promise<Document> {
+      const doc = await this.knowledgeStore.addDocument(title, content, tags);
       this.documents.push(doc);
       return doc;
     },

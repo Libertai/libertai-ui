@@ -1,7 +1,7 @@
 <template>
   <q-btn-dropdown
-    :icon="'img:' + getPersonaAvatarUrl(personasStore.persona.avatar.ipfs_hash)"
-    :label="personasStore.persona.name"
+    :icon="'img:' + getPersonaAvatarUrl(selectedPersona.avatar.ipfs_hash)"
+    :label="selectedPersona.name"
     class="no-shadow rounded-img personas-dropdown q-py-sm icon-md"
     dropdown-icon="img:icons/svg/chevron-down.svg"
     no-caps
@@ -16,7 +16,7 @@
         v-close-popup
         :name="persona.id"
         clickable
-        @click="setPersona(persona.id)"
+        @click="emit('selectPersona', persona)"
       >
         <q-avatar class="q-mr-md" size="32px">
           <img :src="getPersonaAvatarUrl(persona.avatar.ipfs_hash)" alt="avatar" />
@@ -34,10 +34,17 @@
 <script lang="ts" setup>
 import { usePersonasStore } from 'stores/personas';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
+import { PropType } from 'vue';
+import { UIPersona } from 'src/types/personas';
 
 const personasStore = usePersonasStore();
 
-function setPersona(id: string) {
-  personasStore.persona = personasStore.personas.find((persona) => persona.id === id)!;
-}
+const { selectedPersona } = defineProps({
+  selectedPersona: {
+    type: Object as PropType<UIPersona>,
+    required: true,
+  },
+});
+
+const emit = defineEmits<{ selectPersona: [value: UIPersona] }>();
 </script>

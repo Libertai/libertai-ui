@@ -43,8 +43,6 @@
               >{{ accountStore.ltaiBalance.toFixed(0) }} <span v-if="$q.screen.gt.sm">$LTAI</span></span
             >
           </q-btn>
-          <!-- model selector -->
-          <model-selector />
           <account-button />
         </div>
       </q-toolbar>
@@ -53,7 +51,7 @@
     <q-drawer v-model="leftDrawerOpen" class="flex-grow fit tw-flex tw-flex-col" show-if-above>
       <!-- image link with the logo -->
       <q-item class="q-mb-md text-left" clickable to="/">
-        <img :src="`icons/svg/libertai_full${$q.dark.mode ? '_lighten' : ''}.svg`" alt="Libertai" />
+        <img :src="`icons/svg/libertai_full${$q.dark.mode ? '_lighten' : ''}.svg`" alt="LibertAI" />
       </q-item>
       <div class="q-mr-xl q-ml-md q-mt-md">
         <q-btn class="border-primary-highlight" no-caps rounded text-color="dark-mode-text" to="/new" unelevated>
@@ -183,7 +181,6 @@ import { useRoute, useRouter } from 'vue-router';
 
 // Import Components
 import AccountButton from 'src/components/AccountButton.vue';
-import ModelSelector from 'src/components/ModelSelector.vue';
 import UserSettingsDialog from 'components/UserSettingsDialog.vue';
 import { useAccount } from '@wagmi/vue';
 import ToggleTheme from 'components/ToggleTheme.vue';
@@ -207,14 +204,6 @@ const route = useRoute();
 
 // Reference to the chat-store state
 const { chats } = storeToRefs(chatsStore);
-
-// const addressPoints = computed(() => {
-//   if (account.isConnected.value) {
-//     return points.getAddressRealtimePoints(account.address.value);
-//   } else {
-//     return 0;
-//   }
-// });
 
 // Delete a chat
 async function deleteChat(chatId: string) {

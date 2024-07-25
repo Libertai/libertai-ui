@@ -2,7 +2,7 @@
   <div class="markdown-component" v-html="renderedContent"></div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ref, watch } from 'vue';
 import { Marked } from 'marked';
 import { markedHighlight } from 'marked-highlight';
@@ -32,9 +32,9 @@ const marked = new Marked(
 
 const renderedContent = ref('');
 
-function updateContent(content) {
+async function updateContent(content: string) {
   // content = DOMPurify.sanitize(content);
-  renderedContent.value = DOMPurify.sanitize(marked.parse(content));
+  renderedContent.value = DOMPurify.sanitize(await marked.parse(content));
 }
 
 updateContent(props.content);

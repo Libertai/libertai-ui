@@ -67,12 +67,12 @@
           <q-card-section class="q-pt-none bg-purple-50">
             <q-input
               v-model="address"
+              :counter="addressVerifier(address) !== true"
               :rules="addressRules"
               autofocus
               bg-color="secondary"
               bottom-slots
               class="q-pa-lg"
-              counter
               input-class="text-light"
               label="Address"
               label-color="grey"
@@ -85,9 +85,11 @@
                 <q-icon name="wallet" />
               </template>
 
-              <template #hint>Enter an address to check if there are $LTAI tokens associated with it.</template>
+              <template v-if="addressVerifier(address) !== true" #hint>
+                Enter an address to check if there are $LTAI tokens associated with it.
+              </template>
             </q-input>
-            <div v-if="addressVerifier(address) === true" class="text-h6 text-bold q-pa-lg">
+            <div v-if="addressVerifier(address) === true" class="text-h6 text-bold q-ma-lg">
               <div v-if="tokensStore.getAddressTokens(address) === 0">
                 You have no $LTAI so far. You can still earn $LTAI by staking ALEPH or running a node!
               </div>

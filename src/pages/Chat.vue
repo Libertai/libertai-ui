@@ -1,21 +1,20 @@
 <template>
-  <q-page class="column align-items-center">
+  <q-page v-if="chatRef" class="column align-items-center">
     <div ref="scrollAreaRef" class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)">
       <!-- Display message history -->
       <q-list class="col-grow q-ma-xl">
-        <!-- TODO: find a key -->
         <!-- eslint-disable-next-line vue/valid-v-for -->
         <q-item
-          v-for="(message, message_index) in messagesRef"
-          :class="`q-py-md q-my-md ${$q.screen.gt.sm ? 'q-mx-xl' : 'q-mx-sm'} items-start dyn-container chat-item rounded-borders ${$q.dark.mode ? '' : message.role == usernameRef ? 'bg-white' : 'bg-secondary'}`"
+          v-for="(message, message_index) in chatRef!.messages"
+          :class="`q-py-md q-my-md ${$q.screen.gt.sm ? 'q-mx-xl' : 'q-mx-sm'} items-start dyn-container chat-item rounded-borders ${$q.dark.mode ? '' : message.author === 'user' ? 'bg-white' : 'bg-secondary'}`"
         >
           <!-- Display the avatar of the user or the AI -->
           <q-item-section avatar>
-            <q-avatar v-if="message.role == usernameRef">
+            <q-avatar v-if="message.author === 'user'">
               <img :src="getPersonaAvatarUrl(settingsStore.avatar.ipfs_hash)" alt="user" />
             </q-avatar>
             <q-avatar v-else>
-              <img :src="getPersonaAvatarUrl(personaRef.avatar.ipfs_hash)" alt="AI" />
+              <img :src="getPersonaAvatarUrl(chatRef!.persona.avatar.ipfs_hash)" alt="AI" />
             </q-avatar>
           </q-item-section>
           <!-- Edit message popup -- triggered on click if the edit mode is enabled -->
@@ -25,14 +24,18 @@
               v-slot="scope"
               v-model="message.content"
               auto-save
-              @save="(v, iV) => updateChatMessageContent(message_index, v, iV)"
+              @save="
+                (value: string, initialValue: string) => updateChatMessageContent(message_index, value, initialValue)
+              "
             >
               <strong>{{ message.role }}</strong>
               <q-input v-model="scope.value" autofocus autogrow counter dense />
             </q-popup-edit>
-            <!-- Display the role of the user or the AI -->
+            <!-- Display the name of the user or the AI -->
             <q-item-label class="text-semibold q-mb-md">
-              {{ message.role }}
+              <span v-if="message.author === 'user'">{{ chatRef?.username }}</span>
+              <span v-else>{{ chatRef?.persona.name }}</span>
+
               <span class="bull-date">{{ formatDate(message.timestamp) }}</span>
             </q-item-label>
             <!-- Display any attachments -->
@@ -48,7 +51,7 @@
             <!-- Display the content of the message -->
             <q-item-label style="display: block">
               <MarkdownRenderer
-                :class="message.role == usernameRef ? '' : 'message-content'"
+                :class="message.author === 'user' ? '' : 'message-content'"
                 :content="message.content"
                 breaks
               />
@@ -65,7 +68,7 @@
           <div class="absolute dyn-container chat-toolbar">
             <!-- Allow regenerating the last message from the AI if fully completed -->
             <q-btn
-              v-if="!isLoadingRef && message_index === messagesRef.length - 1"
+              v-if="!isLoadingRef && message_index === chatRef!.messages.length - 1"
               dense
               flat
               icon="refresh"
@@ -89,7 +92,7 @@
               dense
               flat
               size="sm"
-              @click="editMessage($refs['message-' + message_index][0] as any)"
+              @click="editMessage(($refs['message-' + message_index] as any)[0])"
             >
               <q-tooltip>Edit</q-tooltip>
             </q-btn>
@@ -160,21 +163,18 @@ import { useRoute, useRouter } from 'vue-router';
 
 import { defaultChatTopic, inferChatTopic } from 'src/utils/chat';
 
-// LlamaCppApiEngine
 import { LlamaCppApiEngine, Message } from '@libertai/libertai-js';
 
-// Local state
-import { Chat, UIMessage, useChatsStore } from 'stores/chats';
+import { useChatsStore } from 'stores/chats';
 import { useModelsStore } from 'stores/models';
 import { useKnowledgeStore } from 'stores/knowledge';
-import { usePersonasStore } from 'stores/personas';
 
-// Components
 import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
 import MessageInput from 'src/components/MessageInput.vue';
 import axios from 'axios';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
 import { useSettingsStore } from 'stores/settings';
+import { Chat, UIMessage } from 'src/types/chats';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -184,13 +184,11 @@ const router = useRouter();
 const chatsStore = useChatsStore();
 const modelsStore = useModelsStore();
 const knowledgeStore = useKnowledgeStore();
-const personasStore = usePersonasStore();
 const settingsStore = useSettingsStore();
 
 // Local page state
 const inputTextRef = ref('');
 const isLoadingRef = ref(false);
-const hasResetRef = ref(false);
 const inputRef = ref(null);
 const scrollAreaRef = ref<HTMLDivElement>();
 const enableEditRef = ref(false);
@@ -200,9 +198,6 @@ const enableEditRef = ref(false);
 
 // Chat specific state
 const chatRef = ref<Chat>();
-const personaRef = ref();
-const usernameRef = ref();
-const messagesRef = ref<UIMessage[]>([]);
 
 // Instance of an inference engine
 const inferenceEngine = new LlamaCppApiEngine();
@@ -212,18 +207,13 @@ onMounted(() => {
   nextTick(clearCookies);
 });
 
-/* Set chat on initial load */
-
-setChat(route.params.id as string);
-
-/* Watchers */
-
 // Update the chat when the route changes
 watch(
   () => route.params.id as string,
-  async (newId) => {
+  async (newId: string) => {
     await setChat(newId);
   },
+  { immediate: true },
 );
 
 // Update whether we should show the knowledge uploader based on whether the user is connected
@@ -233,28 +223,6 @@ watch(
 //     enableKnowledgeRef.value = active;
 //   },
 // );
-
-// Update the chat model when the selected model changes
-watch(
-  () => modelsStore.selectedModel,
-  async (newModel) => {
-    // Ser / DeSer to ensure we have a fresh copy
-    newModel = JSON.parse(JSON.stringify(newModel));
-
-    if (!chatRef.value) {
-      return;
-    }
-    let chatModelApiUrl = chatRef.value.model.apiUrl;
-    if (chatModelApiUrl !== newModel.apiUrl) {
-      // We have a new model, so update local and stored state
-      chatRef.value.model = newModel;
-      await chatsStore.updateChatModel(chatRef.value.id, newModel);
-
-      // Send a notification
-      $q.notify(`Changing current chat model to ${newModel.name}`);
-    }
-  },
-);
 
 /* Helper functions */
 
@@ -285,12 +253,12 @@ async function setChatName(first_sentence: string) {
 }
 
 // Scroll to the bottom of the chat when new messages are added
-async function scrollBottom() {
+const scrollBottom = () => {
   scrollAreaRef.value?.lastElementChild?.scrollIntoView({
     behavior: 'smooth',
     block: 'end',
   });
-}
+};
 
 // Generate a new response from the AI
 async function generatePersonaMessage() {
@@ -298,35 +266,40 @@ async function generatePersonaMessage() {
     return;
   }
 
-  let chatId = chatRef.value.id;
-  let chatTags = chatRef.value.tags;
-  let messages = JSON.parse(JSON.stringify(messagesRef.value));
-  let persona = personaRef.value;
-  let username = usernameRef.value;
-  let model = chatRef.value.model;
+  const chatId = chatRef.value.id;
+  const chatTags = chatRef.value.tags;
+  const username = chatRef.value.username;
+  const messages = JSON.parse(JSON.stringify(chatRef.value.messages));
+  const persona = chatRef.value.persona;
+
+  const modelId = chatRef.value.modelId;
+  const model = modelsStore.models.find((model) => model.id === modelId);
+
+  if (model === undefined) {
+    console.error('Model not available');
+    return;
+  }
 
   // Create a new message to encapsulate our response
-  let response: UIMessage = {
-    role: persona.name,
+  const response: UIMessage = {
+    author: 'ai',
+    role: persona.role,
     content: '',
     stopped: false,
     error: null,
   };
 
-  // And push it to the local state so that it renders
-  messagesRef.value = [...messagesRef.value, response];
-  chatRef.value.messages = messagesRef.value;
+  chatRef.value.messages = [...chatRef.value.messages, response];
 
   try {
     // Set loading state
     isLoadingRef.value = true;
-    hasResetRef.value = false;
 
     // NOTE: assuming last message is guaranteed to be non-empty and the user's last message
     // Get the last message from the user
-    let lastMessage = messages[messages.length - 1];
-    let searchResultMessages: Message[] = [];
-    let searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
+    const lastMessage = messages[messages.length - 1];
+    const searchResultMessages: Message[] = [];
+    const searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
     searchResults.forEach((result) => {
       searchResultMessages.push({
         role: 'search-result',
@@ -379,14 +352,8 @@ async function generatePersonaMessage() {
     const allMessages: Message[] = [...expandedMessages, ...searchResultMessages];
 
     // Generate a stream of responses from the AI
-    for await (const output of inferenceEngine.generateAnswer(
-      allMessages,
-      model,
-      { ...persona, role: persona.role ?? persona.name }, // For backward-compatibility
-      username,
-      false,
-    )) {
-      let stopped = output.stopped;
+    for await (const output of inferenceEngine.generateAnswer(allMessages, model, persona, username, false)) {
+      const stopped = output.stopped;
       let content = output.content;
       if (!stopped) {
         content += ' *[writing ...]*';
@@ -395,7 +362,7 @@ async function generatePersonaMessage() {
       response.content = content;
       response.stopped = stopped;
 
-      messagesRef.value = [...messagesRef.value];
+      chatRef.value.messages = [...chatRef.value.messages];
       // Scroll to the bottom of the chat
       nextTick(scrollBottom);
     }
@@ -407,8 +374,7 @@ async function generatePersonaMessage() {
   } finally {
     // Done! update the local state to reflect the end of the process
     isLoadingRef.value = false;
-    hasResetRef.value = false;
-    messagesRef.value = [...messagesRef.value];
+    chatRef.value.messages = [...chatRef.value.messages];
   }
 }
 
@@ -420,13 +386,12 @@ async function regenerateMessage() {
   }
 
   // we discard the last message if it's from the AI, and regenerate
-  const lastMessage = messagesRef.value[messagesRef.value.length - 1];
-  if (lastMessage.role !== usernameRef.value) {
+  const messages = chatRef.value.messages;
+  const lastMessage = messages.at(-1)!;
+  if (lastMessage.author !== 'user') {
     let chatId = chatRef.value.id;
     // Update the local state
-    messagesRef.value.pop();
-    messagesRef.value = [...messagesRef.value];
-    chatRef.value.messages = messagesRef.value;
+    chatRef.value.messages.pop();
     // Update the chat state
     await chatsStore.popChatMessages(chatId);
   }
@@ -438,8 +403,8 @@ async function sendMessage(content: string) {
     return;
   }
 
-  let chatId = chatRef.value.id;
-  let inputText = inputTextRef.value;
+  const chatId = chatRef.value.id;
+  const inputText = inputTextRef.value;
   // const attachments = JSON.parse(JSON.stringify(attachmentsRef.value));
 
   // Wipe the input text
@@ -447,16 +412,13 @@ async function sendMessage(content: string) {
   // Wipe the attachments
   // attachmentsRef.value = [];
 
-  nextTick(scrollBottom);
-
   if (!content.trim()) return;
 
   if (content.trim() === '') return;
 
   // Append the new message to the chat history and push to local state
   let newMessage = await chatsStore.appendUserMessage(chatId, inputText);
-  messagesRef.value.push({ ...newMessage, stopped: true, error: null });
-  chatRef.value.messages = messagesRef.value;
+  chatRef.value.messages.push({ ...newMessage, stopped: true, error: null });
 
   // Scroll to the bottom of the chat
   nextTick(scrollBottom);
@@ -467,87 +429,63 @@ async function sendMessage(content: string) {
 
 // Set a chat by its ID
 async function setChat(chatId: string) {
-  // This is annoying but we need to set whether the user is connected
+  // This is annoying, but we need to set whether the user is connected
   //enableKnowledgeRef.value = account.isConnected.value;
 
   // Load the chat from the store and set it
-  chatRef.value = await chatsStore.readChat(chatId);
-  if (!chatRef.value) {
-    console.error('pages::Chat.vue::setChat - chat not found');
+  const loadedChat = await chatsStore.readChat(chatId);
+  if (!loadedChat) {
+    console.error('Chat not found');
     await router.push({ name: 'new-chat' });
     return;
   }
 
-  personasStore.persona = chatRef.value.persona;
-  let persona = chatRef.value.persona;
-  watch(personasStore.persona, async (persona) => {
-    personaRef.value = persona;
-  });
-
   // Extract the chat properties
-  let title = chatRef.value.title;
-  let username = chatRef.value.username;
-  // Load messages, mapping over with additional properties we need in the UI
-  let messages = chatRef.value.messages.map((message) => {
-    // Set stopped to true
-    message.stopped = true;
-    // Set error to null
-    message.error = null;
-    return message;
-  });
+  const title = loadedChat.title;
 
-  console.log(messages);
-  // Set the selected model for the chat by its URL
-  let modelApiUrl = chatRef.value.model.apiUrl;
-  modelsStore.setModelByURL(modelApiUrl);
+  // Load messages and remove potential previous errors
+  loadedChat.messages = loadedChat.messages.map((message) => ({ ...message, stopped: true, error: null }));
 
-  // Set the local messages state
-  messagesRef.value = messages;
-
-  // Set the local persona state
-  personaRef.value = persona;
-
-  // Set the local username state
-  usernameRef.value = username;
+  chatRef.value = loadedChat;
 
   // Set the chat title if it's not set
   if (title === defaultChatTopic || title === '') {
     // Set the chat name based on the first message
-    await setChatName(messages[0].content);
+    await setChatName(loadedChat.messages[0].content);
   }
 
-  // Determine if there are messages we need to respond to
-  // NOTE: this is assuming all chats should be initiated by the user
-  if (messages.length % 2 === 1) {
+  // Determine if there is a message we need to respond to
+  const lastMessage = loadedChat.messages.at(-1);
+  if (lastMessage?.author === 'user') {
     await generatePersonaMessage();
   }
-  nextTick(scrollBottom);
+  scrollBottom();
 }
 
 async function updateChatMessageContent(messageIndex: number, content: string, initialContent: string) {
-  let chatId = chatRef.value!.id;
+  const chatId = chatRef.value!.id;
   try {
     await chatsStore.updateChatMessageContent(chatId, messageIndex, content);
   } catch (error) {
     console.error('pages::Chat.vue::updateChatMessageContent - error', error);
     // Reset the content to the initial content
-    messagesRef.value[messageIndex].content = initialContent;
+    chatRef.value!.messages[messageIndex].content = initialContent;
     $q.notify('Failed to update message content');
   }
 }
 
-async function copyMessage(message: Message) {
+async function copyMessage(message: UIMessage) {
   await copyToClipboard(message.content);
   $q.notify('Message copied to clipboard');
 }
 
-async function editMessage(message: any) {
+const editMessage = (message: any) => {
   enableEditRef.value = true;
 
   setTimeout(() => {
     message.$el.click();
   }, 50);
-}
+};
 
 async function clearCookies() {
   // Clear the slots
@@ -556,8 +494,6 @@ async function clearCookies() {
   await axios.get('https://curated.aleph.cloud/change-pool', {
     withCredentials: true,
   });
-  // Set the reset flag
-  hasResetRef.value = true;
 }
 
 // function openKnowledgeUploader() {
@@ -623,7 +559,7 @@ code {
 
 .chat-item {
   .chat-toolbar {
-    right: 0px;
+    right: 0;
     bottom: 10px;
   }
 
@@ -636,7 +572,7 @@ code {
 @media (min-width: 600px) {
   .chat-item {
     .chat-toolbar {
-      right: 0px;
+      right: 0;
       top: 10px;
       bottom: auto;
       opacity: 0;

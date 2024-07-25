@@ -16,21 +16,21 @@
         :base-persona="basePersonaCreate"
         title="Create persona"
         @save-persona="
-          (persona: UIPersona) => {
+          (persona: BasePersonaEdition) => {
             personasStore.personas.push({ ...persona, allowEdit: true, hidden: false, id: uuidv4() });
           }
         "
       />
       <persona-dialog
         v-model="editPersona"
-        :base-persona="personasStore.persona"
+        :base-persona="selectedPersona"
         @save-persona="
-          (persona: UIPersona) => {
-            personasStore.persona = persona;
+          (persona: BasePersonaEdition) => {
+            const fullPersona: UIPersona = { ...selectedPersona!, ...persona };
 
             personasStore.personas = personasStore.personas.map((userPersona) => {
-              if (userPersona.id === persona.id) {
-                return persona;
+              if (userPersona.id === fullPersona.id) {
+                return fullPersona;
               }
               return userPersona;
             });
@@ -48,7 +48,7 @@
         unelevated
         @click="($refs['importPersonaUpload'] as any).click()"
       >
-        <q-tooltip v-if="tokenGatingMessage !== undefined">{{ `(${tokenGatingMessage})` }}</q-tooltip>
+        <q-tooltip v-if="tokenGatingMessage !== undefined">{{ tokenGatingMessage }}</q-tooltip>
       </q-btn>
     </div>
 
@@ -121,13 +121,13 @@ import { usePersonasStore } from 'stores/personas';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
-import { getPersonaAvatarUrl, UIPersona } from 'src/utils/personas';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
 import PersonaDialog from 'src/components/PersonaDialog.vue';
 import { useAccountStore } from 'stores/account';
 import { exportFile } from 'quasar';
 import { getTokenGatingMessage } from 'src/utils/messages';
 import { z } from 'zod';
-import { BasePersonaDialogProp } from 'components/PersonaDialog.vue';
+import { BasePersonaEdition, UIPersona } from 'src/types/personas';
 
 const personasStore = usePersonasStore();
 const accountStore = useAccountStore();
@@ -135,17 +135,17 @@ const router = useRouter();
 
 const createPersona = ref(false);
 const editPersona = ref(false);
-const basePersonaCreate = ref<BasePersonaDialogProp | undefined>(undefined);
+const selectedPersona = ref<UIPersona | undefined>(undefined);
+const basePersonaCreate = ref<BasePersonaEdition | undefined>(undefined);
 
 const tokenGatingMessage = computed(() => getTokenGatingMessage(accountStore.ltaiBalance, 100));
 
 const startChatWithPersona = (persona: UIPersona) => {
-  personasStore.persona = persona;
-  router.push('/new');
+  router.push(`/new?persona=${persona.id}`);
 };
 
 const startEditingPersona = (persona: UIPersona) => {
-  personasStore.persona = persona;
+  selectedPersona.value = persona;
   editPersona.value = true;
 };
 
@@ -156,9 +156,6 @@ const duplicatePersona = (persona: UIPersona) => {
 
 const deletePersona = (persona: UIPersona) => {
   personasStore.personas = personasStore.personas.filter((userPersona) => userPersona.id !== persona.id);
-  if (personasStore.persona.id === persona.id) {
-    personasStore.persona = personasStore.personas.find((userPersona) => !userPersona.hidden)!;
-  }
 };
 
 const reversePersonaVisibility = (persona: UIPersona) => {
@@ -174,13 +171,11 @@ const personaExportImportSchema = z.object({
   data: z.object({
     description: z.string(),
     name: z.string(),
-    avatar: z.union([
-      z.object({
-        item_hash: z.string(),
-        ipfs_hash: z.string(),
-      }),
-      z.string().url(),
-    ]),
+    role: z.string(),
+    avatar: z.object({
+      item_hash: z.string(),
+      ipfs_hash: z.string(),
+    }),
   }),
 });
 type PersonaExportImportSchema = z.infer<typeof personaExportImportSchema>;
@@ -191,6 +186,7 @@ const exportPersona = (persona: UIPersona) => {
     data: {
       description: persona.description,
       name: persona.name,
+      role: persona.role,
       avatar: persona.avatar,
     },
   };
@@ -217,10 +213,7 @@ const importPersona = (event: Event) => {
       return;
     }
 
-    const avatar = typeof parsedFile.data.data.avatar === 'string' ? undefined : parsedFile.data.data.avatar;
-    const personaData = { ...parsedFile.data.data, avatar };
-
-    basePersonaCreate.value = personaData;
+    basePersonaCreate.value = parsedFile.data.data;
     createPersona.value = true;
   };
   reader.readAsText(file);
