@@ -26,14 +26,18 @@ export const processFile = async (file: File): Promise<MessageAttachment> => {
         });
         break;
       default:
-        throw new Error(`Unsupported file type: ${file.type}`);
+        throw new Error(`Unsupported file type: ${type}`);
+    }
+
+    if (extractedText.length > 4 * 1024) {
+      // File is too big to be inlined, rejecting it.
+      // Later we'll use a knowledge db to fix this.
+      throw new Error('File is too big, please use a file of 4 KB of content or less.');
     }
   } catch (error) {
     console.error('Error processing file:', error);
     throw error;
   }
-
-  // TODO: throw error if file is too big
 
   return { title, content: extractedText, type, id: uuidv4() };
 };

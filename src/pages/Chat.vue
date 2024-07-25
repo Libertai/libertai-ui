@@ -43,13 +43,14 @@
               <q-chip
                 v-for="attachment in message.attachments"
                 :key="attachment.id"
-                class="q-mr-xs bg-primary text-white"
+                class="tw-mr-1 bg-primary text-white"
+                icon="img:icons/svg/attachment.svg"
               >
                 {{ attachment.title }}
               </q-chip>
             </q-item-label>
             <!-- Display the content of the message -->
-            <q-item-label style="display: block">
+            <q-item-label class="tw-block">
               <MarkdownRenderer
                 :class="message.author === 'user' ? '' : 'message-content'"
                 :content="message.content"

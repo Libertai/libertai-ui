@@ -1,18 +1,24 @@
 <template>
   <div>
-    <q-item-label v-if="attachments.length > 0">
-      <q-chip v-for="attachment in attachments" :key="attachment.id" class="q-mr-xs bg-primary text-white">
+    <q-item-label v-if="attachments.length > 0" class="max-sm:tw-px-2 sm:tw-px-6">
+      <q-chip
+        v-for="attachment in attachments"
+        :key="attachment.id"
+        class="tw-mr-1 bg-primary text-white"
+        removable
+        @remove="removeAttachment(attachment.id)"
+      >
         {{ attachment.title }}
       </q-chip>
     </q-item-label>
     <q-input
       v-model="message"
       :bottom-slots="props.hint !== ''"
-      :class="`${$q.screen.gt.sm ? 'q-pa-lg' : 'q-pa-sm'}`"
       :loading="isLoading"
       autofocus
       autogrow
       bg-color="secondary"
+      class="max-sm:tw-p-2 sm:tw-p-6"
       input-class="text-light"
       input-style="max-height: 10em;"
       label-color="grey"
@@ -38,16 +44,16 @@
         <q-btn dense flat icon="img:icons/send.svg" round @click="sendMessage" />
       </template>
 
-      <template #hint>
+      <template v-if="hint !== ''" #hint>
         {{ hint }}
       </template>
     </q-input>
     <!-- Hidden attachments upload -->
-    <!-- TODO: Handle new attachments and removal of attachments-->
     <input
       ref="messageAttachmentsUpload"
       accept=".txt,.md,.pdf"
       hidden
+      multiple
       type="file"
       @change="processMessageAttachments"
     />
@@ -58,6 +64,7 @@
 import { ref } from 'vue';
 import { processFile } from 'src/utils/attachments';
 import { MessageAttachment, SendMessageParams } from 'src/types/chats';
+import { useQuasar } from 'quasar';
 
 const props = defineProps({
   isLoading: {
@@ -69,6 +76,8 @@ const props = defineProps({
     default: '',
   },
 });
+
+const $q = useQuasar();
 
 const emit = defineEmits<{ sendMessage: [value: SendMessageParams] }>();
 
@@ -82,12 +91,22 @@ const processMessageAttachments = async (event: any) => {
 
   await Promise.all(
     Array.from(target.files as FileList).map(async (file) => {
-      // TODO: handle processing error
-      const fileData = await processFile(file);
-      attachmentsData.push(fileData);
+      try {
+        const fileData = await processFile(file);
+        attachmentsData.push(fileData);
+      } catch (error) {
+        $q.notify({
+          message: (error as Error)?.message ?? 'File processing failed, please try again',
+          color: 'red',
+        });
+      }
     }),
   );
-  attachments.value = attachmentsData;
+  attachments.value = attachments.value.concat(attachmentsData);
+};
+
+const removeAttachment = (attachmentId: string) => {
+  attachments.value = attachments.value.filter((a) => a.id !== attachmentId);
 };
 
 const sendMessage = (event: Event | KeyboardEvent) => {

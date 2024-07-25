@@ -26,7 +26,7 @@
     >
       <div class="row no-wrap q-pa-md q-pt-none">
         <div class="column items-center">
-          <div class="text-small q-mb-xs">{{ account.address.value }}</div>
+          <div class="text-small tw-mb-1">{{ account.address.value }}</div>
 
           <q-btn
             v-close-popup

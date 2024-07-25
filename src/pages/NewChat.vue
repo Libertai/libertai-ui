@@ -26,7 +26,7 @@
           </q-card-section>
         </q-card>
       </div>
-      <div class="fixed-bottom absolute q-mb-xl q-pb-xs">
+      <div class="fixed-bottom absolute q-mb-xl tw-pb-1">
         <message-input
           hint="Disclaimer: This chat bot uses personas for entertainment and informational purposes only. The
               chat bot's responses are not a reflection of any real person or organization's views or opinions, and should not

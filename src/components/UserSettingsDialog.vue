@@ -34,11 +34,11 @@
       </q-card-section>
 
       <q-card-section class="text-primary" horizontal>
-        <q-btn v-close-popup class="q-px-xl q-py-xs" label="Close" rounded />
+        <q-btn v-close-popup class="q-px-xl tw-py-1" label="Close" rounded />
         <q-space />
         <q-btn
           v-close-popup
-          class="bg-primary q-px-xl q-py-xs"
+          class="bg-primary q-px-xl tw-py-1"
           label="Confirm"
           rounded
           text-color="white"
