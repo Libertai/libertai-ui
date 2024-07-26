@@ -308,7 +308,7 @@ async function generatePersonaMessage() {
     // A successful response! Append the chat to long term storage.
     await chatsStore.appendModelResponse(chatId, response.content, [] /*searchResults*/);
   } catch (error) {
-    console.error('pages::Chat.vue::generatePersonaMessage - error', error);
+    console.error('generatePersonaMessage error: ', error);
     response.error = error;
   } finally {
     // Done! update the local state to reflect the end of the process
@@ -349,7 +349,7 @@ async function sendMessage({ content, attachments }: SendMessageParams) {
   chatRef.value.messages.push({ ...newMessage, stopped: true, error: null });
 
   // Scroll to the bottom of the chat
-  scrollBottom();
+  nextTick(scrollBottom);
 
   // Generate a response from the AI
   await generatePersonaMessage();

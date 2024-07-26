@@ -107,7 +107,11 @@ function openChatSettings(chatToEdit: Chat) {
 }
 
 async function saveChatSettings(newChat: Chat) {
-  await chatsStore.updateChat(newChat.id, { username: newChat.username });
+  await chatsStore.updateChat(newChat.id, {
+    username: newChat.username,
+    modelId: newChat.modelId,
+    persona: JSON.parse(JSON.stringify(newChat.persona)),
+  });
   router.go(0);
 }
 

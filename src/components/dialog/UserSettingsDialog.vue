@@ -1,7 +1,7 @@
 <template>
   <q-dialog class="q-pa-lg text-light" label="Customize" style="flex-grow: 1">
     <q-card class="q-pa-md">
-      <q-card-actions :class="`flex flex-left text-semibold ${$q.dark.mode ? '' : 'text-purple700'}`">
+      <q-card-actions :class="`flex flex-left text-semibold ${$q.dark.mode ? '' : 'text-purple-700'}`">
         User settings
         <q-space />
         <q-btn
@@ -46,11 +46,7 @@
           label="Confirm"
           rounded
           text-color="white"
-          @click="
-            () => {
-              settingsStore.update({ username, avatar: toRaw(avatar), darkmode, isSignatureHashStored });
-            }
-          "
+          @click="updateSettings"
         />
       </q-card-section>
     </q-card>
@@ -59,12 +55,10 @@
 
 <script lang="ts" setup>
 import { useSettingsStore } from 'stores/settings';
-import { ref, toRaw, toRef, watch } from 'vue';
+import { ref, toRef, watch } from 'vue';
 import AlephAvatar from 'components/AlephAvatar.vue';
-import { useQuasar } from 'quasar';
 
 const settingsStore = useSettingsStore();
-const $q = useQuasar();
 
 // Form values
 const username = ref(settingsStore.username);
@@ -85,4 +79,13 @@ watch(toRef(settingsStore, 'darkmode'), () => {
 watch(toRef(settingsStore, 'isSignatureHashStored'), () => {
   isSignatureHashStored.value = settingsStore.isSignatureHashStored;
 });
+
+const updateSettings = () => {
+  settingsStore.update({
+    username: username.value,
+    avatar: avatar.value,
+    darkmode: darkmode.value,
+    isSignatureHashStored: isSignatureHashStored.value,
+  });
+};
 </script>

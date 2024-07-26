@@ -102,8 +102,10 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       this.chats = await this.chatsStore.getChats();
     },
 
-    async appendUserMessage(chatId: string, message: string, attachments?: MessageAttachment[]) {
-      return this.chatsStore.appendUserMessage(chatId, message, attachments);
+    async appendUserMessage(chatId: string, message: string, attachments?: MessageAttachment[]): Promise<UIMessage> {
+      const userMessage = await this.chatsStore.appendUserMessage(chatId, message, attachments);
+      this.chats = await this.chatsStore.getChats();
+      return userMessage;
     },
 
     async appendModelResponse(chatId: string, response: string, searchResults: any) {

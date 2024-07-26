@@ -13,16 +13,22 @@
             </div>
           </q-card-section>
           <q-card-section>
-            <persona-dropdown
-              :selected-persona="selectedPersona"
-              @select-persona="(persona: UIPersona) => (selectedPersona = persona)"
-            />
+            <div class="tw-gap-2 tw-flex tw-flex-col tw-text-center">
+              <p>Persona</p>
+              <persona-dropdown
+                :selected-persona="selectedPersona"
+                @select-persona="(persona: UIPersona) => (selectedPersona = persona)"
+              />
+            </div>
           </q-card-section>
           <q-card-section>
-            <model-selector
-              :selected-model="selectedModel"
-              @select-model="(model: UIModel) => (selectedModel = model)"
-            />
+            <div class="tw-gap-2 tw-flex tw-flex-col tw-text-center">
+              <p>Model</p>
+              <model-selector
+                :selected-model="selectedModel"
+                @select-model="(model: UIModel) => (selectedModel = model)"
+              />
+            </div>
           </q-card-section>
           <q-card-section>
             <span>Your name</span>
