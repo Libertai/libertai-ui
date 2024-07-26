@@ -24,6 +24,10 @@
               @select-model="(model: UIModel) => (selectedModel = model)"
             />
           </q-card-section>
+          <q-card-section>
+            <span>Your name</span>
+            <q-input v-model="username" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
+          </q-card-section>
         </q-card>
       </div>
       <div class="fixed-bottom absolute q-mb-xl tw-pb-1">
@@ -62,13 +66,14 @@ const router = useRouter();
 const modelsStore = useModelsStore();
 const chatsStore = useChatsStore();
 const personasStore = usePersonasStore();
+const settingsStore = useSettingsStore();
 
-const username = useSettingsStore().username;
 const route = useRoute();
 
 // Inputs
 const selectedModel = ref<UIModel>(modelsStore.models[0]);
 const selectedPersona = ref<UIPersona>(personasStore.personas[0]);
+const username = ref(settingsStore.username);
 
 watch(
   () => route.query.persona as string | undefined,
@@ -92,7 +97,7 @@ async function sendMessage({ content, attachments }: SendMessageParams) {
   const persona = JSON.parse(JSON.stringify(selectedPersona.value));
 
   // Creates the new chat
-  const chat = await chatsStore.createChat(title, username, selectedModel.value.id, persona);
+  const chat = await chatsStore.createChat(title, username.value, selectedModel.value.id, persona);
   // Append the first user message to the chat history
   await chatsStore.appendUserMessage(chat.id, content, attachments);
 

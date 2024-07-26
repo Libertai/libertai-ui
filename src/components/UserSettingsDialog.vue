@@ -24,6 +24,10 @@
       </q-card-section>
 
       <q-card-section horizontal>
+        <q-toggle v-model="darkmode" checked-icon="dark_mode" label="Dark mode" unchecked-icon="lightbulb" />
+      </q-card-section>
+
+      <q-card-section horizontal>
         <q-toggle
           v-model="isSignatureHashStored"
           checked-icon="check"
@@ -44,7 +48,7 @@
           text-color="white"
           @click="
             () => {
-              settingsStore.update({ username, avatar: toRaw(avatar), isSignatureHashStored });
+              settingsStore.update({ username, avatar: toRaw(avatar), darkmode, isSignatureHashStored });
             }
           "
         />
@@ -57,12 +61,15 @@
 import { useSettingsStore } from 'stores/settings';
 import { ref, toRaw, toRef, watch } from 'vue';
 import AlephAvatar from 'components/AlephAvatar.vue';
+import { useQuasar } from 'quasar';
 
 const settingsStore = useSettingsStore();
+const $q = useQuasar();
 
 // Form values
 const username = ref(settingsStore.username);
 const avatar = ref(settingsStore.avatar);
+const darkmode = ref(settingsStore.darkmode);
 const isSignatureHashStored = ref(settingsStore.isSignatureHashStored);
 
 // Update the inputs when the store changes (might be updated by Aleph settings fetching)
@@ -71,6 +78,10 @@ watch(toRef(settingsStore, 'username'), () => {
 });
 watch(toRef(settingsStore, 'avatar'), () => {
   avatar.value = settingsStore.avatar;
+});
+watch(toRef(settingsStore, 'darkmode'), () => {
+  $q.dark.set(settingsStore.darkmode);
+  darkmode.value = settingsStore.darkmode;
 });
 watch(toRef(settingsStore, 'isSignatureHashStored'), () => {
   isSignatureHashStored.value = settingsStore.isSignatureHashStored;

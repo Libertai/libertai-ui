@@ -11,7 +11,6 @@
         </q-btn>
         <user-settings-dialog v-model="showUserSettingsDialog" />
 
-        <toggle-theme />
         <q-space />
 
         <div class="row q-gutter-x-sm">
@@ -183,7 +182,6 @@ import { useRoute, useRouter } from 'vue-router';
 import AccountButton from 'src/components/AccountButton.vue';
 import UserSettingsDialog from 'components/UserSettingsDialog.vue';
 import { useAccount } from '@wagmi/vue';
-import ToggleTheme from 'components/ToggleTheme.vue';
 import { useAccountStore } from 'stores/account';
 
 const leftDrawerOpen = ref(false);
