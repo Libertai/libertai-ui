@@ -91,6 +91,11 @@
   border-radius: 50%;
 }
 
+/* Display whole values of dropdown buttons */
+.q-btn-dropdown .q-btn__content {
+  white-space: wrap;
+}
+
 /* TEXT */
 .text-semibold {
   font-weight: 600;

@@ -1,6 +1,6 @@
 <template>
   <q-btn-dropdown
-    :label="selectedModel.name.substring(0, 12) + '..'"
+    :label="selectedModel.name"
     class="text-semibold icon-md border-primary-highlight"
     color="primary"
     dropdown-icon="img:icons/svg/chevron-down_lighten.svg"
