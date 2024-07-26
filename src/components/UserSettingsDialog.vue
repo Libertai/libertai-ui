@@ -80,7 +80,6 @@ watch(toRef(settingsStore, 'avatar'), () => {
   avatar.value = settingsStore.avatar;
 });
 watch(toRef(settingsStore, 'darkmode'), () => {
-  $q.dark.set(settingsStore.darkmode);
   darkmode.value = settingsStore.darkmode;
 });
 watch(toRef(settingsStore, 'isSignatureHashStored'), () => {

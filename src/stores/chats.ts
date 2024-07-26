@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { chatTag } from 'src/utils/chat';
 import idb from 'src/utils/idb';
 import { chatsMigrations } from 'src/utils/migrations/chats';
-import { Chat, ChatMigration, MessageAttachment, MinimalChat, UIMessage } from 'src/types/chats';
+import { Chat, ChatMigration, MessageAttachment, UIMessage } from 'src/types/chats';
 import { UIPersona } from 'src/types/personas';
 import { LocalForage } from 'src/types/utils';
 
@@ -11,12 +11,8 @@ const CHATS_STORE_NAME = 'chats-store';
 const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
 
 /**
- * Representation of an attachment:
+ * To implement in attachments:
  * interface Attachment {
- *   // File type
- *   type: string;  // eg 'application/pdf', 'text/plain', etc.
- *   // File name
- *   name: string;
  *   // Document id within the embedding store, if stored there
  *   documentId: string?;
  *   // The content of the attachment, if stored inlined
@@ -38,7 +34,7 @@ const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
 type ChatsStoreState = {
   version: number;
   chatsStore: ChatsStore;
-  chats: MinimalChat[];
+  chats: Chat[];
 };
 
 export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
@@ -57,7 +53,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
   actions: {
     async load() {
       // Get the partial chats
-      this.chats = await this.chatsStore.readChats();
+      this.chats = await this.chatsStore.getChats();
 
       try {
         // Running migrations if needed
@@ -74,7 +70,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       }
     },
 
-    async readChat(id: string) {
+    async readChat(id: string): Promise<Chat> {
       return await this.chatsStore.readChat(id);
     },
 
@@ -157,16 +153,10 @@ class ChatsStore {
     return idb.put<Chat>(chat.id, chat, this.store);
   }
 
-  async readChats(): Promise<MinimalChat[]> {
-    const result: MinimalChat[] = [];
-    await this.store.iterate((value: Chat) => {
-      const chat = value;
-      const partialChat = {
-        id: chat.id,
-        title: chat.title,
-        createdAt: chat.createdAt,
-      };
-      result.push(partialChat);
+  async getChats(): Promise<Chat[]> {
+    const result: Chat[] = [];
+    await this.store.iterate((chat: Chat) => {
+      result.push(chat);
     });
     // Sort the chats by creation date (descending)
     result.sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf());

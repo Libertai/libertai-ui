@@ -5,7 +5,7 @@ export type MessageAttachment = {
   id: string;
   title: string;
   content: string;
-  type: string;
+  type: string; // eg 'application/pdf', 'text/plain', etc.
 };
 
 // TODO: clean this type and understand the added properties
@@ -30,7 +30,6 @@ export type Chat = {
   messages: UIMessage[];
   createdAt: Date;
 };
-export type MinimalChat = Pick<Chat, 'id' | 'title' | 'createdAt'> & Partial<Chat>;
 
 // eslint-disable-next-line no-unused-vars
 export type ChatMigration = (currentChat: Chat) => Chat;
