@@ -44,7 +44,7 @@
                 </q-item-section>
               </q-item>
 
-              <q-item v-close-popup clickable>
+              <q-item v-close-popup clickable @click="openChatSettings(chat)">
                 <q-item-section avatar>
                   <q-avatar :icon="`img:icons/svg/settings${$q.dark.mode ? '_lighten' : ''}.svg`" />
                 </q-item-section>
@@ -70,6 +70,7 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+    <chat-settings-dialog v-model="showChatSettings" :chat="settingsChat" @save-chat="saveChatSettings" />
   </q-list>
 </template>
 
@@ -78,14 +79,19 @@ import { storeToRefs } from 'pinia';
 import { useChatsStore } from 'stores/chats';
 import { useRoute, useRouter } from 'vue-router';
 import { nextTick, ref } from 'vue';
+import ChatSettingsDialog from 'components/dialog/ChatSettingsDialog.vue';
+import { Chat } from 'src/types/chats';
 
 const chatsStore = useChatsStore();
 const route = useRoute();
 const router = useRouter();
 
 const { chats } = storeToRefs(chatsStore);
+
 const deleteChatConfirmAction = ref(false);
 const deleteChatId = ref<string | null>(null);
+const showChatSettings = ref(false);
+const settingsChat = ref<Chat | null>(null);
 
 // Delete a chat
 async function deleteChat(chatId: string) {
@@ -95,7 +101,17 @@ async function deleteChat(chatId: string) {
   }
 }
 
-async function deleteChatConfirm(chatId: string) {
+function openChatSettings(chatToEdit: Chat) {
+  settingsChat.value = chatToEdit;
+  showChatSettings.value = true;
+}
+
+async function saveChatSettings(newChat: Chat) {
+  await chatsStore.updateChat(newChat.id, { username: newChat.username });
+  router.go(0);
+}
+
+function deleteChatConfirm(chatId: string) {
   deleteChatConfirmAction.value = true;
   deleteChatId.value = chatId;
 }

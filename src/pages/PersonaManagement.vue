@@ -122,7 +122,7 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
-import PersonaDialog from 'src/components/PersonaDialog.vue';
+import PersonaDialog from 'components/dialog/PersonaDialog.vue';
 import { useAccountStore } from 'stores/account';
 import { exportFile } from 'quasar';
 import { getTokenGatingMessage } from 'src/utils/messages';

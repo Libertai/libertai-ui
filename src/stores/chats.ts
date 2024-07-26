@@ -44,15 +44,21 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
 
     // Interface for our ChatsStore
     chatsStore: new ChatsStore(),
-    // List of partials chats
+
     chats: [],
   }),
   persist: {
     paths: ['version'],
   },
+  getters: {
+    getChat: (state) => {
+      return (id: string): Chat | undefined => {
+        return state.chats.find((c) => c.id === id);
+      };
+    },
+  },
   actions: {
     async load() {
-      // Get the partial chats
       this.chats = await this.chatsStore.getChats();
 
       try {
@@ -70,10 +76,6 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       }
     },
 
-    async readChat(id: string): Promise<Chat> {
-      return await this.chatsStore.readChat(id);
-    },
-
     async createChat(title: string, username: string, modelId: string, persona: UIPersona): Promise<Chat> {
       const chat = await this.chatsStore.createChat(title, username, [], modelId, persona);
       const tag = chatTag(chat.id);
@@ -82,15 +84,9 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       return chat;
     },
 
-    async updateChatTitle(chatId: string, title: string) {
-      await this.chatsStore.updateChat(chatId, { title });
-      // Update the partial chats
-      this.chats = this.chats.map((chat) => {
-        if (chat.id === chatId) {
-          chat.title = title;
-        }
-        return chat;
-      });
+    async updateChat(chatId: string, updates: Partial<Chat>) {
+      await this.chatsStore.updateChat(chatId, updates);
+      this.chats = await this.chatsStore.getChats();
     },
 
     async updateChatMessageContent(chatId: string, messageIndex: number, content: string) {
@@ -98,18 +94,21 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       const messages = chat.messages;
       messages[messageIndex].content = content;
       await this.chatsStore.updateChat(chatId, { messages });
+      this.chats = await this.chatsStore.getChats();
     },
 
     async popChatMessages(chatId: string) {
-      return await this.chatsStore.popChatMessages(chatId);
+      await this.chatsStore.popChatMessages(chatId);
+      this.chats = await this.chatsStore.getChats();
     },
 
     async appendUserMessage(chatId: string, message: string, attachments?: MessageAttachment[]) {
-      return await this.chatsStore.appendUserMessage(chatId, message, attachments);
+      return this.chatsStore.appendUserMessage(chatId, message, attachments);
     },
 
     async appendModelResponse(chatId: string, response: string, searchResults: any) {
-      return await this.chatsStore.appendModelResponse(chatId, response, searchResults);
+      await this.chatsStore.appendModelResponse(chatId, response, searchResults);
+      this.chats = await this.chatsStore.getChats();
     },
 
     async deleteChat(chatId: string) {
@@ -200,6 +199,8 @@ class ChatsStore {
       content: messageContent,
       timestamp: new Date(),
       attachments,
+      stopped: true,
+      error: null,
     };
     chat.messages.push(message);
     await idb.put(chatId, chat, this.store);
@@ -214,6 +215,8 @@ class ChatsStore {
       content: responseContent,
       timestamp: new Date(),
       searchResults,
+      stopped: true,
+      error: null,
     };
     chat.messages.push(message);
     await idb.put(chatId, chat, this.store);

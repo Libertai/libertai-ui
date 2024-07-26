@@ -132,7 +132,6 @@ import { LlamaCppApiEngine, Message } from '@libertai/libertai-js';
 
 import { useChatsStore } from 'stores/chats';
 import { useModelsStore } from 'stores/models';
-import { useKnowledgeStore } from 'stores/knowledge';
 
 import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
 import MessageInput from 'src/components/MessageInput.vue';
@@ -148,7 +147,7 @@ const router = useRouter();
 // App state
 const chatsStore = useChatsStore();
 const modelsStore = useModelsStore();
-const knowledgeStore = useKnowledgeStore();
+// const knowledgeStore = useKnowledgeStore();
 const settingsStore = useSettingsStore();
 
 // Local page state
@@ -157,7 +156,6 @@ const scrollAreaRef = ref<HTMLDivElement>();
 const enableEditRef = ref(false);
 // const showKnowledgeUploaderRef = ref(false);
 
-// Chat specific state
 const chatRef = ref<Chat>();
 
 // Instance of an inference engine
@@ -182,10 +180,10 @@ watch(
 // Set the name of the chat based on the first sentence
 async function setChatName(first_sentence: string) {
   // Get our chat id
-  let chatId = chatRef.value!.id;
+  const chatId = chatRef.value!.id;
   try {
     const title = await inferChatTopic(first_sentence);
-    await chatsStore.updateChatTitle(chatId, title);
+    await chatsStore.updateChat(chatId, { title });
     // Update the chat title state
     chatRef.value!.title = title;
   } catch (error) {
@@ -208,7 +206,7 @@ async function generatePersonaMessage() {
   }
 
   const chatId = chatRef.value.id;
-  const chatTags = chatRef.value.tags;
+  // const chatTags = chatRef.value.tags;
   const username = chatRef.value.username;
   const messages = JSON.parse(JSON.stringify(chatRef.value.messages));
   const persona = chatRef.value.persona;
@@ -238,15 +236,15 @@ async function generatePersonaMessage() {
 
     // NOTE: assuming last message is guaranteed to be non-empty and the user's last message
     // Get the last message from the user
-    const lastMessage = messages[messages.length - 1];
-    const searchResultMessages: Message[] = [];
-    const searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
-    searchResults.forEach((result) => {
-      searchResultMessages.push({
-        role: 'search-result',
-        content: result.content,
-      });
-    });
+    // const lastMessage = messages[messages.length - 1];
+    // const searchResultMessages: Message[] = [];
+    // const searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
+    // searchResults.forEach((result) => {
+    //   searchResultMessages.push({
+    //     role: 'search-result',
+    //     content: result.content,
+    //   });
+    // });
 
     // Expand all the messages to inline any compatible attachments
     const expandedMessages = messages
@@ -290,7 +288,7 @@ async function generatePersonaMessage() {
       .flat();
 
     // Append the search results to the messages
-    const allMessages: Message[] = [...expandedMessages, ...searchResultMessages];
+    const allMessages: Message[] = [...expandedMessages /*...searchResultMessages */];
 
     // Generate a stream of responses from the AI
     for await (const output of inferenceEngine.generateAnswer(allMessages, model, persona, username, false)) {
@@ -305,10 +303,10 @@ async function generatePersonaMessage() {
 
       chatRef.value.messages = [...chatRef.value.messages];
       // Scroll to the bottom of the chat
-      nextTick(scrollBottom);
+      scrollBottom();
     }
     // A successful response! Append the chat to long term storage.
-    await chatsStore.appendModelResponse(chatId, response.content, searchResults);
+    await chatsStore.appendModelResponse(chatId, response.content, [] /*searchResults*/);
   } catch (error) {
     console.error('pages::Chat.vue::generatePersonaMessage - error', error);
     response.error = error;
@@ -330,7 +328,7 @@ async function regenerateMessage() {
   const messages = chatRef.value.messages;
   const lastMessage = messages.at(-1)!;
   if (lastMessage.author !== 'user') {
-    let chatId = chatRef.value.id;
+    const chatId = chatRef.value.id;
     // Update the local state
     chatRef.value.messages.pop();
     // Update the chat state
@@ -351,7 +349,7 @@ async function sendMessage({ content, attachments }: SendMessageParams) {
   chatRef.value.messages.push({ ...newMessage, stopped: true, error: null });
 
   // Scroll to the bottom of the chat
-  nextTick(scrollBottom);
+  scrollBottom();
 
   // Generate a response from the AI
   await generatePersonaMessage();
@@ -359,16 +357,13 @@ async function sendMessage({ content, attachments }: SendMessageParams) {
 
 // Set a chat by its ID
 async function setChat(chatId: string) {
-  // Load the chat from the store and set it
-  const loadedChat = await chatsStore.readChat(chatId);
+  const loadedChat = chatsStore.getChat(chatId);
+
   if (!loadedChat) {
-    console.error('Chat not found');
+    $q.notify({ message: 'Chat not found', color: 'red' });
     await router.push({ name: 'new-chat' });
     return;
   }
-
-  // Extract the chat properties
-  const title = loadedChat.title;
 
   // Load messages and remove potential previous errors
   loadedChat.messages = loadedChat.messages.map((message) => ({ ...message, stopped: true, error: null }));
@@ -376,6 +371,7 @@ async function setChat(chatId: string) {
   chatRef.value = loadedChat;
 
   // Set the chat title if it's not set
+  const title = loadedChat.title;
   if (title === defaultChatTopic || title === '') {
     // Set the chat name based on the first message
     await setChatName(loadedChat.messages[0].content);
@@ -386,7 +382,7 @@ async function setChat(chatId: string) {
   if (lastMessage?.author === 'user') {
     await generatePersonaMessage();
   }
-  scrollBottom();
+  setTimeout(() => scrollBottom(), 50);
 }
 
 async function updateChatMessageContent(messageIndex: number, content: string, initialContent: string) {
@@ -394,7 +390,7 @@ async function updateChatMessageContent(messageIndex: number, content: string, i
   try {
     await chatsStore.updateChatMessageContent(chatId, messageIndex, content);
   } catch (error) {
-    console.error('pages::Chat.vue::updateChatMessageContent - error', error);
+    console.error('updateChatMessageContent: ', error);
     // Reset the content to the initial content
     chatRef.value!.messages[messageIndex].content = initialContent;
     $q.notify('Failed to update message content');

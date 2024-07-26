@@ -104,7 +104,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import AccountButton from 'src/components/AccountButton.vue';
-import UserSettingsDialog from 'components/UserSettingsDialog.vue';
+import UserSettingsDialog from 'components/dialog/UserSettingsDialog.vue';
 import { useAccount } from '@wagmi/vue';
 import { useAccountStore } from 'stores/account';
 import ChatsList from 'components/ChatsList.vue';
