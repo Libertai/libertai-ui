@@ -360,7 +360,7 @@ async function setChat(chatId: string) {
   const loadedChat = chatsStore.getChat(chatId);
 
   if (!loadedChat) {
-    $q.notify({ message: 'Chat not found', color: 'red' });
+    $q.notify({ message: 'Chat not found', color: 'negative' });
     await router.push({ name: 'new-chat' });
     return;
   }

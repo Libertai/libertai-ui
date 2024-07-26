@@ -16,7 +16,7 @@
             if (accountStore.alephStorage === null) {
               $q.notify({
                 message: 'Connect your wallet to upload an avatar',
-                color: 'red',
+                color: 'negative',
               });
               return;
             }

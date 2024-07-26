@@ -95,7 +95,7 @@ watch(
     } catch (err) {
       $q.notify({
         message: 'Invalid address',
-        color: 'red',
+        color: 'negative',
       });
       router.push('/tokens');
     }

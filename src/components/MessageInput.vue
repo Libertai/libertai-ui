@@ -97,7 +97,7 @@ const processMessageAttachments = async (event: any) => {
       } catch (error) {
         $q.notify({
           message: (error as Error)?.message ?? 'File processing failed, please try again',
-          color: 'red',
+          color: 'negative',
         });
       }
     }),
