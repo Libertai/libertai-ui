@@ -2,7 +2,7 @@
   <q-page v-if="chatRef" class="column align-items-center">
     <div ref="scrollAreaRef" class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)">
       <!-- Display message history -->
-      <q-list class="col-grow q-ma-xl">
+      <q-list class="col-grow max-sm:tw-m-6 sm:tw-m-12">
         <!-- eslint-disable-next-line vue/valid-v-for -->
         <q-item
           v-for="(message, message_index) in chatRef.messages"
@@ -80,7 +80,7 @@
             </q-btn>
             <!-- Allow copying the message to the clipboard -->
             <q-btn
-              :icon="`img:icons/svg/copy2${$q.dark.mode ? '_lighten' : ''}.svg`"
+              :icon="`img:icons/svg/copy${$q.dark.mode ? '_lighten' : ''}.svg`"
               dense
               flat
               size="sm"
@@ -102,7 +102,7 @@
       </q-list>
     </div>
 
-    <div class="q-mb-md q-mr-md">
+    <div class="tw-mx-4">
       <message-input :is-loading="isLoadingRef" class="col" @send-message="sendMessage" />
     </div>
 
