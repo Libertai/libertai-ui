@@ -35,21 +35,21 @@
             unelevated
           >
             <q-list>
-              <q-item v-close-popup clickable @click="deleteChatConfirm(chat.id)">
-                <q-item-section avatar>
-                  <q-avatar :icon="`img:icons/delete${$q.dark.mode ? '_lighten' : ''}.svg`" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>Delete</q-item-label>
-                </q-item-section>
-              </q-item>
-
               <q-item v-close-popup clickable @click="openChatSettings(chat)">
                 <q-item-section avatar>
                   <q-avatar :icon="`img:icons/svg/settings${$q.dark.mode ? '_lighten' : ''}.svg`" />
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>Settings</q-item-label>
+                </q-item-section>
+              </q-item>
+
+              <q-item v-close-popup clickable @click="deleteChatConfirm(chat.id)">
+                <q-item-section avatar>
+                  <q-avatar :icon="`img:icons/delete${$q.dark.mode ? '_lighten' : ''}.svg`" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Delete</q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
@@ -86,7 +86,7 @@ const chatsStore = useChatsStore();
 const route = useRoute();
 const router = useRouter();
 
-const { chats } = storeToRefs(chatsStore);
+const { getSortedChats: chats } = storeToRefs(chatsStore);
 
 const deleteChatConfirmAction = ref(false);
 const deleteChatId = ref<string | null>(null);
@@ -95,7 +95,7 @@ const settingsChat = ref<Chat | null>(null);
 
 // Delete a chat
 async function deleteChat(chatId: string) {
-  await chatsStore.deleteChat(chatId);
+  chatsStore.deleteChat(chatId);
   if (route.params?.id === chatId) {
     await nextTick(() => router.push('/new'));
   }
@@ -106,8 +106,8 @@ function openChatSettings(chatToEdit: Chat) {
   showChatSettings.value = true;
 }
 
-async function saveChatSettings(newChat: Chat) {
-  await chatsStore.updateChat(newChat.id, {
+function saveChatSettings(newChat: Chat) {
+  chatsStore.updateChat(newChat.id, {
     username: newChat.username,
     modelId: newChat.modelId,
     persona: JSON.parse(JSON.stringify(newChat.persona)),

@@ -12,6 +12,7 @@ export type MessageAttachment = {
 export type UIMessage = Message & {
   author: 'user' | 'ai';
   attachments?: MessageAttachment[];
+  timestamp?: string; // ISO 8601 date
 
   // to understand
   stopped?: boolean;
@@ -28,7 +29,7 @@ export type Chat = {
   modelId?: string;
   persona: UIPersona;
   messages: UIMessage[];
-  createdAt: Date;
+  createdAt: string; // ISO 8601 date
 };
 
 // eslint-disable-next-line no-unused-vars

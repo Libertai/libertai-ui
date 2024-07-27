@@ -183,7 +183,7 @@ async function setChatName(first_sentence: string) {
   const chatId = chatRef.value!.id;
   try {
     const title = await inferChatTopic(first_sentence);
-    await chatsStore.updateChat(chatId, { title });
+    chatsStore.updateChat(chatId, { title });
     // Update the chat title state
     chatRef.value!.title = title;
   } catch (error) {
@@ -306,7 +306,7 @@ async function generatePersonaMessage() {
       scrollBottom();
     }
     // A successful response! Append the chat to long term storage.
-    await chatsStore.appendModelResponse(chatId, response.content, [] /*searchResults*/);
+    chatsStore.appendModelResponse(chatId, response.content, [] /*searchResults*/);
   } catch (error) {
     console.error('generatePersonaMessage error: ', error);
     response.error = error;
@@ -332,7 +332,7 @@ async function regenerateMessage() {
     // Update the local state
     chatRef.value.messages.pop();
     // Update the chat state
-    await chatsStore.popChatMessages(chatId);
+    chatsStore.popChatMessages(chatId);
   }
   await generatePersonaMessage();
 }
@@ -345,7 +345,7 @@ async function sendMessage({ content, attachments }: SendMessageParams) {
   const chatId = chatRef.value.id;
 
   // Append the new message to the chat history and push to local state
-  const newMessage = await chatsStore.appendUserMessage(chatId, content, attachments);
+  const newMessage = chatsStore.appendUserMessage(chatId, content, attachments);
   chatRef.value.messages.push({ ...newMessage, stopped: true, error: null });
 
   // Scroll to the bottom of the chat
@@ -368,7 +368,7 @@ async function setChat(chatId: string) {
   // Load messages and remove potential previous errors
   loadedChat.messages = loadedChat.messages.map((message) => ({ ...message, stopped: true, error: null }));
 
-  chatRef.value = loadedChat;
+  chatRef.value = JSON.parse(JSON.stringify(loadedChat));
 
   // Set the chat title if it's not set
   const title = loadedChat.title;
@@ -385,10 +385,10 @@ async function setChat(chatId: string) {
   setTimeout(() => scrollBottom(), 50);
 }
 
-async function updateChatMessageContent(messageIndex: number, content: string, initialContent: string) {
+function updateChatMessageContent(messageIndex: number, content: string, initialContent: string) {
   const chatId = chatRef.value!.id;
   try {
-    await chatsStore.updateChatMessageContent(chatId, messageIndex, content);
+    chatsStore.updateChatMessageContent(chatId, messageIndex, content);
   } catch (error) {
     console.error('updateChatMessageContent: ', error);
     // Reset the content to the initial content
@@ -424,10 +424,10 @@ async function clearCookies() {
 // }
 
 // TODO: Replace this by using dayjs
-function formatDate(d: Date | undefined) {
-  if (!d) d = new Date();
+function formatDate(d: string | undefined) {
+  const dateObj = d ? new Date(d) : new Date();
   const currentDate = new Date();
-  const timeDiff = currentDate.getTime() / 1000 - d.getTime() / 1000;
+  const timeDiff = currentDate.getTime() / 1000 - dateObj.getTime() / 1000;
 
   let unit: DateUnitOptions = 'hours';
   let txtUnit = 'h';
@@ -448,7 +448,7 @@ function formatDate(d: Date | undefined) {
     txtUnit = 'month';
   }
 
-  const diff = date.getDateDiff(currentDate, d, unit);
+  const diff = date.getDateDiff(currentDate, dateObj, unit);
   return diff + txtUnit;
 }
 </script>
