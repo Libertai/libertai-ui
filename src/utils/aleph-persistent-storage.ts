@@ -6,9 +6,11 @@ import { signMessage } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
 import { SignMessageReturnType } from 'viem';
 
-const MESSAGE = 'LibertAI';
-const LIBERTAI_KEY = 'libertai-chat-ui';
+// Aleph keys and channels
 const SECURITY_AGGREGATE_KEY = 'security';
+const MESSAGE = 'LibertAI';
+const LIBERTAI_CHANNEL = 'libertai-chat-ui';
+const LIBERTAI_SETTINGS_KEY = `${LIBERTAI_CHANNEL}-settings`;
 
 export class AlephPersistentStorage {
   constructor(
@@ -48,23 +50,36 @@ export class AlephPersistentStorage {
       // TODO: Add zod parsing
       const securitySettings = (await accountClient.fetchAggregate(account.address, SECURITY_AGGREGATE_KEY)) as any;
 
+      type SecurityAuthorization = {
+        address: string;
+        chain?: string;
+        channels?: string;
+        types?: string;
+        post_types?: string;
+        aggregate_keys?: string;
+      };
+
       if (
         !securitySettings.authorizations.find(
-          (authorization: any) =>
+          (authorization: SecurityAuthorization) =>
             authorization.address === subAccount.address &&
-            authorization.types.includes('AGGREGATE') &&
-            authorization.aggregate_keys.includes(LIBERTAI_KEY),
+            authorization.types === undefined &&
+            authorization.channels !== undefined &&
+            authorization.channels.includes(LIBERTAI_CHANNEL),
         )
       ) {
+        const oldAuthorizations = securitySettings.authorizations.filter(
+          (a: SecurityAuthorization) => a.address !== subAccount.address,
+        );
+
         await accountClient.createAggregate({
           key: SECURITY_AGGREGATE_KEY,
           content: {
             authorizations: [
-              ...securitySettings.authorizations,
+              ...oldAuthorizations,
               {
                 address: subAccount.address,
-                types: ['AGGREGATE'],
-                aggregate_keys: [LIBERTAI_KEY],
+                channels: [LIBERTAI_CHANNEL],
               },
             ],
           },
@@ -78,8 +93,7 @@ export class AlephPersistentStorage {
           authorizations: [
             {
               address: subAccount.address,
-              types: ['AGGREGATE'],
-              aggregate_keys: [LIBERTAI_KEY],
+              channels: [LIBERTAI_CHANNEL],
             },
           ],
         },
@@ -87,13 +101,13 @@ export class AlephPersistentStorage {
     }
   }
 
-  async save(content: object) {
+  async saveSettings(content: object) {
     try {
       const message = await this.subAccountClient.createAggregate({
-        key: LIBERTAI_KEY,
+        key: LIBERTAI_SETTINGS_KEY,
         content,
         address: this.account.address,
-        channel: LIBERTAI_KEY,
+        channel: LIBERTAI_CHANNEL,
       });
       console.log(`Data saved on Aleph with hash ${message.item_hash}`);
     } catch (error) {
@@ -101,9 +115,9 @@ export class AlephPersistentStorage {
     }
   }
 
-  async fetch() {
+  async fetchSettings() {
     try {
-      const settings = await this.subAccountClient.fetchAggregate(this.account.address, LIBERTAI_KEY);
+      const settings = await this.subAccountClient.fetchAggregate(this.account.address, LIBERTAI_SETTINGS_KEY);
       return settings;
     } catch (error) {
       console.error(`Fetching settings from Aleph failed: ${error}`);
@@ -115,7 +129,7 @@ export class AlephPersistentStorage {
     const message = await this.subAccountClient.createStore({
       fileObject: file,
       storageEngine: ItemType.ipfs,
-      channel: LIBERTAI_KEY,
+      channel: LIBERTAI_CHANNEL,
     });
     return message;
   }

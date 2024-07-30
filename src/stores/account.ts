@@ -42,7 +42,7 @@ export const useAccountStore = defineStore('account', {
       }
 
       this.alephStorage = alephStorage;
-      const settingsOnAleph = await this.alephStorage.fetch();
+      const settingsOnAleph = await this.alephStorage.fetchSettings();
       const saveOnAleph = !settingsOnAleph;
       await settingsStore.update(settingsOnAleph ?? {}, saveOnAleph);
     },

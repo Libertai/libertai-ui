@@ -63,6 +63,14 @@
 
       <chats-list />
 
+      <q-item to="/knowledge-base">
+        <img :src="`icons/svg/book${$q.dark.mode ? '_lighten' : ''}.svg`" alt="knowledge" />
+
+        <q-item-section class="q-pl-sm">
+          <span>Knowledge base</span>
+        </q-item-section>
+      </q-item>
+
       <q-item to="/persona-management">
         <img :src="`icons/svg/robot${$q.dark.mode ? '_lighten' : ''}.svg`" alt="persona" />
 
