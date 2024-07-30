@@ -5,12 +5,14 @@ import { ItemType } from '@aleph-sdk/message';
 import { signMessage } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
 import { SignMessageReturnType } from 'viem';
+import { knowledgeAlephStorage, KnowledgeBase } from 'src/types/knowledge';
 
 // Aleph keys and channels
 const SECURITY_AGGREGATE_KEY = 'security';
 const MESSAGE = 'LibertAI';
 const LIBERTAI_CHANNEL = 'libertai-chat-ui';
 const LIBERTAI_SETTINGS_KEY = `${LIBERTAI_CHANNEL}-settings`;
+const LIBERTAI_KNOWLEDGE_BASE_KEY = `${LIBERTAI_CHANNEL}-knowledge-base-test-0`;
 
 export class AlephPersistentStorage {
   constructor(
@@ -109,9 +111,9 @@ export class AlephPersistentStorage {
         address: this.account.address,
         channel: LIBERTAI_CHANNEL,
       });
-      console.log(`Data saved on Aleph with hash ${message.item_hash}`);
+      console.log(`Settings saved on Aleph with hash ${message.item_hash}`);
     } catch (error) {
-      console.error(`Saving data on Aleph failed: ${error}`);
+      console.error(`Saving settings on Aleph failed: ${error}`);
     }
   }
 
@@ -132,5 +134,37 @@ export class AlephPersistentStorage {
       channel: LIBERTAI_CHANNEL,
     });
     return message;
+  }
+
+  async fetchKnowledgeBases(): Promise<KnowledgeBase[] | undefined> {
+    try {
+      const response = await this.subAccountClient.fetchAggregate(this.account.address, LIBERTAI_KNOWLEDGE_BASE_KEY);
+
+      const parsedKnowledgeBases = knowledgeAlephStorage.safeParse(response);
+      if (!parsedKnowledgeBases.success) {
+        throw new Error(`Zod parsing failed: ${parsedKnowledgeBases.error}`);
+      }
+
+      return parsedKnowledgeBases.data.data;
+    } catch (error) {
+      console.error(`Fetching Knowledge bases from Aleph failed: ${error}`);
+      return undefined;
+    }
+  }
+
+  async saveKnowledgeBases(knowledgeBases: KnowledgeBase[]) {
+    try {
+      const message = await this.subAccountClient.createAggregate({
+        key: LIBERTAI_KNOWLEDGE_BASE_KEY,
+        content: {
+          data: knowledgeBases,
+        },
+        address: this.account.address,
+        channel: LIBERTAI_CHANNEL,
+      });
+      console.log(`Knowledge bases saved on Aleph with hash ${message.item_hash}`);
+    } catch (error) {
+      console.error(`Saving knowledge bases on Aleph failed: ${error}`);
+    }
   }
 }
