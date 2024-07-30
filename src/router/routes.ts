@@ -23,11 +23,11 @@ const routes = [
       },
       {
         path: 'knowledge-base',
-        component: () => import('src/pages/KnowledgeBase.vue'),
+        component: () => import('pages/KnowledgeBasesList.vue'),
       },
       {
         path: 'persona-management',
-        component: () => import('src/pages/PersonaManagement.vue'),
+        component: () => import('pages/PersonaManagement.vue'),
       },
     ],
   },

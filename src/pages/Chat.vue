@@ -36,7 +36,7 @@
               <span v-if="message.author === 'user'">{{ chatRef.username }}</span>
               <span v-else>{{ chatRef.persona.name }}</span>
 
-              <span class="bull-date">{{ formatDate(message.timestamp) }}</span>
+              <span class="bull-date">{{ dayjs().to(message.timestamp) }}</span>
             </q-item-label>
             <!-- Display any attachments -->
             <q-item-label v-if="message.attachments && message.attachments.length > 0">
@@ -105,24 +105,12 @@
     <div class="tw-mx-4">
       <message-input :is-loading="isLoadingRef" class="col" @send-message="sendMessage" />
     </div>
-
-    <!-- This should really not pass the ref, but it's a quick fix for now -->
-    <!--    <q-dialog v-model="showKnowledgeUploaderRef" position="bottom">-->
-    <!--      <KnowledgeStoreUploader-->
-    <!--        :chat-ref="chatRef"-->
-    <!--        auto-upload-->
-    <!--        label="Auto KnowledgeStoreUploader"-->
-    <!--        multiple-->
-    <!--        url="http://localhost:4444/upload"-->
-    <!--        @attachment-added="addAttachment"-->
-    <!--      />-->
-    <!--    </q-dialog>-->
   </q-page>
 </template>
 
 <script lang="ts" setup>
 import 'highlight.js/styles/devibeans.css';
-import { copyToClipboard, date, DateUnitOptions, useQuasar } from 'quasar';
+import { copyToClipboard, useQuasar } from 'quasar';
 import { nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -139,6 +127,7 @@ import axios from 'axios';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
 import { useSettingsStore } from 'stores/settings';
 import { Chat, SendMessageParams, UIMessage } from 'src/types/chats';
+import dayjs from 'dayjs';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -147,14 +136,12 @@ const router = useRouter();
 // App state
 const chatsStore = useChatsStore();
 const modelsStore = useModelsStore();
-// const knowledgeStore = useKnowledgeStore();
 const settingsStore = useSettingsStore();
 
 // Local page state
 const isLoadingRef = ref(false);
 const scrollAreaRef = ref<HTMLDivElement>();
 const enableEditRef = ref(false);
-// const showKnowledgeUploaderRef = ref(false);
 
 const chatRef = ref<Chat>();
 
@@ -417,39 +404,6 @@ async function clearCookies() {
   await axios.get('https://curated.aleph.cloud/change-pool', {
     withCredentials: true,
   });
-}
-
-// function openKnowledgeUploader() {
-//   showKnowledgeUploaderRef.value = true;
-// }
-
-// TODO: Replace this by using dayjs
-function formatDate(d: string | undefined) {
-  const dateObj = d ? new Date(d) : new Date();
-  const currentDate = new Date();
-  const timeDiff = currentDate.getTime() / 1000 - dateObj.getTime() / 1000;
-
-  let unit: DateUnitOptions = 'hours';
-  let txtUnit = 'h';
-  if (timeDiff < 60) {
-    unit = 'seconds';
-    txtUnit = 's';
-  } else if (timeDiff < 3600) {
-    unit = 'minutes';
-    txtUnit = 'm';
-  } else if (timeDiff < 86400) {
-    unit = 'hours';
-    txtUnit = 'h';
-  } else if (timeDiff < 2592000) {
-    unit = 'days';
-    txtUnit = 'd';
-  } else if (timeDiff > 2592000) {
-    unit = 'months';
-    txtUnit = 'month';
-  }
-
-  const diff = date.getDateDiff(currentDate, dateObj, unit);
-  return diff + txtUnit;
 }
 </script>
 <style>
