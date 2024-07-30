@@ -21,9 +21,8 @@ const routes = [
         name: 'tokens-detail',
         component: () => import('pages/TokensDetail.vue'),
       },
-      // knowledge db
       {
-        path: 'knowledge-db',
+        path: 'knowledge-base',
         component: () => import('src/pages/KnowledgeBase.vue'),
       },
       {
