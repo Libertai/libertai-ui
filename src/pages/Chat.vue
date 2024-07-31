@@ -69,7 +69,7 @@
           <div class="absolute dyn-container chat-toolbar">
             <!-- Allow regenerating the last message from the AI if fully completed -->
             <q-btn
-              v-if="!isLoadingRef && message.author === 'ai'"
+              v-if="!isLoadingRef && message.author === 'ai' && message_index === chatRef.messages.length - 1"
               dense
               flat
               icon="refresh"
