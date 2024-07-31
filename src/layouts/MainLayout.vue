@@ -11,7 +11,6 @@
         </q-btn>
         <user-settings-dialog v-model="showUserSettingsDialog" />
 
-        <toggle-theme />
         <q-space />
 
         <div class="row q-gutter-x-sm">
@@ -61,77 +60,8 @@
           New Chat
         </q-btn>
       </div>
-      <!-- list of chats by reference to the chats-store -->
-      <q-list class="q-mt-md" style="flex-grow: 1">
-        <q-scroll-area style="height: 100%; min-height: 100px" visible>
-          <q-item
-            v-for="chat of (chats as any[]).slice().reverse()"
-            :key="chat.id"
-            :to="`/chat/${chat.id}`"
-            class="q-mx-md rounded-borders q-py-md q-my-md item-history"
-            exact
-            exact-active-class="bg-secondary item-active"
-          >
-            <q-item-section side>
-              <q-btn
-                v-if="route.params?.id === chat.id"
-                class="tw-p-1"
-                flat
-                icon="img:icons/svg/msg_active.svg"
-                size="sm"
-              >
-              </q-btn>
-              <q-btn
-                v-if="route.params?.id !== chat.id"
-                :icon="`img:icons/svg/msg${$q.dark.mode ? '_lighten' : ''}.svg`"
-                class="tw-p-1"
-                flat
-                size="sm"
-              >
-              </q-btn>
-            </q-item-section>
 
-            <q-item-section>
-              <q-item-label class="text-caption ellipsis-2-lines">
-                {{ chat.title }}
-              </q-item-label>
-            </q-item-section>
-
-            <q-item-section v-if="route.params?.id === chat.id" side>
-              <q-btn-group dense flat>
-                <q-btn
-                  class="tw-p-1"
-                  icon="img:icons/delete.svg"
-                  size="sm"
-                  @_click="deleteChat(chat.id)"
-                  @click="deleteChatConfirm(chat.id)"
-                >
-                  <q-tooltip>Delete chat</q-tooltip>
-                </q-btn>
-              </q-btn-group>
-            </q-item-section>
-          </q-item>
-        </q-scroll-area>
-        <q-dialog v-model="deleteChatConfirmAction">
-          <q-card>
-            <q-card-section class="row items-center">
-              <q-avatar color="primary" icon="delete" text-color="white" />
-              <span class="q-ml-xl">Are you sure you want to delete the current chat conversation?</span>
-            </q-card-section>
-
-            <q-card-actions align="right">
-              <q-btn
-                v-close-popup
-                class="border-primary-highlight"
-                label="Cancel"
-                rounded
-                text-color="dark-mode-text"
-              />
-              <q-btn v-close-popup color="primary" label="Confirm" rounded @click="deleteChat(deleteChatId!)" />
-            </q-card-actions>
-          </q-card>
-        </q-dialog>
-      </q-list>
+      <chats-list />
 
       <q-item to="/persona-management">
         <img :src="`icons/svg/robot${$q.dark.mode ? '_lighten' : ''}.svg`" alt="persona" />
@@ -172,51 +102,20 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, ref } from 'vue';
-import { storeToRefs } from 'pinia';
-
-// Import State
-import { useChatsStore } from 'stores/chats';
-import { useRoute, useRouter } from 'vue-router';
-
-// Import Components
+import { ref } from 'vue';
 import AccountButton from 'src/components/AccountButton.vue';
-import UserSettingsDialog from 'components/UserSettingsDialog.vue';
+import UserSettingsDialog from 'components/dialog/UserSettingsDialog.vue';
 import { useAccount } from '@wagmi/vue';
-import ToggleTheme from 'components/ToggleTheme.vue';
 import { useAccountStore } from 'stores/account';
+import ChatsList from 'components/ChatsList.vue';
 
 const leftDrawerOpen = ref(false);
-// Control whether the advanced persona customization is shown
 const showUserSettingsDialog = ref(false);
 
-const deleteChatConfirmAction = ref(false);
-const deleteChatId = ref<string | null>(null);
-
 // Setup Stores
-const chatsStore = useChatsStore();
 const accountStore = useAccountStore();
 
 const account = useAccount();
-
-const router = useRouter();
-const route = useRoute();
-
-// Reference to the chat-store state
-const { chats } = storeToRefs(chatsStore);
-
-// Delete a chat
-async function deleteChat(chatId: string) {
-  await chatsStore.deleteChat(chatId);
-  if (route.params?.id === chatId) {
-    nextTick(() => router.push('/new'));
-  }
-}
-
-async function deleteChatConfirm(chatId: string) {
-  deleteChatConfirmAction.value = true;
-  deleteChatId.value = chatId;
-}
 
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;

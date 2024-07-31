@@ -13,16 +13,26 @@
             </div>
           </q-card-section>
           <q-card-section>
-            <persona-dropdown
-              :selected-persona="selectedPersona"
-              @select-persona="(persona: UIPersona) => (selectedPersona = persona)"
-            />
+            <div class="tw-gap-2 tw-flex tw-flex-col tw-text-center">
+              <p>Persona</p>
+              <persona-dropdown
+                :selected-persona="selectedPersona"
+                @select-persona="(persona: UIPersona) => (selectedPersona = persona)"
+              />
+            </div>
           </q-card-section>
           <q-card-section>
-            <model-selector
-              :selected-model="selectedModel"
-              @select-model="(model: UIModel) => (selectedModel = model)"
-            />
+            <div class="tw-gap-2 tw-flex tw-flex-col tw-text-center">
+              <p>Model</p>
+              <model-selector
+                :selected-model="selectedModel"
+                @select-model="(model: UIModel) => (selectedModel = model)"
+              />
+            </div>
+          </q-card-section>
+          <q-card-section>
+            <span>Your name</span>
+            <q-input v-model="username" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
           </q-card-section>
         </q-card>
       </div>
@@ -62,13 +72,14 @@ const router = useRouter();
 const modelsStore = useModelsStore();
 const chatsStore = useChatsStore();
 const personasStore = usePersonasStore();
+const settingsStore = useSettingsStore();
 
-const username = useSettingsStore().username;
 const route = useRoute();
 
 // Inputs
 const selectedModel = ref<UIModel>(modelsStore.models[0]);
 const selectedPersona = ref<UIPersona>(personasStore.personas[0]);
+const username = ref(settingsStore.username);
 
 watch(
   () => route.query.persona as string | undefined,
@@ -92,7 +103,7 @@ async function sendMessage({ content, attachments }: SendMessageParams) {
   const persona = JSON.parse(JSON.stringify(selectedPersona.value));
 
   // Creates the new chat
-  const chat = await chatsStore.createChat(title, username, selectedModel.value.id, persona);
+  const chat = await chatsStore.createChat(title, username.value, selectedModel.value.id, persona);
   // Append the first user message to the chat history
   await chatsStore.appendUserMessage(chat.id, content, attachments);
 

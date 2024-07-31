@@ -2,7 +2,7 @@
   <q-page v-if="chatRef" class="column align-items-center">
     <div ref="scrollAreaRef" class="col-grow overflow-auto" style="max-height: calc(100vh - 190px)">
       <!-- Display message history -->
-      <q-list class="col-grow q-ma-xl">
+      <q-list class="col-grow max-sm:tw-m-6 sm:tw-m-12">
         <!-- eslint-disable-next-line vue/valid-v-for -->
         <q-item
           v-for="(message, message_index) in chatRef.messages"
@@ -80,7 +80,7 @@
             </q-btn>
             <!-- Allow copying the message to the clipboard -->
             <q-btn
-              :icon="`img:icons/svg/copy2${$q.dark.mode ? '_lighten' : ''}.svg`"
+              :icon="`img:icons/svg/copy${$q.dark.mode ? '_lighten' : ''}.svg`"
               dense
               flat
               size="sm"
@@ -102,7 +102,7 @@
       </q-list>
     </div>
 
-    <div class="q-mb-md q-mr-md">
+    <div class="tw-mx-4">
       <message-input :is-loading="isLoadingRef" class="col" @send-message="sendMessage" />
     </div>
 
@@ -132,7 +132,6 @@ import { LlamaCppApiEngine, Message } from '@libertai/libertai-js';
 
 import { useChatsStore } from 'stores/chats';
 import { useModelsStore } from 'stores/models';
-import { useKnowledgeStore } from 'stores/knowledge';
 
 import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
 import MessageInput from 'src/components/MessageInput.vue';
@@ -148,7 +147,7 @@ const router = useRouter();
 // App state
 const chatsStore = useChatsStore();
 const modelsStore = useModelsStore();
-const knowledgeStore = useKnowledgeStore();
+// const knowledgeStore = useKnowledgeStore();
 const settingsStore = useSettingsStore();
 
 // Local page state
@@ -157,7 +156,6 @@ const scrollAreaRef = ref<HTMLDivElement>();
 const enableEditRef = ref(false);
 // const showKnowledgeUploaderRef = ref(false);
 
-// Chat specific state
 const chatRef = ref<Chat>();
 
 // Instance of an inference engine
@@ -182,10 +180,10 @@ watch(
 // Set the name of the chat based on the first sentence
 async function setChatName(first_sentence: string) {
   // Get our chat id
-  let chatId = chatRef.value!.id;
+  const chatId = chatRef.value!.id;
   try {
     const title = await inferChatTopic(first_sentence);
-    await chatsStore.updateChatTitle(chatId, title);
+    chatsStore.updateChat(chatId, { title });
     // Update the chat title state
     chatRef.value!.title = title;
   } catch (error) {
@@ -208,7 +206,7 @@ async function generatePersonaMessage() {
   }
 
   const chatId = chatRef.value.id;
-  const chatTags = chatRef.value.tags;
+  // const chatTags = chatRef.value.tags;
   const username = chatRef.value.username;
   const messages = JSON.parse(JSON.stringify(chatRef.value.messages));
   const persona = chatRef.value.persona;
@@ -238,15 +236,15 @@ async function generatePersonaMessage() {
 
     // NOTE: assuming last message is guaranteed to be non-empty and the user's last message
     // Get the last message from the user
-    const lastMessage = messages[messages.length - 1];
-    const searchResultMessages: Message[] = [];
-    const searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
-    searchResults.forEach((result) => {
-      searchResultMessages.push({
-        role: 'search-result',
-        content: result.content,
-      });
-    });
+    // const lastMessage = messages[messages.length - 1];
+    // const searchResultMessages: Message[] = [];
+    // const searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
+    // searchResults.forEach((result) => {
+    //   searchResultMessages.push({
+    //     role: 'search-result',
+    //     content: result.content,
+    //   });
+    // });
 
     // Expand all the messages to inline any compatible attachments
     const expandedMessages = messages
@@ -290,7 +288,7 @@ async function generatePersonaMessage() {
       .flat();
 
     // Append the search results to the messages
-    const allMessages: Message[] = [...expandedMessages, ...searchResultMessages];
+    const allMessages: Message[] = [...expandedMessages /*...searchResultMessages */];
 
     // Generate a stream of responses from the AI
     for await (const output of inferenceEngine.generateAnswer(allMessages, model, persona, username, false)) {
@@ -305,12 +303,12 @@ async function generatePersonaMessage() {
 
       chatRef.value.messages = [...chatRef.value.messages];
       // Scroll to the bottom of the chat
-      nextTick(scrollBottom);
+      scrollBottom();
     }
     // A successful response! Append the chat to long term storage.
-    await chatsStore.appendModelResponse(chatId, response.content, searchResults);
+    chatsStore.appendModelResponse(chatId, response.content, [] /*searchResults*/);
   } catch (error) {
-    console.error('pages::Chat.vue::generatePersonaMessage - error', error);
+    console.error('generatePersonaMessage error: ', error);
     response.error = error;
   } finally {
     // Done! update the local state to reflect the end of the process
@@ -330,11 +328,11 @@ async function regenerateMessage() {
   const messages = chatRef.value.messages;
   const lastMessage = messages.at(-1)!;
   if (lastMessage.author !== 'user') {
-    let chatId = chatRef.value.id;
+    const chatId = chatRef.value.id;
     // Update the local state
     chatRef.value.messages.pop();
     // Update the chat state
-    await chatsStore.popChatMessages(chatId);
+    chatsStore.popChatMessages(chatId);
   }
   await generatePersonaMessage();
 }
@@ -347,7 +345,7 @@ async function sendMessage({ content, attachments }: SendMessageParams) {
   const chatId = chatRef.value.id;
 
   // Append the new message to the chat history and push to local state
-  const newMessage = await chatsStore.appendUserMessage(chatId, content, attachments);
+  const newMessage = chatsStore.appendUserMessage(chatId, content, attachments);
   chatRef.value.messages.push({ ...newMessage, stopped: true, error: null });
 
   // Scroll to the bottom of the chat
@@ -359,23 +357,21 @@ async function sendMessage({ content, attachments }: SendMessageParams) {
 
 // Set a chat by its ID
 async function setChat(chatId: string) {
-  // Load the chat from the store and set it
-  const loadedChat = await chatsStore.readChat(chatId);
+  const loadedChat = chatsStore.getChat(chatId);
+
   if (!loadedChat) {
-    console.error('Chat not found');
+    $q.notify({ message: 'Chat not found', color: 'negative' });
     await router.push({ name: 'new-chat' });
     return;
   }
 
-  // Extract the chat properties
-  const title = loadedChat.title;
-
   // Load messages and remove potential previous errors
   loadedChat.messages = loadedChat.messages.map((message) => ({ ...message, stopped: true, error: null }));
 
-  chatRef.value = loadedChat;
+  chatRef.value = JSON.parse(JSON.stringify(loadedChat));
 
   // Set the chat title if it's not set
+  const title = loadedChat.title;
   if (title === defaultChatTopic || title === '') {
     // Set the chat name based on the first message
     await setChatName(loadedChat.messages[0].content);
@@ -386,15 +382,15 @@ async function setChat(chatId: string) {
   if (lastMessage?.author === 'user') {
     await generatePersonaMessage();
   }
-  scrollBottom();
+  setTimeout(() => scrollBottom(), 50);
 }
 
-async function updateChatMessageContent(messageIndex: number, content: string, initialContent: string) {
+function updateChatMessageContent(messageIndex: number, content: string, initialContent: string) {
   const chatId = chatRef.value!.id;
   try {
-    await chatsStore.updateChatMessageContent(chatId, messageIndex, content);
+    chatsStore.updateChatMessageContent(chatId, messageIndex, content);
   } catch (error) {
-    console.error('pages::Chat.vue::updateChatMessageContent - error', error);
+    console.error('updateChatMessageContent: ', error);
     // Reset the content to the initial content
     chatRef.value!.messages[messageIndex].content = initialContent;
     $q.notify('Failed to update message content');
@@ -428,10 +424,10 @@ async function clearCookies() {
 // }
 
 // TODO: Replace this by using dayjs
-function formatDate(d: Date | undefined) {
-  if (!d) d = new Date();
+function formatDate(d: string | undefined) {
+  const dateObj = d ? new Date(d) : new Date();
   const currentDate = new Date();
-  const timeDiff = currentDate.getTime() / 1000 - d.getTime() / 1000;
+  const timeDiff = currentDate.getTime() / 1000 - dateObj.getTime() / 1000;
 
   let unit: DateUnitOptions = 'hours';
   let txtUnit = 'h';
@@ -452,7 +448,7 @@ function formatDate(d: Date | undefined) {
     txtUnit = 'month';
   }
 
-  const diff = date.getDateDiff(currentDate, d, unit);
+  const diff = date.getDateDiff(currentDate, dateObj, unit);
   return diff + txtUnit;
 }
 </script>

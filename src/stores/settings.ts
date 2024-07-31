@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from 'stores/account';
 import { SignMessageReturnType } from 'viem';
+import { Dark } from 'quasar';
 
 type Settings = {
   darkmode: boolean;
@@ -39,6 +40,7 @@ export const useSettingsStore = defineStore('settings', {
     async update(newSettings: Partial<Settings>, saveOnAleph: boolean = true) {
       if (newSettings.darkmode !== undefined) {
         this.darkmode = newSettings.darkmode;
+        Dark.set(newSettings.darkmode);
       }
       if (newSettings.username !== undefined) {
         this.username = newSettings.username;

@@ -1,7 +1,7 @@
 <template>
   <q-dialog class="q-pa-lg text-light" label="Customize" style="flex-grow: 1">
     <q-card class="q-pa-md">
-      <q-card-actions :class="`flex flex-left text-semibold ${$q.dark.mode ? '' : 'text-purple700'}`">
+      <q-card-actions :class="`flex flex-left text-semibold ${$q.dark.mode ? '' : 'text-purple-700'}`">
         User settings
         <q-space />
         <q-btn
@@ -24,6 +24,10 @@
       </q-card-section>
 
       <q-card-section horizontal>
+        <q-toggle v-model="darkmode" checked-icon="dark_mode" label="Dark mode" unchecked-icon="lightbulb" />
+      </q-card-section>
+
+      <q-card-section horizontal>
         <q-toggle
           v-model="isSignatureHashStored"
           checked-icon="check"
@@ -42,11 +46,7 @@
           label="Confirm"
           rounded
           text-color="white"
-          @click="
-            () => {
-              settingsStore.update({ username, avatar: toRaw(avatar), isSignatureHashStored });
-            }
-          "
+          @click="updateSettings"
         />
       </q-card-section>
     </q-card>
@@ -55,7 +55,7 @@
 
 <script lang="ts" setup>
 import { useSettingsStore } from 'stores/settings';
-import { ref, toRaw, toRef, watch } from 'vue';
+import { ref, toRef, watch } from 'vue';
 import AlephAvatar from 'components/AlephAvatar.vue';
 
 const settingsStore = useSettingsStore();
@@ -63,6 +63,7 @@ const settingsStore = useSettingsStore();
 // Form values
 const username = ref(settingsStore.username);
 const avatar = ref(settingsStore.avatar);
+const darkmode = ref(settingsStore.darkmode);
 const isSignatureHashStored = ref(settingsStore.isSignatureHashStored);
 
 // Update the inputs when the store changes (might be updated by Aleph settings fetching)
@@ -72,7 +73,19 @@ watch(toRef(settingsStore, 'username'), () => {
 watch(toRef(settingsStore, 'avatar'), () => {
   avatar.value = settingsStore.avatar;
 });
+watch(toRef(settingsStore, 'darkmode'), () => {
+  darkmode.value = settingsStore.darkmode;
+});
 watch(toRef(settingsStore, 'isSignatureHashStored'), () => {
   isSignatureHashStored.value = settingsStore.isSignatureHashStored;
 });
+
+const updateSettings = () => {
+  settingsStore.update({
+    username: username.value,
+    avatar: avatar.value,
+    darkmode: darkmode.value,
+    isSignatureHashStored: isSignatureHashStored.value,
+  });
+};
 </script>
