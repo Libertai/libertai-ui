@@ -4,7 +4,7 @@
       <q-toolbar>
         <q-btn aria-label="Menu" color="primary" dense flat icon="menu" round @click="toggleLeftDrawer" />
 
-        <q-btn class="q-pa-xs" flat @click="showUserSettingsDialog = true">
+        <q-btn class="tw-p-1" flat @click="showUserSettingsDialog = true">
           <q-icon size="xs">
             <img :src="`icons/svg/settings${$q.dark.mode ? '_lighten' : ''}.svg`" alt="settings" />
           </q-icon>
@@ -75,7 +75,7 @@
             <q-item-section side>
               <q-btn
                 v-if="route.params?.id === chat.id"
-                class="q-pa-xs"
+                class="tw-p-1"
                 flat
                 icon="img:icons/svg/msg_active.svg"
                 size="sm"
@@ -84,7 +84,7 @@
               <q-btn
                 v-if="route.params?.id !== chat.id"
                 :icon="`img:icons/svg/msg${$q.dark.mode ? '_lighten' : ''}.svg`"
-                class="q-pa-xs"
+                class="tw-p-1"
                 flat
                 size="sm"
               >
@@ -100,7 +100,7 @@
             <q-item-section v-if="route.params?.id === chat.id" side>
               <q-btn-group dense flat>
                 <q-btn
-                  class="q-pa-xs"
+                  class="tw-p-1"
                   icon="img:icons/delete.svg"
                   size="sm"
                   @_click="deleteChat(chat.id)"

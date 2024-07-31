@@ -5,8 +5,8 @@
       <q-list class="col-grow q-ma-xl">
         <!-- eslint-disable-next-line vue/valid-v-for -->
         <q-item
-          v-for="(message, message_index) in chatRef!.messages"
-          :class="`q-py-md q-my-md ${$q.screen.gt.sm ? 'q-mx-xl' : 'q-mx-sm'} items-start dyn-container chat-item rounded-borders ${$q.dark.mode ? '' : message.author === 'user' ? 'bg-white' : 'bg-secondary'}`"
+          v-for="(message, message_index) in chatRef.messages"
+          :class="`q-py-md q-my-md max-sm:tw-mx-2 sm:tw-mx-12 items-start dyn-container chat-item rounded-borders ${$q.dark.mode ? '' : message.author === 'user' ? 'bg-white' : 'bg-secondary'}`"
         >
           <!-- Display the avatar of the user or the AI -->
           <q-item-section avatar>
@@ -14,7 +14,7 @@
               <img :src="getPersonaAvatarUrl(settingsStore.avatar.ipfs_hash)" alt="user" />
             </q-avatar>
             <q-avatar v-else>
-              <img :src="getPersonaAvatarUrl(chatRef!.persona.avatar.ipfs_hash)" alt="AI" />
+              <img :src="getPersonaAvatarUrl(chatRef.persona.avatar.ipfs_hash)" alt="AI" />
             </q-avatar>
           </q-item-section>
           <!-- Edit message popup -- triggered on click if the edit mode is enabled -->
@@ -33,23 +33,24 @@
             </q-popup-edit>
             <!-- Display the name of the user or the AI -->
             <q-item-label class="text-semibold q-mb-md">
-              <span v-if="message.author === 'user'">{{ chatRef?.username }}</span>
-              <span v-else>{{ chatRef?.persona.name }}</span>
+              <span v-if="message.author === 'user'">{{ chatRef.username }}</span>
+              <span v-else>{{ chatRef.persona.name }}</span>
 
               <span class="bull-date">{{ formatDate(message.timestamp) }}</span>
             </q-item-label>
             <!-- Display any attachments -->
-            <!--            <q-item-label v-if="message.attachments && message.attachments.length > 0">-->
-            <!--              <q-chip-->
-            <!--                v-for="attachment in message.attachments"-->
-            <!--                :key="attachment.id"-->
-            <!--                class="q-mr-xs bg-primary text-white"-->
-            <!--              >-->
-            <!--                {{ attachment.title }}-->
-            <!--              </q-chip>-->
-            <!--            </q-item-label>-->
+            <q-item-label v-if="message.attachments && message.attachments.length > 0">
+              <q-chip
+                v-for="attachment in message.attachments"
+                :key="attachment.id"
+                class="tw-mr-1 bg-primary text-white"
+                icon="img:icons/svg/attachment.svg"
+              >
+                {{ attachment.title }}
+              </q-chip>
+            </q-item-label>
             <!-- Display the content of the message -->
-            <q-item-label style="display: block">
+            <q-item-label class="tw-block">
               <MarkdownRenderer
                 :class="message.author === 'user' ? '' : 'message-content'"
                 :content="message.content"
@@ -68,7 +69,7 @@
           <div class="absolute dyn-container chat-toolbar">
             <!-- Allow regenerating the last message from the AI if fully completed -->
             <q-btn
-              v-if="!isLoadingRef && message_index === chatRef!.messages.length - 1"
+              v-if="!isLoadingRef && message.author === 'ai'"
               dense
               flat
               icon="refresh"
@@ -101,46 +102,10 @@
       </q-list>
     </div>
 
-    <div class="row items-center q-mb-md q-mr-md">
-      <!-- "+" icon for uploading files, shown only when knowledge search is enabled -->
-      <!--      <q-btn-->
-      <!--        v-if="enableKnowledgeRef"-->
-      <!--        class="cursor-pointer q-mr-sm"-->
-      <!--        flat-->
-      <!--        icon="add"-->
-      <!--        round-->
-      <!--        style="margin-left: 16px"-->
-      <!--        @click="openKnowledgeUploader"-->
-      <!--      />-->
-
-      <!--      <q-chip-->
-      <!--        v-for="attachment in attachmentsRef"-->
-      <!--        :key="attachment.id"-->
-      <!--        removable-->
-      <!--        @remove="removeAttachment(attachment)"-->
-      <!--      >-->
-      <!--        {{ attachment.title }}-->
-      <!--      </q-chip>-->
-      <message-input
-        ref="inputRef"
-        v-model="inputTextRef"
-        :is-loading="isLoadingRef"
-        class="col"
-        @send-message="sendMessage"
-      />
+    <div class="q-mb-md q-mr-md">
+      <message-input :is-loading="isLoadingRef" class="col" @send-message="sendMessage" />
     </div>
 
-    <!-- Enable edit mode -->
-    <!--<div class="fixed-bottom-right q-mb-md q-mr-md" style="z-index: 10">
-      <div class="q-gutter-x-md" style="display: flex; align-items: center; justify-content: flex-end">
-        <q-checkbox v-model="enableEditRef" left-label>
-          <q-tooltip anchor="top right" class="bg-primary" self="bottom right">
-            When this is activated, just click on a message to start editing it.
-          </q-tooltip>
-          Enable edits
-        </q-checkbox>
-      </div>
-    </div>-->
     <!-- This should really not pass the ref, but it's a quick fix for now -->
     <!--    <q-dialog v-model="showKnowledgeUploaderRef" position="bottom">-->
     <!--      <KnowledgeStoreUploader-->
@@ -174,7 +139,7 @@ import MessageInput from 'src/components/MessageInput.vue';
 import axios from 'axios';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
 import { useSettingsStore } from 'stores/settings';
-import { Chat, UIMessage } from 'src/types/chats';
+import { Chat, SendMessageParams, UIMessage } from 'src/types/chats';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -187,14 +152,10 @@ const knowledgeStore = useKnowledgeStore();
 const settingsStore = useSettingsStore();
 
 // Local page state
-const inputTextRef = ref('');
 const isLoadingRef = ref(false);
-const inputRef = ref(null);
 const scrollAreaRef = ref<HTMLDivElement>();
 const enableEditRef = ref(false);
-// const enableKnowledgeRef = ref(false);
 // const showKnowledgeUploaderRef = ref(false);
-// const attachmentsRef = ref<any[]>([]);
 
 // Chat specific state
 const chatRef = ref<Chat>();
@@ -216,27 +177,7 @@ watch(
   { immediate: true },
 );
 
-// Update whether we should show the knowledge uploader based on whether the user is connected
-// watch(
-//   () => account.active,
-//   (active) => {
-//     enableKnowledgeRef.value = active;
-//   },
-// );
-
 /* Helper functions */
-
-// function addAttachment(attachmentEvent: AttachmentAddedEvent) {
-//   const attachment = JSON.parse(JSON.stringify(attachmentEvent));
-//   attachmentsRef.value.push(attachment);
-// }
-
-// async function removeAttachment(attachment) {
-//   Remove the attachment from the knowledge store
-// await knowledgeStore.removeDocument(attachment.documentId);
-// let index = attachmentsRef.value.indexOf(attachment);
-// attachmentsRef.value.splice(index, 1);
-// }
 
 // Set the name of the chat based on the first sentence
 async function setChatName(first_sentence: string) {
@@ -311,22 +252,21 @@ async function generatePersonaMessage() {
     const expandedMessages = messages
       .map((message: UIMessage): Message[] => {
         const ret = [];
-        // Push any attachments ahead of the message
-        // if (message.attachments) {
-        //   message.attachments.forEach((attachment) => {
-        //     if (attachment.content) {
-        //       ret.push({
-        //         role: 'attachment',
-        //         content: `[${attachment.title}](${attachment.content})`,
-        //       });
-        //     } else if (attachment.documentId) {
-        //       ret.push({
-        //         role: 'attachment',
-        //         content: `[${attachment.title}](document-id-${attachment.documentId})`,
-        //       });
-        //     }
-        //   });
-        // }
+        // Push any attachments as messages ahead of the message itself
+        message.attachments?.forEach((attachment) => {
+          if (attachment.content) {
+            ret.push({
+              role: 'attachment',
+              content: `[${attachment.title}](${attachment.content})`,
+            });
+          }
+          // else if (attachment.documentId) {
+          //   ret.push({
+          //     role: 'attachment',
+          //     content: `[${attachment.title}](document-id-${attachment.documentId})`,
+          //   });
+          // }
+        });
 
         // Push what search results we found based on the message
         // TODO: this should probably be a more generic tool-call or llm-chain-link
@@ -334,14 +274,15 @@ async function generatePersonaMessage() {
         // TODO: I should probably write these below messages in the log
         //  Really these search results should get attached to the message that
         //   lead to them being queried
-        if (message.searchResults) {
-          message.searchResults.forEach((result: Message) => {
-            ret.push({
-              role: 'search-result',
-              content: result.content,
-            });
-          });
-        }
+        // if (message.searchResults) {
+        //   message.searchResults.forEach((result: Message) => {
+        //     ret.push({
+        //       role: 'search-result',
+        //       content: result.content,
+        //     });
+        //   });
+        // }
+
         // Push the message itself
         ret.push(message);
         return ret;
@@ -398,26 +339,15 @@ async function regenerateMessage() {
   await generatePersonaMessage();
 }
 
-async function sendMessage(content: string) {
+async function sendMessage({ content, attachments }: SendMessageParams) {
   if (chatRef.value === undefined) {
     return;
   }
 
   const chatId = chatRef.value.id;
-  const inputText = inputTextRef.value;
-  // const attachments = JSON.parse(JSON.stringify(attachmentsRef.value));
-
-  // Wipe the input text
-  inputTextRef.value = '';
-  // Wipe the attachments
-  // attachmentsRef.value = [];
-
-  if (!content.trim()) return;
-
-  if (content.trim() === '') return;
 
   // Append the new message to the chat history and push to local state
-  let newMessage = await chatsStore.appendUserMessage(chatId, inputText);
+  const newMessage = await chatsStore.appendUserMessage(chatId, content, attachments);
   chatRef.value.messages.push({ ...newMessage, stopped: true, error: null });
 
   // Scroll to the bottom of the chat
@@ -429,9 +359,6 @@ async function sendMessage(content: string) {
 
 // Set a chat by its ID
 async function setChat(chatId: string) {
-  // This is annoying, but we need to set whether the user is connected
-  //enableKnowledgeRef.value = account.isConnected.value;
-
   // Load the chat from the store and set it
   const loadedChat = await chatsStore.readChat(chatId);
   if (!loadedChat) {

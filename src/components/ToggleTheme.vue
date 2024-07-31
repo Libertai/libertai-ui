@@ -1,7 +1,7 @@
 <template>
   <q-btn
     :icon="darkmode ? 'img:icons/svg/light_mode.svg' : 'img:icons/svg/dark_mode.svg'"
-    class="q-pa-xs"
+    class="tw-p-1"
     flat
     @click="darkmode = !darkmode"
   />

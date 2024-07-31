@@ -26,10 +26,8 @@
           </q-card-section>
         </q-card>
       </div>
-      <div class="fixed-bottom absolute q-mb-xl q-pb-xs">
+      <div class="fixed-bottom absolute q-mb-xl tw-pb-1">
         <message-input
-          ref="input"
-          v-model="messageInputRef"
           hint="Disclaimer: This chat bot uses personas for entertainment and informational purposes only. The
               chat bot's responses are not a reflection of any real person or organization's views or opinions, and should not
               be used as a substitute for professional advice. The accuracy and reliability of the chat bot's responses cannot
@@ -56,6 +54,7 @@ import { getPersonaAvatarUrl } from 'src/utils/personas';
 import ModelSelector from 'components/select/ModelSelector.vue';
 import { UIModel } from 'src/utils/models';
 import { UIPersona } from 'src/types/personas';
+import { SendMessageParams } from 'src/types/chats';
 
 const router = useRouter();
 
@@ -70,7 +69,6 @@ const route = useRoute();
 // Inputs
 const selectedModel = ref<UIModel>(modelsStore.models[0]);
 const selectedPersona = ref<UIPersona>(personasStore.personas[0]);
-const messageInputRef = ref('');
 
 watch(
   () => route.query.persona as string | undefined,
@@ -87,12 +85,7 @@ watch(
   },
 );
 
-async function sendMessage() {
-  const message = messageInputRef.value;
-  if (message.length === 0) {
-    return;
-  }
-
+async function sendMessage({ content, attachments }: SendMessageParams) {
   // Extract the values out of our relevant refs
   const title = defaultChatTopic;
   // NOTE: this is a ref to the store, so we need to deep clone it
@@ -101,10 +94,8 @@ async function sendMessage() {
   // Creates the new chat
   const chat = await chatsStore.createChat(title, username, selectedModel.value.id, persona);
   // Append the first user message to the chat history
-  await chatsStore.appendUserMessage(chat.id, message);
+  await chatsStore.appendUserMessage(chat.id, content, attachments);
 
-  // Set the message to empty
-  messageInputRef.value = '';
   // Navigate to the chat page
   await router.push({ name: 'chat', params: { id: chat.id } });
 }
