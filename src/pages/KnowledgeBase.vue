@@ -41,7 +41,15 @@
 
           <q-btn-dropdown class="tw-p-1" dropdown-icon="more_horiz" unelevated>
             <q-list>
-              <q-item v-close-popup clickable @click="deleteDocumentConfirmation = true">
+              <q-item v-close-popup clickable @click="showRenameDocument = true">
+                <q-item-section avatar>
+                  <ltai-icon class="tw-mx-auto" name="svguse:icons.svg#pencil" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Rename</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item v-close-popup clickable @click="showDeleteDocumentConfirmation = true">
                 <q-item-section avatar>
                   <ltai-icon class="tw-mx-auto" name="svguse:icons.svg#delete" />
                 </q-item-section>
@@ -51,12 +59,19 @@
               </q-item>
             </q-list>
           </q-btn-dropdown>
-          <ltai-dialog v-model="deleteDocumentConfirmation" title="Delete chat" @save="deleteDocument(document)">
-            <q-card-section class="row">
-              <span>Are you sure you want to delete the the document {{ document.name }}?</span>
-            </q-card-section>
-          </ltai-dialog>
         </div>
+
+        <!-- Dialogs-->
+        <knowledge-base-rename-document-dialog
+          v-model="showRenameDocument"
+          :name="document.name"
+          @save="(newName: string) => renameDocument(document, newName)"
+        />
+        <ltai-dialog v-model="showDeleteDocumentConfirmation" title="Delete document" @save="deleteDocument(document)">
+          <q-card-section class="row">
+            <span>Are you sure you want to delete the the document {{ document.name }}?</span>
+          </q-card-section>
+        </ltai-dialog>
       </div>
     </div>
   </section>
@@ -73,6 +88,7 @@ import { processDocument } from 'src/utils/knowledge/document';
 import { filesize } from 'filesize';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 import LtaiDialog from 'components/libertai/LtaiDialog.vue';
+import KnowledgeBaseRenameDocumentDialog from 'components/dialog/KnowledgeBaseRenameDocumentDialog.vue';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -83,7 +99,8 @@ const accountStore = useAccountStore();
 const knowledgeStore = useKnowledgeStore();
 
 const knowledgeBaseRef = ref<KnowledgeBase | undefined>(undefined);
-const deleteDocumentConfirmation = ref(false);
+const showRenameDocument = ref(false);
+const showDeleteDocumentConfirmation = ref(false);
 
 watch(
   () => route.params.id as string,
@@ -170,6 +187,30 @@ const downloadDocument = async (document: KnowledgeDocument) => {
 
   const downloadedFile = await accountStore.alephStorage.downloadFile(document.store.ipfs_hash);
   exportFile(document.name, downloadedFile);
+};
+
+const renameDocument = async (document: KnowledgeDocument, newName: string) => {
+  if (knowledgeBaseRef.value === undefined || accountStore.alephStorage === null) {
+    return;
+  }
+
+  try {
+    knowledgeBaseRef.value.documents = knowledgeBaseRef.value.documents.map((d) => {
+      if (d.id === document.id) {
+        return { ...d, name: newName };
+      }
+      return d;
+    });
+    await knowledgeStore.updateKnowledgeBase(
+      knowledgeBaseRef.value.id,
+      JSON.parse(JSON.stringify(knowledgeBaseRef.value)),
+    );
+  } catch (error) {
+    $q.notify({
+      message: (error as Error)?.message ?? 'Document rename failed, please try again',
+      color: 'negative',
+    });
+  }
 };
 
 const deleteDocument = async (document: KnowledgeDocument) => {
