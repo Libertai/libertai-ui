@@ -15,18 +15,18 @@
           <q-btn
             v-if="!account.isConnected.value"
             :class="$q.screen.gt.sm ? '' : 'float-right q-pa-sm'"
-            :icon="`img:icons/svg/star${$q.dark.mode ? '_lighten' : ''}.svg`"
-            :label="$q.screen.gt.sm ? 'Earn $LTAI' : ''"
             no-caps
             rounded
             text-color="primary"
             to="/tokens"
             unelevated
-          />
+          >
+            <ltai-icon :left="$q.screen.gt.sm" name="svguse:icons.svg#tokens-star" />
+            <span v-if="$q.screen.gt.sm">Earn $LTAI</span>
+          </q-btn>
           <q-btn
             v-else
             :class="$q.screen.gt.sm ? 'btn-gradient' : 'float-right q-pa-sm'"
-            :icon="$q.screen.gt.sm ? undefined : 'img:icons/svg/star.svg'"
             :text-color="$q.screen.gt.sm ? 'white' : 'black'"
             :to="{
               name: 'tokens-detail',
@@ -36,6 +36,7 @@
             rounded
             unelevated
           >
+            <ltai-icon v-if="!$q.screen.gt.sm" left name="svguse:icons.svg#tokens-star" />
             <span :key="account.address.value"
               >{{ accountStore.ltaiBalance.toFixed(0) }} <span v-if="$q.screen.gt.sm">$LTAI</span></span
             >
@@ -48,7 +49,7 @@
     <q-drawer v-model="leftDrawerOpen" class="flex-grow fit tw-flex tw-flex-col" show-if-above>
       <!-- image link with the logo -->
       <q-item class="q-mb-md text-left" clickable to="/">
-        <img :src="`icons/svg/libertai_full${$q.dark.mode ? '_lighten' : ''}.svg`" alt="LibertAI" />
+        <img :src="`icons/libertai_full${$q.dark.mode ? '_lighten' : ''}.svg`" alt="LibertAI" />
       </q-item>
       <div class="q-mr-xl q-ml-md q-mt-md">
         <q-btn class="border-primary-highlight" no-caps rounded text-color="dark-mode-text" to="/new" unelevated>
@@ -86,7 +87,7 @@
       </q-list>
       <!-- powered by aleph.im -->
       <q-item clickable href="https://aleph.im" target="_blank">
-        <img :src="`icons/svg/powered-by${$q.dark.mode ? '_lighten' : ''}.svg`" alt="aleph.im" />
+        <img :src="`icons/powered-by${$q.dark.mode ? '_lighten' : ''}.svg`" alt="aleph.im" />
       </q-item>
     </q-drawer>
 

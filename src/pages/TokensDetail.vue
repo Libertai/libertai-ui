@@ -22,7 +22,7 @@
           <q-card-section class="bg-purple-50 q-pa-xl row text-bold max-lg:tw-text-center">
             <div :class="`text-h6 lg:tw-text-left ${$q.screen.gt.sm ? 'col-8' : 'col-12'}`">
               <q-avatar class="q-mr-sm">
-                <img alt="libertai" src="/icons/svg/libertai.svg" />
+                <img alt="libertai" src="/icons/libertai.svg" />
               </q-avatar>
               <span>Current $LTAI balance</span>
             </div>

@@ -44,7 +44,7 @@
                 v-for="attachment in message.attachments"
                 :key="attachment.id"
                 class="tw-mr-1 bg-primary text-white"
-                icon="img:icons/svg/attachment.svg"
+                icon="img:icons/attachment.svg"
               >
                 {{ attachment.title }}
               </q-chip>

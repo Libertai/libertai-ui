@@ -4,13 +4,9 @@
       <q-card-actions :class="`flex flex-left text-semibold ${$q.dark.mode ? '' : 'text-purple-700'}`">
         {{ title }}
         <q-space />
-        <q-btn
-          v-close-popup
-          :icon="`img:icons/svg/close${$q.dark.mode ? '_lighten' : ''}.svg`"
-          flat
-          size="sm"
-          unelevated
-        />
+        <q-btn v-close-popup flat size="sm" unelevated>
+          <ltai-icon name="svguse:icons.svg#close" />
+        </q-btn>
       </q-card-actions>
 
       <slot />
@@ -31,6 +27,8 @@
   </q-dialog>
 </template>
 <script lang="ts" setup>
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+
 const { title } = defineProps<{ title: string }>();
 
 const emit = defineEmits<{ save: [] }>();

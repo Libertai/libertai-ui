@@ -8,13 +8,14 @@
       <div class="tw-mt-4 tw-flex md:tw-justify-end">
         <q-btn
           class="border-primary-highlight"
-          icon="img:icons/svg/add.svg"
-          label="Upload document"
           no-caps
           rounded
           unelevated
           @click="($refs.documentUpload as any).click()"
-        />
+        >
+          <ltai-icon left name="svguse:icons.svg#add" />
+          <span>Upload document</span>
+        </q-btn>
         <!-- Hidden document upload -->
         <input ref="documentUpload" accept=".txt,.md,.pdf" hidden multiple type="file" @change="uploadDocuments" />
       </div>
