@@ -62,7 +62,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { processFile } from 'src/utils/attachments';
+import { processAttachment } from 'src/utils/knowledge/attachments';
 import { MessageAttachment, SendMessageParams } from 'src/types/chats';
 import { useQuasar } from 'quasar';
 
@@ -92,7 +92,7 @@ const processMessageAttachments = async (event: any) => {
   await Promise.all(
     Array.from(target.files as FileList).map(async (file) => {
       try {
-        const fileData = await processFile(file);
+        const fileData = await processAttachment(file);
         attachmentsData.push(fileData);
       } catch (error) {
         $q.notify({
