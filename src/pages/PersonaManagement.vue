@@ -69,9 +69,7 @@
 
         <div class="tw-grid tw-grid-cols-5 tw-gap-x-4 tw-w-40 tw-mx-auto">
           <q-btn unelevated @click="startChatWithPersona(persona)">
-            <q-icon size="xs">
-              <img alt="new chat" src="/icons/svg/chat.svg" />
-            </q-icon>
+            <ltai-icon name="svguse:icons.svg#chat" size="xs" />
             <q-tooltip>New chat</q-tooltip>
           </q-btn>
 
@@ -83,9 +81,7 @@
           </q-btn>
 
           <q-btn :disabled="accountStore.ltaiBalance < 100" unelevated @click="exportPersona(persona)">
-            <q-icon size="xs">
-              <img alt="export" src="/icons/svg/download.svg" />
-            </q-icon>
+            <ltai-icon name="svguse:icons.svg#download" size="xs" />
             <q-tooltip v-if="tokenGatingMessage === undefined">Export</q-tooltip>
             <q-tooltip v-else>{{ `Export (${tokenGatingMessage})` }}</q-tooltip>
           </q-btn>
@@ -97,10 +93,7 @@
             <q-tooltip>Delete</q-tooltip>
           </q-btn>
           <q-btn v-else unelevated @click="reversePersonaVisibility(persona)">
-            <q-icon size="xs">
-              <img v-if="persona.hidden" alt="hide" src="/icons/svg/show.svg" />
-              <img v-else alt="hide" src="/icons/svg/hide.svg" />
-            </q-icon>
+            <ltai-icon :name="`svguse:icons.svg#${persona.hidden ? 'eye' : 'eye-slash'}`" size="xs" />
             <q-tooltip>Hide</q-tooltip>
           </q-btn>
 
@@ -128,6 +121,7 @@ import { exportFile } from 'quasar';
 import { getTokenGatingMessage } from 'src/utils/messages';
 import { z } from 'zod';
 import { BasePersonaEdition, UIPersona } from 'src/types/personas';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 
 const personasStore = usePersonasStore();
 const accountStore = useAccountStore();

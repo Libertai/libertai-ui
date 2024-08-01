@@ -22,8 +22,8 @@
         :to="`/knowledge-base/${knowledgeBase.id}`"
         class="tw-block"
       >
-        <div class="tw-flex tw-border tw-rounded-lg tw-p-4">
-          <img alt="folder" class="tw-mr-4" height="20" src="/icons/svg/folder.svg" width="20" />
+        <div class="tw-flex tw-border tw-items-center tw-rounded-lg tw-p-4">
+          <ltai-icon class="tw-h-5 tw-w-5 tw-mr-4" name="svguse:icons.svg#folder" />
           <p class="tw-font-bold tw-text-base">{{ knowledgeBase.name }}</p>
           <div class="tw-ml-auto tw-flex tw-gap-4">
             <p>{{ knowledgeBase.documents.length }} File{{ knowledgeBase.documents.length !== 1 ? 's' : '' }}</p>
@@ -40,6 +40,7 @@
 import { ref } from 'vue';
 import KnowledgeBaseCreationDialog from 'components/dialog/KnowledgeBaseCreationDialog.vue';
 import { useKnowledgeStore } from 'stores/knowledge';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 import dayjs from 'dayjs';
 
 const knowledgeStore = useKnowledgeStore();

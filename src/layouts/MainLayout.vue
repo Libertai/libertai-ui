@@ -54,28 +54,17 @@
       </q-item>
       <div class="q-mr-xl q-ml-md q-mt-md">
         <q-btn class="border-primary-highlight" no-caps rounded text-color="dark-mode-text" to="/new" unelevated>
-          <q-icon class="text-dark" left size="xs">
-            <img alt="new chat" src="/icons/svg/chat-plus.svg" />
-          </q-icon>
+          <ltai-icon left name="svguse:icons.svg#chat-plus" size="xs" />
           New Chat
         </q-btn>
       </div>
 
       <chats-list />
 
-      <q-item to="/knowledge-base">
-        <img :src="`icons/svg/book${$q.dark.mode ? '_lighten' : ''}.svg`" alt="knowledge" />
-
-        <q-item-section class="q-pl-sm">
-          <span>Knowledge base</span>
-        </q-item-section>
-      </q-item>
-
-      <q-item to="/persona-management">
-        <img :src="`icons/svg/robot${$q.dark.mode ? '_lighten' : ''}.svg`" alt="persona" />
-
-        <q-item-section class="q-pl-sm">
-          <span>Persona management</span>
+      <q-item v-for="item in sidebarItems" :key="item.link" :to="item.link">
+        <q-item-section class="tw-flex tw-flex-row tw-justify-start tw-items-center">
+          <ltai-icon :name="item.icon" class="tw-w-6 tw-h-6 tw-block" />
+          <p class="tw-pl-2">{{ item.title }}</p>
         </q-item-section>
       </q-item>
 
@@ -116,6 +105,7 @@ import UserSettingsDialog from 'components/dialog/UserSettingsDialog.vue';
 import { useAccount } from '@wagmi/vue';
 import { useAccountStore } from 'stores/account';
 import ChatsList from 'components/ChatsList.vue';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 
 const leftDrawerOpen = ref(false);
 const showUserSettingsDialog = ref(false);
@@ -128,4 +118,17 @@ const account = useAccount();
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 }
+
+const sidebarItems = [
+  {
+    link: '/knowledge-base',
+    icon: 'svguse:icons.svg#book',
+    title: 'Knowledge base',
+  },
+  {
+    link: '/persona-management',
+    icon: 'svguse:icons.svg#robot',
+    title: 'Persona management',
+  },
+];
 </script>
