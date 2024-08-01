@@ -12,7 +12,7 @@ const SECURITY_AGGREGATE_KEY = 'security';
 const MESSAGE = 'LibertAI';
 const LIBERTAI_CHANNEL = 'libertai-chat-ui';
 const LIBERTAI_SETTINGS_KEY = `${LIBERTAI_CHANNEL}-settings`;
-const LIBERTAI_KNOWLEDGE_BASE_KEY = `${LIBERTAI_CHANNEL}-knowledge-base-test-0`;
+const LIBERTAI_KNOWLEDGE_BASE_KEY = `${LIBERTAI_CHANNEL}-knowledge-base-test-1`;
 
 export class AlephPersistentStorage {
   constructor(
@@ -136,8 +136,12 @@ export class AlephPersistentStorage {
     return message;
   }
 
-  async downloadFile(hash: string) {
-    return this.subAccountClient.downloadFile(hash);
+  async downloadFile(ipfsHash: string) {
+    return this.subAccountClient.downloadFile(ipfsHash);
+  }
+
+  async deleteFile(itemHash: string) {
+    return this.subAccountClient.forget({ hashes: [itemHash] });
   }
 
   async fetchKnowledgeBases(): Promise<KnowledgeBase[] | undefined> {
