@@ -79,22 +79,12 @@
               <q-tooltip>Regenerate</q-tooltip>
             </q-btn>
             <!-- Allow copying the message to the clipboard -->
-            <q-btn
-              :icon="`img:icons/svg/copy${$q.dark.mode ? '_lighten' : ''}.svg`"
-              dense
-              flat
-              size="sm"
-              @click="copyMessage(message)"
-            >
+            <q-btn dense flat size="sm" @click="copyMessage(message)">
+              <ltai-icon name="svguse:icons.svg#copy" />
               <q-tooltip>Copy</q-tooltip>
             </q-btn>
-            <q-btn
-              :icon="`img:icons/svg/edit${$q.dark.mode ? '_lighten' : ''}.svg`"
-              dense
-              flat
-              size="sm"
-              @click="editMessage(($refs['message-' + message_index] as any)[0])"
-            >
+            <q-btn dense flat size="sm" @click="editMessage(($refs['message-' + message_index] as any)[0])">
+              <ltai-icon name="svguse:icons.svg#pencil" />
               <q-tooltip>Edit</q-tooltip>
             </q-btn>
           </div>
@@ -128,6 +118,7 @@ import { getPersonaAvatarUrl } from 'src/utils/personas';
 import { useSettingsStore } from 'stores/settings';
 import { Chat, SendMessageParams, UIMessage } from 'src/types/chats';
 import dayjs from 'dayjs';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 
 const $q = useQuasar();
 const route = useRoute();
