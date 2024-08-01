@@ -74,9 +74,7 @@
           </q-btn>
 
           <q-btn :disabled="!persona.allowEdit" unelevated @click="startEditingPersona(persona)">
-            <q-icon size="xs">
-              <img :src="`icons/svg/settings.svg`" alt="settings" />
-            </q-icon>
+            <ltai-icon name="svguse:icons.svg#settings" size="xs" />
             <q-tooltip>Edit persona</q-tooltip>
           </q-btn>
 
@@ -87,9 +85,7 @@
           </q-btn>
 
           <q-btn v-if="persona.allowEdit" unelevated @click="deletePersona(persona)">
-            <q-icon size="xs">
-              <img alt="delete" src="/icons/svg/delete.svg" />
-            </q-icon>
+            <ltai-icon name="svguse:icons.svg#delete" size="xs" />
             <q-tooltip>Delete</q-tooltip>
           </q-btn>
           <q-btn v-else unelevated @click="reversePersonaVisibility(persona)">

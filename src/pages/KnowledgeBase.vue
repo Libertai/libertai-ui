@@ -39,9 +39,23 @@
             <ltai-icon name="svguse:icons.svg#download" />
           </q-btn>
 
-          <q-btn class="tw-w-10 tw-h-10" disable unelevated>
-            <ltai-icon name="more_horiz" />
-          </q-btn>
+          <q-btn-dropdown class="tw-p-1" dropdown-icon="more_horiz" unelevated>
+            <q-list>
+              <q-item v-close-popup clickable @click="deleteDocumentConfirmation = true">
+                <q-item-section avatar>
+                  <ltai-icon class="tw-mx-auto" name="svguse:icons.svg#delete" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>Delete</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+          <ltai-dialog v-model="deleteDocumentConfirmation" title="Delete chat" @save="deleteDocument(document)">
+            <q-card-section class="row">
+              <span>Are you sure you want to delete the the document {{ document.name }}?</span>
+            </q-card-section>
+          </ltai-dialog>
         </div>
       </div>
     </div>
@@ -58,6 +72,7 @@ import { useAccountStore } from 'stores/account';
 import { processDocument } from 'src/utils/knowledge/document';
 import { filesize } from 'filesize';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import LtaiDialog from 'components/libertai/LtaiDialog.vue';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -68,6 +83,7 @@ const accountStore = useAccountStore();
 const knowledgeStore = useKnowledgeStore();
 
 const knowledgeBaseRef = ref<KnowledgeBase | undefined>(undefined);
+const deleteDocumentConfirmation = ref(false);
 
 watch(
   () => route.params.id as string,
@@ -126,7 +142,10 @@ const uploadDocuments = async (event: any) => {
         const document = await processDocument(file);
         const uploadedFileMessage = await accountStore.alephStorage!.uploadFile(file);
 
-        documents.push({ ...document, store_hash: uploadedFileMessage.content.item_hash });
+        documents.push({
+          ...document,
+          store: { item_hash: uploadedFileMessage.item_hash, ipfs_hash: uploadedFileMessage.content.item_hash },
+        });
       } catch (error) {
         $q.notify({
           message: (error as Error)?.message ?? 'Document processing failed, please try again',
@@ -149,7 +168,28 @@ const downloadDocument = async (document: KnowledgeDocument) => {
     return;
   }
 
-  const downloadedFile = await accountStore.alephStorage.downloadFile(document.store_hash);
+  const downloadedFile = await accountStore.alephStorage.downloadFile(document.store.ipfs_hash);
   exportFile(document.name, downloadedFile);
+};
+
+const deleteDocument = async (document: KnowledgeDocument) => {
+  if (knowledgeBaseRef.value === undefined || accountStore.alephStorage === null) {
+    return;
+  }
+
+  try {
+    await accountStore.alephStorage.deleteFile(document.store.item_hash);
+
+    knowledgeBaseRef.value.documents = knowledgeBaseRef.value.documents.filter((d) => d.id !== document.id);
+    await knowledgeStore.updateKnowledgeBase(
+      knowledgeBaseRef.value.id,
+      JSON.parse(JSON.stringify(knowledgeBaseRef.value)),
+    );
+  } catch (error) {
+    $q.notify({
+      message: (error as Error)?.message ?? 'Document deletion failed, please try again',
+      color: 'negative',
+    });
+  }
 };
 </script>

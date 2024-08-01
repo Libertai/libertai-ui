@@ -6,7 +6,10 @@ const knowledgeDocumentSchema = z.object({
   type: z.string(),
   content: z.string(),
   size: z.number(),
-  store_hash: z.string(),
+  store: z.object({
+    item_hash: z.string(),
+    ipfs_hash: z.string(),
+  }),
 });
 export type KnowledgeDocument = z.infer<typeof knowledgeDocumentSchema>;
 

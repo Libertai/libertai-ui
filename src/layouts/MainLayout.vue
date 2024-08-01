@@ -5,9 +5,7 @@
         <q-btn aria-label="Menu" color="primary" dense flat icon="menu" round @click="toggleLeftDrawer" />
 
         <q-btn class="tw-p-1" flat @click="showUserSettingsDialog = true">
-          <q-icon size="xs">
-            <img :src="`icons/svg/settings${$q.dark.mode ? '_lighten' : ''}.svg`" alt="settings" />
-          </q-icon>
+          <ltai-icon name="svguse:icons.svg#settings" size="xs" />
         </q-btn>
         <user-settings-dialog v-model="showUserSettingsDialog" />
 
