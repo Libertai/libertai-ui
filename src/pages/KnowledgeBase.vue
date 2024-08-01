@@ -1,11 +1,8 @@
 <template>
   <section v-if="knowledgeBaseRef" class="max-sm:tw-mx-4 md:tw-mx-10 tw-space-y-4 tw-my-5">
-    <q-btn
-      :icon="`img:icons/svg/arrow-left${$q.dark.mode ? '_lighten' : ''}.svg`"
-      class="tw-w-10 tw-h-10"
-      to="/knowledge-base"
-      unelevated
-    />
+    <q-btn class="tw-w-10 tw-h-10" to="/knowledge-base" unelevated>
+      <ltai-icon name="svguse:icons.svg#arrow-left" />
+    </q-btn>
     <div>
       <h4 class="text-h4 text-semibold">{{ knowledgeBaseRef.name }}</h4>
       <div class="tw-mt-4 tw-flex md:tw-justify-end">
@@ -29,23 +26,21 @@
         :key="document.id"
         class="tw-flex tw-border tw-items-center tw-rounded-lg tw-p-4"
       >
-        <q-icon
-          :color="$q.dark.mode ? 'primary-dark' : 'purple-700'"
-          class="tw-h-5 tw-w-5 tw-mr-4"
-          name="img:icons/svg/attachment.svg"
-        />
+        <ltai-icon class="tw-h-5 tw-w-5 tw-mr-4" name="svguse:icons.svg#attachment" />
 
         <p class="tw-font-bold tw-text-base">{{ document.name }}</p>
         <div class="tw-ml-auto tw-flex tw-items-center tw-gap-4">
           <p>{{ filesize(document.size, { round: 0 }) }}</p>
-          <q-btn class="tw-w-10 tw-h-10" disable icon="img:icons/svg/chat.svg" unelevated />
+          <q-btn class="tw-w-10 tw-h-10" disable unelevated>
+            <ltai-icon name="svguse:icons.svg#chat" />
+          </q-btn>
 
           <q-btn class="tw-w-10 tw-h-10" unelevated @click="downloadDocument(document)">
-            <q-icon :color="$q.dark.mode ? 'primary-dark' : 'purple-700'" name="download" />
+            <ltai-icon name="svguse:icons.svg#download" />
           </q-btn>
 
           <q-btn class="tw-w-10 tw-h-10" disable unelevated>
-            <q-icon :color="$q.dark.mode ? 'primary-dark' : 'purple-700'" name="more_horiz" />
+            <ltai-icon name="more_horiz" />
           </q-btn>
         </div>
       </div>
@@ -62,6 +57,7 @@ import { useAccount } from '@wagmi/vue';
 import { useAccountStore } from 'stores/account';
 import { processDocument } from 'src/utils/knowledge/document';
 import { filesize } from 'filesize';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 
 const $q = useQuasar();
 const route = useRoute();

@@ -48,7 +48,7 @@ export const useKnowledgeStore = defineStore('knowledge', {
     async updateKnowledgeBase(id: string, kb: KnowledgeBase) {
       this.knowledgeBases = this.knowledgeBases.map((knowledgeBase) => {
         if (knowledgeBase.id === id) {
-          return kb;
+          return { ...kb, lastUpdatedAt: new Date().toISOString() };
         }
         return knowledgeBase;
       });

@@ -10,16 +10,13 @@
         exact-active-class="bg-secondary item-active"
       >
         <q-item-section side>
-          <q-btn v-if="route.params?.id === chat.id" class="tw-p-1" flat icon="img:icons/svg/msg_active.svg" size="sm">
-          </q-btn>
-          <q-btn
-            v-if="route.params?.id !== chat.id"
-            :icon="`img:icons/svg/msg${$q.dark.mode ? '_lighten' : ''}.svg`"
+          <ltai-icon
+            :dark-color="route.params?.id === chat.id ? 'primary' : undefined"
+            :light-color="route.params?.id === chat.id ? 'primary' : 'grey'"
             class="tw-p-1"
-            flat
-            size="sm"
-          >
-          </q-btn>
+            name="svguse:icons.svg#message"
+            size="xs"
+          />
         </q-item-section>
 
         <q-item-section>
@@ -81,6 +78,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { nextTick, ref } from 'vue';
 import ChatSettingsDialog from 'components/dialog/ChatSettingsDialog.vue';
 import { Chat } from 'src/types/chats';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 
 const chatsStore = useChatsStore();
 const route = useRoute();
