@@ -32,7 +32,7 @@
           color="white"
           dense
           flat
-          icon="img:icons/svg/attachment.svg"
+          icon="img:icons/attachment.svg"
           round
           @click="($refs.messageAttachmentsUpload as any).click()"
         >
@@ -41,7 +41,9 @@
       </template>
       <template #append>
         <!--<q-btn round dense flat icon="img:icons/mic.svg" @click="sendMessage" color="" class="" />-->
-        <q-btn dense flat icon="img:icons/send.svg" round @click="sendMessage" />
+        <q-btn dense flat round @click="sendMessage">
+          <ltai-icon dark-color="purple-700" light-color="purple-700" name="svguse:icons.svg#send" />
+        </q-btn>
       </template>
 
       <template v-if="hint !== ''" #hint>
@@ -65,6 +67,7 @@ import { ref } from 'vue';
 import { processAttachment } from 'src/utils/knowledge/attachments';
 import { MessageAttachment, SendMessageParams } from 'src/types/chats';
 import { useQuasar } from 'quasar';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 
 const props = defineProps({
   isLoading: {

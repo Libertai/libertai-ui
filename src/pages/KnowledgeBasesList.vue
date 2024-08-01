@@ -3,15 +3,10 @@
     <h4 class="text-h4 text-semibold tw-mb-5">Knowledge base</h4>
     <p>Manage your knowledge bases</p>
     <div class="tw-mt-4 tw-mb-8 tw-flex md:tw-justify-end">
-      <q-btn
-        class="border-primary-highlight"
-        icon="img:icons/svg/add.svg"
-        label="Create knowledge base"
-        no-caps
-        rounded
-        unelevated
-        @click="createKnowledgeDialog = true"
-      />
+      <q-btn class="border-primary-highlight" no-caps rounded unelevated @click="createKnowledgeDialog = true">
+        <ltai-icon left name="svguse:icons.svg#add" />
+        <span>Create knowledge base</span>
+      </q-btn>
       <knowledge-base-creation-dialog v-model="createKnowledgeDialog" @create="createKnowledgeBase" />
     </div>
 
@@ -28,7 +23,7 @@
           <div class="tw-ml-auto tw-flex tw-gap-4">
             <p>{{ knowledgeBase.documents.length }} File{{ knowledgeBase.documents.length !== 1 ? 's' : '' }}</p>
             <p>Last updated: {{ dayjs(knowledgeBase.lastUpdatedAt).format('LL') }}</p>
-            <img alt="chevron" height="22" src="/icons/svg/chevron-right.svg" width="22" />
+            <ltai-icon class="tw-w-5 tw-h-5" name="svguse:icons.svg#chevron-right" />
           </div>
         </div>
       </RouterLink>

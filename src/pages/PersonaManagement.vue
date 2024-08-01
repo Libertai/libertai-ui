@@ -3,14 +3,10 @@
     <h4 class="text-h4 text-semibold tw-mb-5">Persona Management</h4>
     <p>Click on a persona to edit</p>
     <div class="tw-my-4 tw-flex md:tw-justify-end">
-      <q-btn
-        icon="img:icons/svg/add.svg"
-        label="Create persona"
-        no-caps
-        rounded
-        unelevated
-        @click="createPersona = true"
-      />
+      <q-btn no-caps rounded unelevated @click="createPersona = true">
+        <ltai-icon left name="svguse:icons.svg#add" />
+        <span>Create persona</span>
+      </q-btn>
       <persona-dialog
         v-model="createPersona"
         :base-persona="basePersonaCreate"
@@ -41,13 +37,13 @@
       <input ref="importPersonaUpload" accept="*.json" hidden type="file" @change="importPersona" />
       <q-btn
         :disabled="accountStore.ltaiBalance < 100"
-        icon="img:icons/svg/import.svg"
-        label="Import persona"
         no-caps
         rounded
         unelevated
         @click="($refs['importPersonaUpload'] as any).click()"
       >
+        <ltai-icon left name="svguse:icons.svg#import" />
+        <span>Import persona</span>
         <q-tooltip v-if="tokenGatingMessage !== undefined">{{ tokenGatingMessage }}</q-tooltip>
       </q-btn>
     </div>
@@ -94,9 +90,7 @@
           </q-btn>
 
           <q-btn unelevated @click="duplicatePersona(persona)">
-            <q-icon size="xs">
-              <img alt="duplicate" src="/icons/svg/duplicate.svg" />
-            </q-icon>
+            <ltai-icon name="svguse:icons.svg#duplicate" size="xs" />
             <q-tooltip>Duplicate</q-tooltip>
           </q-btn>
         </div>
