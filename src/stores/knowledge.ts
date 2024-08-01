@@ -6,11 +6,13 @@ import { useAccountStore } from 'stores/account';
 
 type KnowledgeStoreState = {
   knowledgeBases: KnowledgeBase[];
+  isLoaded: boolean;
 };
 
 export const useKnowledgeStore = defineStore('knowledge', {
   state: (): KnowledgeStoreState => ({
     knowledgeBases: [],
+    isLoaded: false,
   }),
   actions: {
     async load() {
@@ -20,6 +22,7 @@ export const useKnowledgeStore = defineStore('knowledge', {
       }
 
       const knowledgeBases = await alephStorage.fetchKnowledgeBases();
+      this.isLoaded = true;
       if (knowledgeBases === undefined) {
         return;
       }
@@ -38,6 +41,17 @@ export const useKnowledgeStore = defineStore('knowledge', {
 
     async createKnowledgeBase(name: string) {
       this.knowledgeBases.push({ id: uuidv4(), name, documents: [], lastUpdatedAt: new Date().toISOString() });
+
+      await this.saveOnAleph();
+    },
+
+    async updateKnowledgeBase(id: string, kb: KnowledgeBase) {
+      this.knowledgeBases = this.knowledgeBases.map((knowledgeBase) => {
+        if (knowledgeBase.id === id) {
+          return kb;
+        }
+        return knowledgeBase;
+      });
 
       await this.saveOnAleph();
     },

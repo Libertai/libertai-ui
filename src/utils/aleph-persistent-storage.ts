@@ -136,6 +136,10 @@ export class AlephPersistentStorage {
     return message;
   }
 
+  async downloadFile(hash: string) {
+    return this.subAccountClient.downloadFile(hash);
+  }
+
   async fetchKnowledgeBases(): Promise<KnowledgeBase[] | undefined> {
     try {
       const response = await this.subAccountClient.fetchAggregate(this.account.address, LIBERTAI_KNOWLEDGE_BASE_KEY);

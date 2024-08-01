@@ -9,7 +9,6 @@ const routes = [
         name: 'new-chat',
         component: () => import('pages/NewChat.vue'),
       },
-      // chat view with chat id
       {
         path: 'chat/:id',
         name: 'chat',
@@ -24,6 +23,10 @@ const routes = [
       {
         path: 'knowledge-base',
         component: () => import('pages/KnowledgeBasesList.vue'),
+      },
+      {
+        path: 'knowledge-base/:id',
+        component: () => import('pages/KnowledgeBase.vue'),
       },
       {
         path: 'persona-management',
