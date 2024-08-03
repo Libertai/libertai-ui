@@ -38,6 +38,7 @@
 
           <q-btn class="tw-w-10 tw-h-10" unelevated @click="downloadDocument(document)">
             <ltai-icon name="svguse:icons.svg#download" />
+            <q-tooltip>Download</q-tooltip>
           </q-btn>
 
           <q-btn-dropdown class="tw-p-1" dropdown-icon="more_horiz" unelevated>
@@ -80,16 +81,17 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { KnowledgeBase, KnowledgeDocument } from 'src/types/knowledge';
+import { KnowledgeBase, KnowledgeBaseIdentifier, KnowledgeDocument } from 'src/types/knowledge';
 import { useKnowledgeStore } from 'stores/knowledge';
 import { exportFile, useQuasar } from 'quasar';
 import { useAccount } from '@wagmi/vue';
 import { useAccountStore } from 'stores/account';
-import { processDocument } from 'src/utils/knowledge/document';
 import { filesize } from 'filesize';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 import LtaiDialog from 'components/libertai/LtaiDialog.vue';
 import KnowledgeBaseRenameDocumentDialog from 'components/dialog/KnowledgeBaseRenameDocumentDialog.vue';
+import { processDocument } from 'src/utils/knowledge/document';
+import { decryptFile, encryptFile } from 'src/utils/encryption';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -100,6 +102,7 @@ const accountStore = useAccountStore();
 const knowledgeStore = useKnowledgeStore();
 
 const knowledgeBaseRef = ref<KnowledgeBase | undefined>(undefined);
+const knowledgeBaseIdentifierRef = ref<KnowledgeBaseIdentifier | undefined>(undefined);
 const showRenameDocument = ref(false);
 const showDeleteDocumentConfirmation = ref(false);
 
@@ -128,8 +131,11 @@ async function loadKnowledgeBase(id: string) {
   }
 
   const knowledgeBase = knowledgeStore.knowledgeBases.find((kb) => kb.id === id);
+  const knowledgeBaseIdentifier = knowledgeStore.knowledgeBaseIdentifiers.find(
+    (kbIdentifier) => kbIdentifier.id === id,
+  );
 
-  if (!knowledgeBase) {
+  if (!knowledgeBase || !knowledgeBaseIdentifier) {
     $q.notify({ message: 'Knowledge base not found', color: 'negative' });
     await router.push({ path: '/knowledge-base' });
     return;
@@ -137,10 +143,11 @@ async function loadKnowledgeBase(id: string) {
 
   // Set the ref with a copy to avoid modifying the store value
   knowledgeBaseRef.value = JSON.parse(JSON.stringify(knowledgeBase));
+  knowledgeBaseIdentifierRef.value = JSON.parse(JSON.stringify(knowledgeBaseIdentifier));
 }
 
 const uploadDocuments = async (event: any) => {
-  if (knowledgeBaseRef.value === undefined) {
+  if (knowledgeBaseRef.value === undefined || knowledgeBaseIdentifierRef.value === undefined) {
     return;
   }
   if (accountStore.alephStorage === null) {
@@ -154,11 +161,15 @@ const uploadDocuments = async (event: any) => {
   const target = event.target as HTMLInputElement;
   const documents: KnowledgeDocument[] = [];
 
+  const encryptionKey = Buffer.from(knowledgeBaseIdentifierRef.value.encryption.key);
+  const encryptionIv = Buffer.from(knowledgeBaseIdentifierRef.value.encryption.iv);
+
   await Promise.all(
     Array.from(target.files as FileList).map(async (file) => {
       try {
         const document = await processDocument(file);
-        const uploadedFileMessage = await accountStore.alephStorage!.uploadFile(file);
+        const encryptedFile = await encryptFile(file, encryptionKey, encryptionIv);
+        const uploadedFileMessage = await accountStore.alephStorage!.uploadFile(encryptedFile);
 
         documents.push({
           ...document,
@@ -176,22 +187,30 @@ const uploadDocuments = async (event: any) => {
   knowledgeBaseRef.value.documents = knowledgeBaseRef.value.documents.concat(documents);
 
   await knowledgeStore.updateKnowledgeBase(
-    knowledgeBaseRef.value.id,
     JSON.parse(JSON.stringify(knowledgeBaseRef.value)),
+    knowledgeBaseIdentifierRef.value,
   );
 };
 
 const downloadDocument = async (document: KnowledgeDocument) => {
-  if (accountStore.alephStorage === null) {
+  if (accountStore.alephStorage === null || knowledgeBaseIdentifierRef.value === undefined) {
     return;
   }
 
+  const encryptionKey = Buffer.from(knowledgeBaseIdentifierRef.value.encryption.key);
+  const encryptionIv = Buffer.from(knowledgeBaseIdentifierRef.value.encryption.iv);
+
   const downloadedFile = await accountStore.alephStorage.downloadFile(document.store.ipfs_hash);
-  exportFile(document.name, downloadedFile);
+  const decryptedFile = decryptFile(downloadedFile, encryptionKey, encryptionIv);
+  exportFile(document.name, decryptedFile);
 };
 
 const renameDocument = async (document: KnowledgeDocument, newName: string) => {
-  if (knowledgeBaseRef.value === undefined || accountStore.alephStorage === null) {
+  if (
+    knowledgeBaseRef.value === undefined ||
+    knowledgeBaseIdentifierRef.value === undefined ||
+    accountStore.alephStorage === null
+  ) {
     return;
   }
 
@@ -203,8 +222,8 @@ const renameDocument = async (document: KnowledgeDocument, newName: string) => {
       return d;
     });
     await knowledgeStore.updateKnowledgeBase(
-      knowledgeBaseRef.value.id,
       JSON.parse(JSON.stringify(knowledgeBaseRef.value)),
+      knowledgeBaseIdentifierRef.value,
     );
   } catch (error) {
     $q.notify({
@@ -215,7 +234,11 @@ const renameDocument = async (document: KnowledgeDocument, newName: string) => {
 };
 
 const deleteDocument = async (document: KnowledgeDocument) => {
-  if (knowledgeBaseRef.value === undefined || accountStore.alephStorage === null) {
+  if (
+    knowledgeBaseRef.value === undefined ||
+    knowledgeBaseIdentifierRef.value === undefined ||
+    accountStore.alephStorage === null
+  ) {
     return;
   }
 
@@ -224,8 +247,8 @@ const deleteDocument = async (document: KnowledgeDocument) => {
 
     knowledgeBaseRef.value.documents = knowledgeBaseRef.value.documents.filter((d) => d.id !== document.id);
     await knowledgeStore.updateKnowledgeBase(
-      knowledgeBaseRef.value.id,
       JSON.parse(JSON.stringify(knowledgeBaseRef.value)),
+      knowledgeBaseIdentifierRef.value,
     );
   } catch (error) {
     $q.notify({

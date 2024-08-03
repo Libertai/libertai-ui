@@ -1,17 +1,19 @@
 import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
 
-import { KnowledgeBase } from 'src/types/knowledge';
+import { KnowledgeBase, KnowledgeBaseIdentifier } from 'src/types/knowledge';
 import { useAccountStore } from 'stores/account';
 
 type KnowledgeStoreState = {
   knowledgeBases: KnowledgeBase[];
+  knowledgeBaseIdentifiers: KnowledgeBaseIdentifier[];
   isLoaded: boolean;
 };
 
 export const useKnowledgeStore = defineStore('knowledge', {
   state: (): KnowledgeStoreState => ({
     knowledgeBases: [],
+    knowledgeBaseIdentifiers: [],
     isLoaded: false,
   }),
   actions: {
@@ -21,39 +23,51 @@ export const useKnowledgeStore = defineStore('knowledge', {
         return;
       }
 
-      const knowledgeBases = await alephStorage.fetchKnowledgeBases();
-      this.isLoaded = true;
-      if (knowledgeBases === undefined) {
-        return;
-      }
+      const knowledgeBaseIdentifiers = await alephStorage.fetchKnowledgeBaseIdentifiers();
+      this.knowledgeBaseIdentifiers = knowledgeBaseIdentifiers ?? [];
 
-      this.knowledgeBases = knowledgeBases;
+      const knowledgeBases = await Promise.all(
+        this.knowledgeBaseIdentifiers.map(async (kbIdentifier): Promise<KnowledgeBase | undefined> => {
+          return await alephStorage.fetchKnowledgeBase(
+            kbIdentifier.post_hash,
+            Buffer.from(kbIdentifier.encryption.key),
+            Buffer.from(kbIdentifier.encryption.iv),
+          );
+        }),
+      );
+      this.knowledgeBases = knowledgeBases.filter((kb) => kb !== undefined);
+      this.isLoaded = true;
     },
 
-    async saveOnAleph() {
+    async createKnowledgeBase(name: string) {
       const { alephStorage } = useAccountStore();
       if (alephStorage === null) {
         return;
       }
 
-      await alephStorage.saveKnowledgeBases(this.knowledgeBases);
+      const newKb: KnowledgeBase = { id: uuidv4(), name, documents: [], lastUpdatedAt: new Date().toISOString() };
+
+      const kbIdentifier = await alephStorage.createKnowledgeBase(newKb, this.knowledgeBaseIdentifiers);
+      if (kbIdentifier === undefined) {
+        throw new Error('Knowledge base creation failed');
+      }
+      this.knowledgeBases.push(newKb);
+      this.knowledgeBaseIdentifiers.push(kbIdentifier);
     },
 
-    async createKnowledgeBase(name: string) {
-      this.knowledgeBases.push({ id: uuidv4(), name, documents: [], lastUpdatedAt: new Date().toISOString() });
+    async updateKnowledgeBase(kb: KnowledgeBase, kbIdentifier: KnowledgeBaseIdentifier) {
+      const { alephStorage } = useAccountStore();
+      if (alephStorage === null) {
+        return;
+      }
+      await alephStorage.updateKnowledgeBase(kb, kbIdentifier);
 
-      await this.saveOnAleph();
-    },
-
-    async updateKnowledgeBase(id: string, kb: KnowledgeBase) {
       this.knowledgeBases = this.knowledgeBases.map((knowledgeBase) => {
-        if (knowledgeBase.id === id) {
+        if (knowledgeBase.id === kb.id) {
           return { ...kb, lastUpdatedAt: new Date().toISOString() };
         }
         return knowledgeBase;
       });
-
-      await this.saveOnAleph();
     },
   },
 });
