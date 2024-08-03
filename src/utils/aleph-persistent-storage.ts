@@ -5,14 +5,21 @@ import { ItemType } from '@aleph-sdk/message';
 import { signMessage } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
 import { SignMessageReturnType } from 'viem';
-import { knowledgeAlephStorage, KnowledgeBase } from 'src/types/knowledge';
+import {
+  KnowledgeBase,
+  KnowledgeBaseIdentifier,
+  knowledgeBaseIdentifiersAlephStorage,
+  knowledgeSchema,
+} from 'src/types/knowledge';
+import { decrypt, encrypt, generateIv, generateKey } from 'src/utils/encryption';
 
 // Aleph keys and channels
 const SECURITY_AGGREGATE_KEY = 'security';
 const MESSAGE = 'LibertAI';
 const LIBERTAI_CHANNEL = 'libertai-chat-ui';
 const LIBERTAI_SETTINGS_KEY = `${LIBERTAI_CHANNEL}-settings`;
-const LIBERTAI_KNOWLEDGE_BASE_KEY = `${LIBERTAI_CHANNEL}-knowledge-base-test-1`;
+const LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY = `${LIBERTAI_CHANNEL}-knowledge-base-identifiers-test-1`;
+const LIBERTAI_KNOWLEDGE_BASE_POST_TYPE = `${LIBERTAI_CHANNEL}-knowledge-base-test-1`;
 
 export class AlephPersistentStorage {
   constructor(
@@ -127,7 +134,7 @@ export class AlephPersistentStorage {
     }
   }
 
-  async uploadFile(file: File) {
+  async uploadFile(file: File | Buffer) {
     const message = await this.subAccountClient.createStore({
       fileObject: file,
       storageEngine: ItemType.ipfs,
@@ -144,35 +151,98 @@ export class AlephPersistentStorage {
     return this.subAccountClient.forget({ hashes: [itemHash] });
   }
 
-  async fetchKnowledgeBases(): Promise<KnowledgeBase[] | undefined> {
+  async fetchKnowledgeBaseIdentifiers(): Promise<KnowledgeBaseIdentifier[] | undefined> {
     try {
-      const response = await this.subAccountClient.fetchAggregate(this.account.address, LIBERTAI_KNOWLEDGE_BASE_KEY);
+      const response = await this.subAccountClient.fetchAggregate(
+        this.account.address,
+        LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY,
+      );
 
-      const parsedKnowledgeBases = knowledgeAlephStorage.safeParse(response);
-      if (!parsedKnowledgeBases.success) {
-        throw new Error(`Zod parsing failed: ${parsedKnowledgeBases.error}`);
+      const parsedKnowledgeBaseIdentifiers = knowledgeBaseIdentifiersAlephStorage.safeParse(response);
+      if (!parsedKnowledgeBaseIdentifiers.success) {
+        throw new Error(`Zod parsing failed: ${parsedKnowledgeBaseIdentifiers.error}`);
       }
 
-      return parsedKnowledgeBases.data.data;
+      return parsedKnowledgeBaseIdentifiers.data.data;
     } catch (error) {
-      console.error(`Fetching Knowledge bases from Aleph failed: ${error}`);
+      console.error(`Fetching Knowledge base identifiers from Aleph failed: ${error}`);
       return undefined;
     }
   }
 
-  async saveKnowledgeBases(knowledgeBases: KnowledgeBase[]) {
+  async createKnowledgeBase(
+    kb: KnowledgeBase,
+    currentKbIdentifiers: KnowledgeBaseIdentifier[],
+  ): Promise<KnowledgeBaseIdentifier | undefined> {
     try {
-      const message = await this.subAccountClient.createAggregate({
-        key: LIBERTAI_KNOWLEDGE_BASE_KEY,
+      // Encryption
+      const key = generateKey();
+      const iv = generateIv();
+      const encryptedKb = encrypt(JSON.stringify(kb), key, iv);
+
+      const response = await this.subAccountClient.createPost({
+        postType: LIBERTAI_KNOWLEDGE_BASE_POST_TYPE,
+        content: encryptedKb,
+        address: this.account.address,
+        channel: LIBERTAI_CHANNEL,
+      });
+
+      // TODO: encrypt the key and iv before posting in the aggregate
+      const identifier = {
+        id: kb.id,
+        encryption: { key: key.toString(), iv: iv.toString() },
+        post_hash: response.item_hash,
+      };
+
+      const newKbIdentifiers: KnowledgeBaseIdentifier[] = [...currentKbIdentifiers, identifier];
+      await this.subAccountClient.createAggregate({
+        key: LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY,
         content: {
-          data: knowledgeBases,
+          data: newKbIdentifiers,
         },
         address: this.account.address,
         channel: LIBERTAI_CHANNEL,
       });
-      console.log(`Knowledge bases saved on Aleph with hash ${message.item_hash}`);
+      return identifier;
     } catch (error) {
-      console.error(`Saving knowledge bases on Aleph failed: ${error}`);
+      console.error(`Creating knowledge base failed: ${error}`);
+      return undefined;
+    }
+  }
+
+  async updateKnowledgeBase(knowledgeBase: KnowledgeBase, kbIdentifier: KnowledgeBaseIdentifier) {
+    try {
+      const key = Buffer.from(kbIdentifier.encryption.key);
+      const iv = Buffer.from(kbIdentifier.encryption.iv);
+
+      const encryptedKb = encrypt(JSON.stringify(knowledgeBase), key, iv);
+
+      await this.subAccountClient.createPost({
+        postType: 'amend',
+        ref: kbIdentifier.post_hash,
+        content: encryptedKb,
+        address: this.account.address,
+        channel: LIBERTAI_CHANNEL,
+      });
+    } catch (error) {
+      console.error(`Update of knowledge base ${knowledgeBase.id} failed: ${error}`);
+      return undefined;
+    }
+  }
+
+  async fetchKnowledgeBase(postHash: string, encryptionKey: Buffer, iv: Buffer): Promise<KnowledgeBase | undefined> {
+    try {
+      const response = await this.subAccountClient.getPost({ hashes: [postHash], channels: [LIBERTAI_CHANNEL] });
+
+      const decryptedContent = decrypt(response.content, encryptionKey, iv);
+      const parsedKnowledgeBase = knowledgeSchema.safeParse(JSON.parse(decryptedContent));
+      if (!parsedKnowledgeBase.success) {
+        throw new Error(`Zod parsing failed: ${parsedKnowledgeBase.error}`);
+      }
+      return parsedKnowledgeBase.data;
+    } catch (error) {
+      console.error(`Fetching Knowledge base from Aleph post ${postHash} failed: ${error}`);
+      return undefined;
     }
   }
 }

@@ -21,4 +21,15 @@ export const knowledgeSchema = z.object({
 });
 export type KnowledgeBase = z.infer<typeof knowledgeSchema>;
 
-export const knowledgeAlephStorage = z.object({ data: z.array(knowledgeSchema) });
+export const knowledgeBaseIdentifierSchema = z.object({
+  id: z.string().uuid(),
+  post_hash: z.string(),
+  encryption: z.object({
+    key: z.string(),
+    iv: z.string(),
+  }),
+});
+
+export type KnowledgeBaseIdentifier = z.infer<typeof knowledgeBaseIdentifierSchema>;
+
+export const knowledgeBaseIdentifiersAlephStorage = z.object({ data: z.array(knowledgeBaseIdentifierSchema) });

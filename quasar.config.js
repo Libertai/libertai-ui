@@ -71,6 +71,10 @@ module.exports = configure(function (/* ctx */) {
           viteConf.plugins = [];
         }
         viteConf.plugins = [...viteConf.plugins, nodePolyfills()];
+        viteConf.define = {
+          ...viteConf.define,
+          'process.browser': true,
+        };
       },
 
       // vueRouterBase,

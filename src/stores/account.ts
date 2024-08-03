@@ -9,9 +9,14 @@ import { useKnowledgeStore } from 'stores/knowledge';
 
 const LTAI_BASE_ADDRESS = '0xF8B1b47AA748F5C7b5D0e80C726a843913EB573a';
 
+type AccountStoreState = {
+  alephStorage: AlephPersistentStorage | null;
+  ltaiBalance: number;
+};
+
 export const useAccountStore = defineStore('account', {
-  state: () => ({
-    alephStorage: null as AlephPersistentStorage | null,
+  state: (): AccountStoreState => ({
+    alephStorage: null,
     ltaiBalance: 0,
   }),
   actions: {
