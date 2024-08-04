@@ -33,3 +33,8 @@ const { title } = defineProps<{ title: string }>();
 
 const emit = defineEmits<{ save: [] }>();
 </script>
+<style>
+.q-dialog__backdrop {
+  background: rgba(0, 0, 0, 0.1);
+}
+</style>
