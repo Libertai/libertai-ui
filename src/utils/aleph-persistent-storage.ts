@@ -12,14 +12,17 @@ import {
   knowledgeSchema,
 } from 'src/types/knowledge';
 import { decrypt, encrypt, generateIv, generateKey } from 'src/utils/encryption';
+import { decrypt as eciesDecrypt, encrypt as eciesEncrypt, PrivateKey } from 'eciesjs';
+import { BufferEncoding } from 'vite-plugin-checker/dist/cjs/checkers/vueTsc/typescript-vue-tsc';
 
-// Aleph keys and channels
+// Aleph keys and channels settings
 const SECURITY_AGGREGATE_KEY = 'security';
 const MESSAGE = 'LibertAI';
 const LIBERTAI_CHANNEL = 'libertai-chat-ui';
 const LIBERTAI_SETTINGS_KEY = `${LIBERTAI_CHANNEL}-settings`;
-const LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY = `${LIBERTAI_CHANNEL}-knowledge-base-identifiers-test-1`;
-const LIBERTAI_KNOWLEDGE_BASE_POST_TYPE = `${LIBERTAI_CHANNEL}-knowledge-base-test-1`;
+const LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY = `${LIBERTAI_CHANNEL}-knowledge-base-identifiers-test-4`;
+const LIBERTAI_KNOWLEDGE_BASE_POST_TYPE = `${LIBERTAI_CHANNEL}-knowledge-base-test-4`;
+const BUFFER_ENCODING: BufferEncoding = 'hex';
 
 export class AlephPersistentStorage {
   constructor(
@@ -27,6 +30,8 @@ export class AlephPersistentStorage {
     private account: ETHAccount,
     /* eslint-disable-next-line no-unused-vars */
     private subAccountClient: AuthenticatedAlephHttpClient,
+    // eslint-disable-next-line no-unused-vars
+    private encryptionPrivateKey: PrivateKey,
   ) {}
 
   static async signBaseMessage() {
@@ -40,6 +45,8 @@ export class AlephPersistentStorage {
       console.error('Private key generation failed');
       return undefined;
     }
+    const encryptionPrivateKey = PrivateKey.fromHex(privateKey);
+
     const subAccount = importAccountFromPrivateKey(privateKey);
     const account = await getAccountFromProvider(window.ethereum);
     const accountClient = new AuthenticatedAlephHttpClient(account);
@@ -47,7 +54,7 @@ export class AlephPersistentStorage {
 
     await AlephPersistentStorage.getSecurityPermission(account, subAccount, accountClient);
 
-    return new AlephPersistentStorage(account, subAccountClient);
+    return new AlephPersistentStorage(account, subAccountClient, encryptionPrivateKey);
   }
 
   static async getSecurityPermission(
@@ -163,7 +170,18 @@ export class AlephPersistentStorage {
         throw new Error(`Zod parsing failed: ${parsedKnowledgeBaseIdentifiers.error}`);
       }
 
-      return parsedKnowledgeBaseIdentifiers.data.data;
+      return parsedKnowledgeBaseIdentifiers.data.data.map((kbIdentifier) => {
+        const decryptedKey = eciesDecrypt(
+          this.encryptionPrivateKey.secret,
+          Buffer.from(kbIdentifier.encryption.key, BUFFER_ENCODING),
+        ).toString();
+        const decryptedIv = eciesDecrypt(
+          this.encryptionPrivateKey.secret,
+          Buffer.from(kbIdentifier.encryption.iv, BUFFER_ENCODING),
+        ).toString();
+
+        return { ...kbIdentifier, encryption: { key: decryptedKey, iv: decryptedIv } };
+      });
     } catch (error) {
       console.error(`Fetching Knowledge base identifiers from Aleph failed: ${error}`);
       return undefined;
@@ -187,10 +205,12 @@ export class AlephPersistentStorage {
         channel: LIBERTAI_CHANNEL,
       });
 
-      // TODO: encrypt the key and iv before posting in the aggregate
       const identifier = {
         id: kb.id,
-        encryption: { key: key.toString(), iv: iv.toString() },
+        encryption: {
+          key: eciesEncrypt(this.encryptionPrivateKey.publicKey.toHex(), key).toString(BUFFER_ENCODING),
+          iv: eciesEncrypt(this.encryptionPrivateKey.publicKey.toHex(), iv).toString(BUFFER_ENCODING),
+        },
         post_hash: response.item_hash,
       };
 
