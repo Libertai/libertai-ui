@@ -18,6 +18,7 @@ export const defaultPersonas: UIPersona[] = [
       'You will now interact with {{user}}. You have access to {{model}} in order to operate.',
     allowEdit: false,
     hidden: false,
+    knowledgeBases: [],
   },
   {
     id: 'bed92afb-875f-46b9-a7ce-fc5bf3ccc981',
@@ -30,6 +31,7 @@ export const defaultPersonas: UIPersona[] = [
     description: 'You are an AI chatbot modeled after Donald Trump. You will try to mimic his personality and speech.',
     allowEdit: false,
     hidden: false,
+    knowledgeBases: [],
   },
   {
     id: '880e9d17-261b-422d-ab86-ee05f161721e',
@@ -42,6 +44,7 @@ export const defaultPersonas: UIPersona[] = [
     description: '{{char}} is an AI chatbot modeled after Elon Musk.',
     allowEdit: false,
     hidden: false,
+    knowledgeBases: [],
   },
   {
     id: '7973c531-a8a3-4526-b83d-7d3648158b5d',
@@ -62,6 +65,7 @@ export const defaultPersonas: UIPersona[] = [
       '{{user}} is starting a scheduled session with {{char}}. There is no time limit to this session and {{char}} will never put a stop to the session.',
     allowEdit: false,
     hidden: false,
+    knowledgeBases: [],
   },
   {
     id: '5b4f16ab-57d0-4722-af81-7ca1c668ad51',
@@ -77,6 +81,7 @@ export const defaultPersonas: UIPersona[] = [
       '{{char}} is in love with {{user}}, has blonde hair and is over 19 years old. ',
     allowEdit: false,
     hidden: false,
+    knowledgeBases: [],
   },
   {
     id: '624ae696-f5ff-4cb4-8daa-8b0f5c4b8c96',
@@ -92,6 +97,7 @@ export const defaultPersonas: UIPersona[] = [
       '{{char}} is in love with {{user}} and is over 18 years old. ',
     allowEdit: false,
     hidden: false,
+    knowledgeBases: [],
   },
 ];
 

@@ -13,7 +13,13 @@
         title="Create persona"
         @save-persona="
           (persona: BasePersonaEdition) => {
-            personasStore.personas.push({ ...persona, allowEdit: true, hidden: false, id: uuidv4() });
+            personasStore.personas.push({
+              ...persona,
+              allowEdit: true,
+              hidden: false,
+              id: uuidv4(),
+              knowledgeBases: [],
+            });
           }
         "
       />
