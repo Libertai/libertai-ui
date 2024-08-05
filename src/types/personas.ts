@@ -9,6 +9,7 @@ export type UIPersona = Persona & {
   name: string;
   allowEdit: boolean;
   hidden: boolean;
+  knowledgeBases: string[]; // IDs of linked knowledge bases
 };
 
 export type BasePersonaEdition = Pick<UIPersona, 'name' | 'role' | 'description' | 'avatar'>;
@@ -22,3 +23,6 @@ export const defaultBasePersona: BasePersonaEdition = {
     ipfs_hash: 'QmQMBfgnmuxcQ4kptR1oPE9guYxG13GpASjYVeFQSxNxjE',
   },
 };
+
+// eslint-disable-next-line no-unused-vars
+export type PersonaMigration = (currentPersona: UIPersona) => UIPersona;

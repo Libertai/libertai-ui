@@ -1,23 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { defineStore } from 'pinia';
 import { chatTag } from 'src/utils/chat';
-import { chatsMigrations } from 'src/utils/migrations/chats';
+import { chatsMigrations } from 'src/migrations/chats';
 import { Chat, MessageAttachment, UIMessage } from 'src/types/chats';
 import { UIPersona } from 'src/types/personas';
 import localforage from 'localforage';
 
 const CHATS_STORE_NAME = 'chats-store';
 const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
-
-/**
- * To implement in attachments:
- * interface Attachment {
- *   // Document id within the embedding store, if stored there
- *   documentId: string?;
- *   // The content of the attachment, if stored inlined
- *   content: string?;
- * }
- */
 
 // TODO: Search results are not yet implemented
 /**
@@ -100,6 +90,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
         persona,
         messages: [],
         createdAt: new Date().toISOString(),
+        knowledgeBases: [],
       };
       this.chats.push(chat);
       return chat;

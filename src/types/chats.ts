@@ -30,6 +30,7 @@ export type Chat = {
   persona: UIPersona;
   messages: UIMessage[];
   createdAt: string; // ISO 8601 date
+  knowledgeBases: string[]; // IDs of linked knowledge bases
 };
 
 // eslint-disable-next-line no-unused-vars
