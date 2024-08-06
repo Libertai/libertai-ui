@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { Document, KnowledgeStore } from '@libertai/libertai-js';
-import { defaultKnowledge } from '../utils/knowledge';
+import { defaultKnowledge } from '../utils/knowledge/default';
 import { v4 as uuidv4 } from 'uuid';
 
 export const DEFAULT_KNOWLEDGE_TAG = 'default';
