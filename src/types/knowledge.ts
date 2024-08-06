@@ -1,5 +1,10 @@
 import { z } from 'zod';
 
+export type KnowledgeSearchResult = {
+  content: string;
+  distance: number;
+};
+
 const knowledgeDocumentChunk = z.object({
   content: z.string(),
   vector: z.array(z.number()),

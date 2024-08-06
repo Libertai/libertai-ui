@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
 
-import { KnowledgeBase, KnowledgeBaseIdentifier } from 'src/types/knowledge';
+import { KnowledgeBase, KnowledgeBaseIdentifier, KnowledgeDocument } from 'src/types/knowledge';
 import { useAccountStore } from 'stores/account';
 
 type KnowledgeStoreState = {
@@ -16,6 +16,16 @@ export const useKnowledgeStore = defineStore('knowledge', {
     knowledgeBaseIdentifiers: [],
     isLoaded: false,
   }),
+  getters: {
+    getDocumentsFrom: (state) => {
+      return (ids: string[]): KnowledgeDocument[] => {
+        return state.knowledgeBases
+          .filter((kb) => ids.includes(kb.id))
+          .map((kb) => kb.documents)
+          .flat();
+      };
+    },
+  },
   actions: {
     async load() {
       const { alephStorage } = useAccountStore();

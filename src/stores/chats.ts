@@ -8,17 +8,6 @@ import localforage from 'localforage';
 const CHATS_STORE_NAME = 'chats-store';
 const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
 
-// TODO: Search results are not yet implemented
-/**
- * Representation of a search result:
- * interface SearchResult {
- *  // embedding document id
- *  documentId: string;
- *  // embedding content
- *  content: string;
- * }
- */
-
 type ChatsStoreState = {
   version: number;
   chats: Chat[];
