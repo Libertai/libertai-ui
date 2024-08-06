@@ -22,7 +22,7 @@
           <p class="tw-font-bold tw-text-base">{{ knowledgeBase.name }}</p>
           <div class="tw-ml-auto tw-flex tw-gap-4">
             <p>{{ knowledgeBase.documents.length }} File{{ knowledgeBase.documents.length !== 1 ? 's' : '' }}</p>
-            <p>Last updated: {{ dayjs(knowledgeBase.lastUpdatedAt).format('LL') }}</p>
+            <p class="max-sm:tw-hidden">Last updated: {{ dayjs(knowledgeBase.lastUpdatedAt).format('LL') }}</p>
             <ltai-icon class="tw-w-5 tw-h-5" name="svguse:icons.svg#chevron-right" />
           </div>
         </div>

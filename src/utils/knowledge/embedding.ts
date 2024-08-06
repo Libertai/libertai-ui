@@ -1,12 +1,12 @@
 import axios from 'axios';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
-import { KnowledgeDocumentChunk } from 'src/types/knowledge';
+import { KnowledgeDocument, KnowledgeDocumentChunk, KnowledgeSearchResult } from 'src/types/knowledge';
+import { distance } from 'ml-distance';
 
 const DEFAULT_EMBEDDING_API_URL =
   'https://curated.aleph.cloud/vm/ee1b2a8e5bd645447739d8b234ef495c9a2b4d0b98317d510a3ccf822808ebe5/embedding';
 
 export const generateChunks = async (
-  title: string,
   content: string,
   chunkSize = 500,
   overlapSize = 100,
@@ -18,23 +18,51 @@ export const generateChunks = async (
   });
 
   // Split into a list of LangChain documents
-  const documents = await splitter.createDocuments(
+  const documentChunks = await splitter.createDocuments(
     [content],
-    // TODO: include metadata
+    // TODO: include metadata ?
     [],
     {
-      chunkHeader: `DOCUMENT TITLE: ${title}\n\n---\n\n`,
-      appendChunkOverlapHeader: true,
+      appendChunkOverlapHeader: false,
     },
   );
-  return await Promise.all(
-    documents.map(
-      async (d): Promise<KnowledgeDocumentChunk> => ({
-        content: d.pageContent,
-        vector: await embed(d.pageContent),
-      }),
-    ),
-  );
+  const result: KnowledgeDocumentChunk[] = [];
+
+  // Need to do this synchronously to avoid timeout on the embedding model API
+  for (const chunk of documentChunks) {
+    const embedding_vector = await embed(chunk.pageContent);
+    result.push({
+      content: chunk.pageContent,
+      vector: embedding_vector,
+    });
+  }
+
+  return result;
+};
+
+export const searchDocuments = async (
+  query: string,
+  documents: KnowledgeDocument[],
+  max_chunks = 5,
+  max_distance = 15,
+): Promise<KnowledgeSearchResult[]> => {
+  const query_vector = await embed(query);
+  const matches: KnowledgeSearchResult[] = [];
+
+  // Iterate over all embeddings
+  documents.forEach((document) => {
+    document.chunks.forEach((chunk) => {
+      const euclidean_distance = distance.euclidean(query_vector, chunk.vector);
+
+      // If the distance is greater than the max_distance, skip it
+      if (euclidean_distance > max_distance) return;
+      matches.push({ content: chunk.content, distance: euclidean_distance });
+    });
+  });
+
+  matches.sort((a, b) => a.distance - b.distance);
+
+  return matches.slice(0, max_chunks);
 };
 
 async function embed(content: string): Promise<number[]> {

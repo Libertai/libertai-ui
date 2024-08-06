@@ -119,6 +119,8 @@ import { useSettingsStore } from 'stores/settings';
 import { Chat, SendMessageParams, UIMessage } from 'src/types/chats';
 import dayjs from 'dayjs';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import { searchDocuments } from 'src/utils/knowledge/embedding';
+import { useKnowledgeStore } from 'stores/knowledge';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -128,6 +130,7 @@ const router = useRouter();
 const chatsStore = useChatsStore();
 const modelsStore = useModelsStore();
 const settingsStore = useSettingsStore();
+const knowledgeStore = useKnowledgeStore();
 
 // Local page state
 const isLoadingRef = ref(false);
@@ -185,7 +188,8 @@ async function generatePersonaMessage() {
 
   const chatId = chatRef.value.id;
   const username = chatRef.value.username;
-  const messages = JSON.parse(JSON.stringify(chatRef.value.messages));
+  const messages: UIMessage[] = JSON.parse(JSON.stringify(chatRef.value.messages));
+  const knowledgeBaseIds = chatRef.value.knowledgeBases;
   const persona = chatRef.value.persona;
 
   const modelId = chatRef.value.modelId;
@@ -211,17 +215,21 @@ async function generatePersonaMessage() {
     // Set loading state
     isLoadingRef.value = true;
 
-    // NOTE: assuming last message is guaranteed to be non-empty and the user's last message
-    // Get the last message from the user
-    // const lastMessage = messages[messages.length - 1];
-    // const searchResultMessages: Message[] = [];
-    // const searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
-    // searchResults.forEach((result) => {
-    //   searchResultMessages.push({
-    //     role: 'search-result',
-    //     content: result.content,
-    //   });
-    // });
+    let searchResultMessages: Message[] = [];
+
+    // Finding related knowledge document chunks
+    if (knowledgeBaseIds.length > 0) {
+      const documents = knowledgeStore.getDocumentsFrom(knowledgeBaseIds);
+      const lastUserMessage = messages.findLast((message) => message.author === 'user')!;
+      const searchResults = await searchDocuments(lastUserMessage.content, documents);
+      console.log(searchResults);
+      searchResultMessages = searchResults.map(
+        (result): Message => ({
+          role: 'search-result',
+          content: result.content,
+        }),
+      );
+    }
 
     // Expand all the messages to inline any compatible attachments
     const expandedMessages = messages
@@ -229,34 +237,11 @@ async function generatePersonaMessage() {
         const ret = [];
         // Push any attachments as messages ahead of the message itself
         message.attachments?.forEach((attachment) => {
-          if (attachment.content) {
-            ret.push({
-              role: 'attachment',
-              content: `[${attachment.title}](${attachment.content})`,
-            });
-          }
-          // else if (attachment.documentId) {
-          //   ret.push({
-          //     role: 'attachment',
-          //     content: `[${attachment.title}](document-id-${attachment.documentId})`,
-          //   });
-          // }
+          ret.push({
+            role: 'attachment',
+            content: `[${attachment.title}](${attachment.content})`,
+          });
         });
-
-        // Push what search results we found based on the message
-        // TODO: this should probably be a more generic tool-call or llm-chain-link
-        // TODO: this should probably link back to the document id
-        // TODO: I should probably write these below messages in the log
-        //  Really these search results should get attached to the message that
-        //   lead to them being queried
-        // if (message.searchResults) {
-        //   message.searchResults.forEach((result: Message) => {
-        //     ret.push({
-        //       role: 'search-result',
-        //       content: result.content,
-        //     });
-        //   });
-        // }
 
         // Push the message itself
         ret.push(message);
@@ -265,7 +250,7 @@ async function generatePersonaMessage() {
       .flat();
 
     // Append the search results to the messages
-    const allMessages: Message[] = [...expandedMessages /*...searchResultMessages */];
+    const allMessages: Message[] = [...expandedMessages, ...searchResultMessages];
 
     // Generate a stream of responses from the AI
     for await (const output of inferenceEngine.generateAnswer(allMessages, model, persona, username, false)) {
