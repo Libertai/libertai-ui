@@ -1,10 +1,17 @@
 import { z } from 'zod';
 
+const knowledgeDocumentChunk = z.object({
+  content: z.string(),
+  vector: z.array(z.number()),
+});
+
+export type KnowledgeDocumentChunk = z.infer<typeof knowledgeDocumentChunk>;
+
 const knowledgeDocumentSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
   type: z.string(),
-  content: z.string(),
+  chunks: z.array(knowledgeDocumentChunk),
   size: z.number(),
   store: z.object({
     item_hash: z.string(),

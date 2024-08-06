@@ -33,7 +33,6 @@ const marked = new Marked(
 const renderedContent = ref('');
 
 async function updateContent(content: string) {
-  // content = DOMPurify.sanitize(content);
   renderedContent.value = DOMPurify.sanitize(await marked.parse(content));
 }
 
