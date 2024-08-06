@@ -24,7 +24,6 @@ export type Chat = {
   id: string;
   title: string;
   username: string;
-  tags: string[];
 
   modelId?: string;
   persona: UIPersona;

@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 import { defineStore } from 'pinia';
-import { chatTag } from 'src/utils/chat';
 import { chatsMigrations } from 'src/migrations/chats';
 import { Chat, MessageAttachment, UIMessage } from 'src/types/chats';
 import { UIPersona } from 'src/types/personas';
@@ -84,7 +83,6 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       const chat: Chat = {
         id,
         title,
-        tags: [chatTag(id)],
         username,
         modelId,
         persona,

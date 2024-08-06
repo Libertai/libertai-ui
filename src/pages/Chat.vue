@@ -184,7 +184,6 @@ async function generatePersonaMessage() {
   }
 
   const chatId = chatRef.value.id;
-  // const chatTags = chatRef.value.tags;
   const username = chatRef.value.username;
   const messages = JSON.parse(JSON.stringify(chatRef.value.messages));
   const persona = chatRef.value.persona;
