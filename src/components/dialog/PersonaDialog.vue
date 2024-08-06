@@ -1,7 +1,16 @@
 <template>
   <ltai-dialog
     :title="title"
-    @save="emit('savePersona', { ...basePersona, name, role, description, avatar: toRaw(avatar) })"
+    @save="
+      emit('savePersona', {
+        ...basePersona,
+        name,
+        role,
+        description,
+        avatar: toRaw(avatar),
+        knowledgeBases: toRaw(selectedKnowledgeBases),
+      })
+    "
   >
     <q-card-section horizontal>
       <q-card-section class="tw-my-auto">
@@ -21,6 +30,10 @@
       <span>Persona Description</span>
       <q-input v-model="description" autogrow bg-color="secondary" input-class="text-light" outlined type="textarea" />
     </q-card-section>
+    <q-card-section>
+      <span>Knowledge bases</span>
+      <knowledge-bases-selector v-model="selectedKnowledgeBases" />
+    </q-card-section>
   </ltai-dialog>
 </template>
 
@@ -29,6 +42,7 @@ import { PropType, ref, toRaw, watch } from 'vue';
 import AlephAvatar from 'components/AlephAvatar.vue';
 import { BasePersonaEdition, defaultBasePersona } from 'src/types/personas';
 import LtaiDialog from 'components/libertai/LtaiDialog.vue';
+import KnowledgeBasesSelector from 'components/select/KnowledgeBasesSelector.vue';
 
 const props = defineProps({
   title: {
@@ -48,6 +62,7 @@ const name = ref(props.basePersona.name);
 const role = ref(props.basePersona.role);
 const description = ref(props.basePersona.description);
 const avatar = ref(props.basePersona.avatar);
+const selectedKnowledgeBases = ref<string[]>([]);
 
 watch(
   () => props.basePersona.name,
@@ -64,5 +79,9 @@ watch(
 watch(
   () => props.basePersona.avatar,
   () => (avatar.value = props.basePersona.avatar),
+);
+watch(
+  () => props.basePersona.knowledgeBases,
+  () => (selectedKnowledgeBases.value = JSON.parse(JSON.stringify(props.basePersona.knowledgeBases))),
 );
 </script>

@@ -18,7 +18,6 @@
               allowEdit: true,
               hidden: false,
               id: uuidv4(),
-              knowledgeBases: [],
             });
           }
         "
@@ -166,6 +165,7 @@ const personaExportImportSchema = z.object({
       item_hash: z.string(),
       ipfs_hash: z.string(),
     }),
+    knowledgeBases: z.array(z.string()),
   }),
 });
 type PersonaExportImportSchema = z.infer<typeof personaExportImportSchema>;
@@ -178,6 +178,7 @@ const exportPersona = (persona: UIPersona) => {
       name: persona.name,
       role: persona.role,
       avatar: persona.avatar,
+      knowledgeBases: persona.knowledgeBases,
     },
   };
 
