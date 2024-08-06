@@ -21,8 +21,8 @@ const SECURITY_AGGREGATE_KEY = 'security';
 const MESSAGE = 'LibertAI';
 const LIBERTAI_CHANNEL = 'libertai-chat-ui';
 const LIBERTAI_SETTINGS_KEY = `${LIBERTAI_CHANNEL}-settings`;
-const LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY = `${LIBERTAI_CHANNEL}-knowledge-base-identifiers-test-4`;
-const LIBERTAI_KNOWLEDGE_BASE_POST_TYPE = `${LIBERTAI_CHANNEL}-knowledge-base-test-4`;
+const LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY = `${LIBERTAI_CHANNEL}-knowledge-base-identifiers-test-12`;
+const LIBERTAI_KNOWLEDGE_BASE_POST_TYPE = `${LIBERTAI_CHANNEL}-knowledge-base-test-12`;
 const BUFFER_ENCODING: BufferEncoding = 'hex';
 
 export class AlephPersistentStorage {
@@ -206,16 +206,29 @@ export class AlephPersistentStorage {
         channel: LIBERTAI_CHANNEL,
       });
 
-      const identifier = {
+      const identifier: KnowledgeBaseIdentifier = {
         id: kb.id,
         encryption: {
-          key: eciesEncrypt(this.encryptionPrivateKey.publicKey.toHex(), key).toString(BUFFER_ENCODING),
-          iv: eciesEncrypt(this.encryptionPrivateKey.publicKey.toHex(), iv).toString(BUFFER_ENCODING),
+          key: key.toString(),
+          iv: iv.toString(),
         },
         post_hash: response.item_hash,
       };
 
-      const newKbIdentifiers: KnowledgeBaseIdentifier[] = [...currentKbIdentifiers, identifier];
+      const newKbIdentifiers: KnowledgeBaseIdentifier[] = [...currentKbIdentifiers, identifier].map((kbIdentifier) => ({
+        ...kbIdentifier,
+        encryption: {
+          key: eciesEncrypt(
+            this.encryptionPrivateKey.publicKey.toHex(),
+            Buffer.from(kbIdentifier.encryption.key),
+          ).toString(BUFFER_ENCODING),
+          iv: eciesEncrypt(
+            this.encryptionPrivateKey.publicKey.toHex(),
+            Buffer.from(kbIdentifier.encryption.iv),
+          ).toString(BUFFER_ENCODING),
+        },
+      }));
+
       await this.subAccountClient.createAggregate({
         key: LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY,
         content: {

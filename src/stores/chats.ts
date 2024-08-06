@@ -79,7 +79,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       }
     },
 
-    createChat(title: string, username: string, modelId: string, persona: UIPersona): Chat {
+    createChat(title: string, username: string, modelId: string, persona: UIPersona, knowledgeBaseIds: string[]): Chat {
       const id = uuidv4();
       const chat: Chat = {
         id,
@@ -90,7 +90,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
         persona,
         messages: [],
         createdAt: new Date().toISOString(),
-        knowledgeBases: [],
+        knowledgeBases: knowledgeBaseIds,
       };
       this.chats.push(chat);
       return chat;
