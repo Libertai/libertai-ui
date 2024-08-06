@@ -102,6 +102,7 @@ function saveChatSettings(newChat: Chat) {
     username: newChat.username,
     modelId: newChat.modelId,
     persona: JSON.parse(JSON.stringify(newChat.persona)),
+    knowledgeBases: JSON.parse(JSON.stringify(newChat.knowledgeBases)),
   });
   router.go(0);
 }

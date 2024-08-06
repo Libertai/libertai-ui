@@ -34,6 +34,11 @@
             <span>Your name</span>
             <q-input v-model="username" bg-color="secondary" input-class="text-light q-px-sm" outlined></q-input>
           </q-card-section>
+
+          <q-card-section>
+            <span>Knowledge bases</span>
+            <knowledge-bases-selector v-model="selectedKnowledgeBases" />
+          </q-card-section>
         </q-card>
       </div>
       <div class="fixed-bottom absolute q-mb-xl tw-pb-1">
@@ -65,6 +70,7 @@ import ModelSelector from 'components/select/ModelSelector.vue';
 import { UIModel } from 'src/utils/models';
 import { UIPersona } from 'src/types/personas';
 import { SendMessageParams } from 'src/types/chats';
+import KnowledgeBasesSelector from 'components/select/KnowledgeBasesSelector.vue';
 
 const router = useRouter();
 
@@ -76,10 +82,11 @@ const settingsStore = useSettingsStore();
 
 const route = useRoute();
 
-// Inputs
+// Form values
 const selectedModel = ref<UIModel>(modelsStore.models[0]);
 const selectedPersona = ref<UIPersona>(personasStore.personas[0]);
 const username = ref(settingsStore.username);
+const selectedKnowledgeBases = ref<string[]>([]);
 
 watch(
   () => route.query.persona as string | undefined,
@@ -102,10 +109,12 @@ async function sendMessage({ content, attachments }: SendMessageParams) {
   // NOTE: this is a ref to the store, so we need to deep clone it
   const persona = JSON.parse(JSON.stringify(selectedPersona.value));
 
+  const knowledgeBaseIds = JSON.parse(JSON.stringify(selectedKnowledgeBases.value));
+
   // Creates the new chat
-  const chat = await chatsStore.createChat(title, username.value, selectedModel.value.id, persona);
+  const chat = chatsStore.createChat(title, username.value, selectedModel.value.id, persona, knowledgeBaseIds);
   // Append the first user message to the chat history
-  await chatsStore.appendUserMessage(chat.id, content, attachments);
+  chatsStore.appendUserMessage(chat.id, content, attachments);
 
   // Navigate to the chat page
   await router.push({ name: 'chat', params: { id: chat.id } });

@@ -28,6 +28,13 @@
         <model-selector :selected-model="selectedModel" @select-model="(model: UIModel) => (selectedModel = model)" />
       </div>
     </q-card-section>
+
+    <q-card-section>
+      <div class="tw-gap-2 tw-flex tw-flex-col tw-text-center">
+        <p>Knowledge bases</p>
+        <knowledge-bases-selector v-model="selectedKnowledgeBases" />
+      </div>
+    </q-card-section>
   </ltai-dialog>
 </template>
 
@@ -43,6 +50,7 @@ import { UIPersona } from 'src/types/personas';
 import PersonaDropdown from 'components/select/PersonaSelector.vue';
 import { usePersonasStore } from 'stores/personas';
 import LtaiDialog from 'components/libertai/LtaiDialog.vue';
+import KnowledgeBasesSelector from 'components/select/KnowledgeBasesSelector.vue';
 
 const { avatar } = useSettingsStore();
 const personasStore = usePersonasStore();
@@ -55,6 +63,7 @@ const emit = defineEmits<{ saveChat: [value: Chat] }>();
 const username = ref('');
 const selectedPersona = ref<UIPersona>(personasStore.personas[0]);
 const selectedModel = ref<UIModel>(modelsStore.models[0]);
+const selectedKnowledgeBases = ref<string[]>([]);
 
 watch(
   () => props.chat,
@@ -65,6 +74,7 @@ watch(
 
     username.value = newChat.username;
     selectedPersona.value = JSON.parse(JSON.stringify(newChat.persona));
+    selectedKnowledgeBases.value = JSON.parse(JSON.stringify(newChat.knowledgeBases));
 
     const model = modelsStore.models.find((m) => m.id === newChat.modelId);
     if (model !== undefined) {
@@ -79,6 +89,7 @@ const saveSettings = () => {
     username: username.value,
     modelId: selectedModel.value.id,
     persona: selectedPersona.value,
+    knowledgeBases: selectedKnowledgeBases.value,
   });
 };
 </script>
