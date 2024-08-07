@@ -220,7 +220,7 @@ async function generatePersonaMessage() {
 
     // Finding related knowledge document chunks
     if (knowledgeBaseIds.length > 0) {
-      const documents = knowledgeStore.getDocumentsFrom(knowledgeBaseIds);
+      const documents = knowledgeStore.getDocumentsFromBases(knowledgeBaseIds);
       const lastUserMessage = messages.findLast((message) => message.author === 'user')!;
       knowledgeSearchResults = await searchDocuments(lastUserMessage.content, documents);
     }

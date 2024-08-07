@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { KnowledgeBase, KnowledgeBaseIdentifier, KnowledgeDocument } from 'src/types/knowledge';
 import { useAccountStore } from 'stores/account';
+import { decryptFile } from 'src/utils/encryption';
 
 type KnowledgeStoreState = {
   knowledgeBases: KnowledgeBase[];
@@ -17,12 +18,39 @@ export const useKnowledgeStore = defineStore('knowledge', {
     isLoaded: false,
   }),
   getters: {
-    getDocumentsFrom: (state) => {
+    getDocumentsFromBases: (state) => {
       return (ids: string[]): KnowledgeDocument[] => {
         return state.knowledgeBases
           .filter((kb) => ids.includes(kb.id))
           .map((kb) => kb.documents)
           .flat();
+      };
+    },
+    getDocumentFile: (state) => {
+      return async (kbIdentifierId: string, documentId: string): Promise<File | undefined> => {
+        const { alephStorage } = useAccountStore();
+        if (alephStorage === null) {
+          return;
+        }
+
+        const document = state.knowledgeBases
+          .map((kb) => kb.documents)
+          .flat()
+          .find((document) => document.id === documentId);
+        if (!document) {
+          return;
+        }
+        const kbIdentifier = state.knowledgeBaseIdentifiers.find((kbi) => kbi.id === kbIdentifierId);
+        if (!kbIdentifier) {
+          return;
+        }
+
+        const encryptionKey = Buffer.from(kbIdentifier.encryption.key);
+        const encryptionIv = Buffer.from(kbIdentifier.encryption.iv);
+
+        const downloadedFile = await alephStorage.downloadFile(document.store.ipfs_hash);
+        const decryptedContent = decryptFile(downloadedFile, encryptionKey, encryptionIv);
+        return new File([decryptedContent], document.name, { type: document.type });
       };
     },
   },
