@@ -48,8 +48,8 @@ export class AlephPersistentStorage {
 
     const subAccount = importAccountFromPrivateKey(privateKey);
     const account = await getAccountFromProvider(window.ethereum);
-    const accountClient = new AuthenticatedAlephHttpClient(account);
-    const subAccountClient = new AuthenticatedAlephHttpClient(subAccount);
+    const accountClient = new AuthenticatedAlephHttpClient(account, process.env.ALEPH_API_URL);
+    const subAccountClient = new AuthenticatedAlephHttpClient(subAccount, process.env.ALEPH_API_URL);
 
     await AlephPersistentStorage.getSecurityPermission(account, subAccount, accountClient);
 
