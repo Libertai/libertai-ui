@@ -1,7 +1,8 @@
 <template>
   <q-select
     v-model="selectedKnowledgeBases"
-    :disable="!knowledgeStore.isLoaded"
+    :disable="!knowledgeStore.isLoaded || knowledgeStore.knowledgeBases.length === 0"
+    :label="knowledgeStore.knowledgeBases.length === 0 ? 'No knowledge base found' : undefined"
     :option-label="
       (option: KnowledgeBase | string) =>
         typeof option === 'string'
