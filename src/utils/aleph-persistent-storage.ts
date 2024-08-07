@@ -12,9 +12,8 @@ import {
   knowledgeSchema,
 } from 'src/types/knowledge';
 import { decrypt, encrypt, generateIv, generateKey } from 'src/utils/encryption';
-import { decrypt as eciesDecrypt, encrypt as eciesEncrypt, PrivateKey } from 'eciesjs';
-// @ts-ignore
-import { BufferEncoding } from 'vite-plugin-checker/dist/cjs/checkers/vueTsc/typescript-vue-tsc';
+import { PrivateKey } from 'eciesjs';
+import { decryptKnowledgeBaseIdentifiers, encryptKnowledgeBaseIdentifiers } from 'src/utils/knowledge/encryption';
 
 // Aleph keys and channels settings
 const SECURITY_AGGREGATE_KEY = 'security';
@@ -23,7 +22,6 @@ const LIBERTAI_CHANNEL = 'libertai-chat-ui';
 const LIBERTAI_SETTINGS_KEY = `${LIBERTAI_CHANNEL}-settings`;
 const LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY = `${LIBERTAI_CHANNEL}-knowledge-base-identifiers-test-12`;
 const LIBERTAI_KNOWLEDGE_BASE_POST_TYPE = `${LIBERTAI_CHANNEL}-knowledge-base-test-12`;
-const BUFFER_ENCODING: BufferEncoding = 'hex';
 
 export class AlephPersistentStorage {
   constructor(
@@ -171,18 +169,7 @@ export class AlephPersistentStorage {
         throw new Error(`Zod parsing failed: ${parsedKnowledgeBaseIdentifiers.error}`);
       }
 
-      return parsedKnowledgeBaseIdentifiers.data.data.map((kbIdentifier) => {
-        const decryptedKey = eciesDecrypt(
-          this.encryptionPrivateKey.secret,
-          Buffer.from(kbIdentifier.encryption.key, BUFFER_ENCODING),
-        ).toString();
-        const decryptedIv = eciesDecrypt(
-          this.encryptionPrivateKey.secret,
-          Buffer.from(kbIdentifier.encryption.iv, BUFFER_ENCODING),
-        ).toString();
-
-        return { ...kbIdentifier, encryption: { key: decryptedKey, iv: decryptedIv } };
-      });
+      return decryptKnowledgeBaseIdentifiers(parsedKnowledgeBaseIdentifiers.data.data, this.encryptionPrivateKey);
     } catch (error) {
       console.error(`Fetching Knowledge base identifiers from Aleph failed: ${error}`);
       return undefined;
@@ -215,28 +202,12 @@ export class AlephPersistentStorage {
         post_hash: response.item_hash,
       };
 
-      const newKbIdentifiers: KnowledgeBaseIdentifier[] = [...currentKbIdentifiers, identifier].map((kbIdentifier) => ({
-        ...kbIdentifier,
-        encryption: {
-          key: eciesEncrypt(
-            this.encryptionPrivateKey.publicKey.toHex(),
-            Buffer.from(kbIdentifier.encryption.key),
-          ).toString(BUFFER_ENCODING),
-          iv: eciesEncrypt(
-            this.encryptionPrivateKey.publicKey.toHex(),
-            Buffer.from(kbIdentifier.encryption.iv),
-          ).toString(BUFFER_ENCODING),
-        },
-      }));
+      const newKbIdentifiers = encryptKnowledgeBaseIdentifiers(
+        [...currentKbIdentifiers, identifier],
+        this.encryptionPrivateKey,
+      );
 
-      await this.subAccountClient.createAggregate({
-        key: LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY,
-        content: {
-          data: newKbIdentifiers,
-        },
-        address: this.account.address,
-        channel: LIBERTAI_CHANNEL,
-      });
+      await this.updateKnowledgeBaseIdentifiers(newKbIdentifiers);
       return identifier;
     } catch (error) {
       console.error(`Creating knowledge base failed: ${error}`);
@@ -289,32 +260,27 @@ export class AlephPersistentStorage {
         hashes: [kbIdentifier.post_hash],
       });
 
-      const newKbIdentifiers: KnowledgeBaseIdentifier[] = [
-        ...currentKbIdentifiers.filter((kbi) => kbi.id !== kbIdentifier.id),
-      ].map((kbi) => ({
-        ...kbi,
-        encryption: {
-          key: eciesEncrypt(this.encryptionPrivateKey.publicKey.toHex(), Buffer.from(kbi.encryption.key)).toString(
-            BUFFER_ENCODING,
-          ),
-          iv: eciesEncrypt(this.encryptionPrivateKey.publicKey.toHex(), Buffer.from(kbi.encryption.iv)).toString(
-            BUFFER_ENCODING,
-          ),
-        },
-      }));
+      const newKbIdentifiers = encryptKnowledgeBaseIdentifiers(
+        currentKbIdentifiers.filter((kbi) => kbi.id !== kbIdentifier.id),
+        this.encryptionPrivateKey,
+      );
 
-      await this.subAccountClient.createAggregate({
-        key: LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY,
-        content: {
-          data: newKbIdentifiers,
-        },
-        address: this.account.address,
-        channel: LIBERTAI_CHANNEL,
-      });
+      await this.updateKnowledgeBaseIdentifiers(newKbIdentifiers);
       return true;
     } catch (error) {
       console.error(`Deleting knowledge base failed: ${error}`);
       return false;
     }
+  }
+
+  private async updateKnowledgeBaseIdentifiers(kbIdentifiers: KnowledgeBaseIdentifier[]) {
+    return this.subAccountClient.createAggregate({
+      key: LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY,
+      content: {
+        data: kbIdentifiers,
+      },
+      address: this.account.address,
+      channel: LIBERTAI_CHANNEL,
+    });
   }
 }

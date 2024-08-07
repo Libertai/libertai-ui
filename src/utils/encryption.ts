@@ -1,9 +1,12 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+// @ts-ignore
+import { BufferEncoding } from 'vite-plugin-checker/dist/cjs/checkers/vueTsc/typescript-vue-tsc';
 
 // Global settings
 const ALGORITHM = 'aes-256-cbc';
 const INPUT_ENCODING = 'utf8';
 const OUTPUT_ENCODING = 'hex';
+export const BUFFER_ENCODING: BufferEncoding = 'hex';
 
 export const encrypt = (data: string, key: Buffer, iv: Buffer): string => {
   const cipher = createCipheriv(ALGORITHM, key, iv);
