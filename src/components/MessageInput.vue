@@ -63,7 +63,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { PropType, ref, watch } from 'vue';
 import { MessageAttachment, SendMessageParams } from 'src/types/chats';
 import { processAttachment } from 'src/utils/knowledge/attachments';
 import { useQuasar } from 'quasar';
@@ -79,7 +79,26 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  additionalAttachment: {
+    type: Object as PropType<File>,
+    default: undefined,
+  },
 });
+
+watch(
+  () => props.additionalAttachment,
+  async (additionalAttachmentFile: File | undefined) => {
+    if (!additionalAttachmentFile) {
+      return;
+    }
+    const attachmentData = await processAttachmentFile(additionalAttachmentFile);
+    if (!attachmentData) {
+      return;
+    }
+    attachments.value = attachments.value.concat([attachmentData]);
+  },
+  { immediate: true },
+);
 
 const $q = useQuasar();
 
@@ -95,18 +114,25 @@ const processMessageAttachments = async (event: any) => {
 
   await Promise.all(
     Array.from(target.files as FileList).map(async (file) => {
-      try {
-        const fileData = await processAttachment(file);
-        attachmentsData.push(fileData);
-      } catch (error) {
-        $q.notify({
-          message: (error as Error)?.message ?? 'File processing failed, please try again',
-          color: 'negative',
-        });
+      const attachment = await processAttachmentFile(file);
+      if (!attachment) {
+        return;
       }
+      attachmentsData.push(attachment);
     }),
   );
   attachments.value = attachments.value.concat(attachmentsData);
+};
+
+const processAttachmentFile = async (file: File): Promise<MessageAttachment | undefined> => {
+  try {
+    return await processAttachment(file);
+  } catch (error) {
+    $q.notify({
+      message: (error as Error)?.message ?? 'File processing failed, please try again',
+      color: 'negative',
+    });
+  }
 };
 
 const removeAttachment = (attachmentId: string) => {

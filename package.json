@@ -3,7 +3,11 @@
   "version": "0.0.1",
   "description": "A UI for decentralized AI",
   "productName": "Libertai UI",
-  "author": "david.amelekh@protonmail.com",
+  "author": "LibertAI Team",
+  "contributors": [
+    "David Amelekh <david.amelekh@protonmail.com>",
+    "Reza Rahemtola <RezaRahemtola@users.noreply.github.com>"
+  ],
   "private": true,
   "license": "MIT",
   "engines": {

@@ -63,8 +63,16 @@
         <p class="tw-font-bold tw-text-base">{{ document.name }}</p>
         <div class="tw-ml-auto tw-flex tw-items-center tw-gap-4">
           <p class="max-sm:tw-hidden">{{ filesize(document.size, { round: 0 }) }}</p>
-          <q-btn class="tw-w-10 tw-h-10" disable unelevated>
+          <q-btn
+            :disable="document.size > MAX_ATTACHMENT_SIZE"
+            class="tw-w-10 tw-h-10"
+            unelevated
+            @click="chatWithDocument(document)"
+          >
             <ltai-icon name="svguse:icons.svg#chat" />
+            <q-tooltip v-if="document.size > MAX_ATTACHMENT_SIZE">
+              Document is too big to be used as chat attachment
+            </q-tooltip>
           </q-btn>
 
           <q-btn class="tw-w-10 tw-h-10" unelevated @click="downloadDocument(document)">
@@ -163,6 +171,7 @@ import { processDocument } from 'src/utils/knowledge/document';
 import { decryptFile, encryptFile } from 'src/utils/encryption';
 import KnowledgeBaseRenameDialog from 'components/dialog/KnowledgeBaseRenameDialog.vue';
 import { supportedInputFiles } from 'src/utils/knowledge/parsing';
+import { MAX_ATTACHMENT_SIZE } from 'src/utils/knowledge/attachments';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -363,5 +372,18 @@ const deleteKnowledgeBase = async () => {
   }
 
   await router.push({ path: '/knowledge-base' });
+};
+
+const chatWithDocument = async (document: KnowledgeDocument) => {
+  if (knowledgeBaseIdentifierRef.value === undefined) {
+    return;
+  }
+
+  await router.push({
+    path: '/new',
+    query: {
+      knowledgeDocumentAttachment: `${knowledgeBaseIdentifierRef.value.id},${document.id}`,
+    },
+  });
 };
 </script>
