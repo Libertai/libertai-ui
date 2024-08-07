@@ -4,31 +4,29 @@ A UI for decentralized AI
 
 ## Install the dependencies
 
-```bash
-npm i
+```sh
+npm install
 ```
+
+> Don't forget to also fill environment variables in a `.env` file. You can use [`.env.example`](.env.example) as an
+> inspiration.
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
 
-```bash
-quasar dev
+```sh
+npm run dev
 ```
 
-### Lint the files
+### Format and lint the files
 
-```bash
-npm run lint
-```
-
-### Format the files
-
-```bash
+```sh
 npm run format
+npm run lint
 ```
 
 ### Build the app for production
 
-```bash
+```sh
 npm run build
 ```
 

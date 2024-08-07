@@ -2,7 +2,7 @@ import mime from 'mime';
 import * as pdfjs from 'pdfjs-dist';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
 
-export const supportedInputFiles = ['.txt', '.md', '.pdf', '.py'].join(',');
+export const supportedInputFiles = ['.txt', '.md', '.pdf'].join(',');
 
 const extractTextFromPdfFile = async (file: File): Promise<string> => {
   const pdfUrl = URL.createObjectURL(file);
