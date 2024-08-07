@@ -1,5 +1,5 @@
 <template>
-  <section class="max-sm:tw-mx-4 md:tw-mx-10 tw-my-5">
+  <section class="max-sm:tw-mx-4 sm:tw-mx-10 tw-my-5">
     <h4 class="text-h4 text-semibold tw-mb-5">Knowledge base</h4>
     <p>Manage your knowledge bases</p>
     <div class="tw-mt-4 tw-mb-8 tw-flex md:tw-justify-end">

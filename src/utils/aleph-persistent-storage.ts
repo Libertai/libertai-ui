@@ -118,13 +118,12 @@ export class AlephPersistentStorage {
 
   async saveSettings(content: object) {
     try {
-      const message = await this.subAccountClient.createAggregate({
+      await this.subAccountClient.createAggregate({
         key: LIBERTAI_SETTINGS_KEY,
         content,
         address: this.account.address,
         channel: LIBERTAI_CHANNEL,
       });
-      console.log(`Settings saved on Aleph with hash ${message.item_hash}`);
     } catch (error) {
       console.error(`Saving settings on Aleph failed: ${error}`);
     }
@@ -191,6 +190,7 @@ export class AlephPersistentStorage {
         content: encryptedKb,
         address: this.account.address,
         channel: LIBERTAI_CHANNEL,
+        storageEngine: ItemType.storage,
       });
 
       const identifier: KnowledgeBaseIdentifier = {
@@ -228,6 +228,7 @@ export class AlephPersistentStorage {
         content: encryptedKb,
         address: this.account.address,
         channel: LIBERTAI_CHANNEL,
+        storageEngine: ItemType.storage,
       });
     } catch (error) {
       console.error(`Update of knowledge base ${knowledgeBase.id} failed: ${error}`);

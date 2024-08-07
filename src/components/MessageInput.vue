@@ -53,7 +53,7 @@
     <!-- Hidden attachments upload -->
     <input
       ref="messageAttachmentsUpload"
-      accept=".txt,.md,.pdf"
+      :accept="supportedInputFiles"
       hidden
       multiple
       type="file"
@@ -64,10 +64,11 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { processAttachment } from 'src/utils/knowledge/attachments';
 import { MessageAttachment, SendMessageParams } from 'src/types/chats';
+import { processAttachment } from 'src/utils/knowledge/attachments';
 import { useQuasar } from 'quasar';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import { supportedInputFiles } from 'src/utils/knowledge/parsing';
 
 const props = defineProps({
   isLoading: {
