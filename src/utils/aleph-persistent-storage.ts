@@ -279,4 +279,42 @@ export class AlephPersistentStorage {
       return undefined;
     }
   }
+
+  async deleteKnowledgeBase(
+    kbIdentifier: KnowledgeBaseIdentifier,
+    currentKbIdentifiers: KnowledgeBaseIdentifier[],
+  ): Promise<boolean> {
+    try {
+      await this.subAccountClient.forget({
+        hashes: [kbIdentifier.post_hash],
+      });
+
+      const newKbIdentifiers: KnowledgeBaseIdentifier[] = [
+        ...currentKbIdentifiers.filter((kbi) => kbi.id !== kbIdentifier.id),
+      ].map((kbi) => ({
+        ...kbi,
+        encryption: {
+          key: eciesEncrypt(this.encryptionPrivateKey.publicKey.toHex(), Buffer.from(kbi.encryption.key)).toString(
+            BUFFER_ENCODING,
+          ),
+          iv: eciesEncrypt(this.encryptionPrivateKey.publicKey.toHex(), Buffer.from(kbi.encryption.iv)).toString(
+            BUFFER_ENCODING,
+          ),
+        },
+      }));
+
+      await this.subAccountClient.createAggregate({
+        key: LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY,
+        content: {
+          data: newKbIdentifiers,
+        },
+        address: this.account.address,
+        channel: LIBERTAI_CHANNEL,
+      });
+      return true;
+    } catch (error) {
+      console.error(`Deleting knowledge base failed: ${error}`);
+      return false;
+    }
+  }
 }
