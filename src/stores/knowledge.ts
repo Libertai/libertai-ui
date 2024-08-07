@@ -79,5 +79,41 @@ export const useKnowledgeStore = defineStore('knowledge', {
         return knowledgeBase;
       });
     },
+
+    async deleteKnowledgeDocument(
+      document: KnowledgeDocument,
+      knowledgeBase: KnowledgeBase,
+      kbIdentifier: KnowledgeBaseIdentifier,
+      updateKnowledgeBase: boolean = true,
+    ) {
+      const { alephStorage } = useAccountStore();
+      if (alephStorage === null) {
+        return;
+      }
+
+      await alephStorage.deleteFile(document.store.item_hash);
+      if (updateKnowledgeBase) {
+        await this.updateKnowledgeBase(knowledgeBase, kbIdentifier);
+      }
+    },
+
+    async deleteKnowledgeBase(knowledgeBase: KnowledgeBase, kbIdentifier: KnowledgeBaseIdentifier): Promise<boolean> {
+      const { alephStorage } = useAccountStore();
+      if (alephStorage === null) {
+        return false;
+      }
+      knowledgeBase.documents.forEach((document) => {
+        this.deleteKnowledgeDocument(document, knowledgeBase, kbIdentifier, false);
+      });
+
+      const success = await alephStorage.deleteKnowledgeBase(kbIdentifier, this.knowledgeBaseIdentifiers);
+
+      if (!success) {
+        return success;
+      }
+      this.knowledgeBases = this.knowledgeBases.filter((kb) => kb.id !== knowledgeBase.id);
+      this.knowledgeBaseIdentifiers = this.knowledgeBaseIdentifiers.filter((kbi) => kbi.id !== kbIdentifier.id);
+      return success;
+    },
   },
 });

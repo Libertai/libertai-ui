@@ -4,7 +4,31 @@
       <ltai-icon name="svguse:icons.svg#arrow-left" />
     </q-btn>
     <div>
-      <h4 class="text-h4 text-semibold">{{ knowledgeBaseRef.name }}</h4>
+      <div class="tw-flex tw-space-x-4">
+        <h4 class="text-h4 text-semibold">{{ knowledgeBaseRef.name }}</h4>
+
+        <q-btn-dropdown class="tw-p-1" dropdown-icon="more_horiz" unelevated>
+          <q-list>
+            <q-item v-close-popup clickable @click="showRenameKnowledgeBase = true">
+              <q-item-section avatar>
+                <ltai-icon class="tw-mx-auto" name="svguse:icons.svg#pencil" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Rename</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item v-close-popup clickable @click="showDeleteKnowledgeBaseConfirmation = true">
+              <q-item-section avatar>
+                <ltai-icon class="tw-mx-auto" name="svguse:icons.svg#delete" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Delete</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+      </div>
+
       <div class="tw-mt-4 tw-flex md:tw-justify-end">
         <q-btn
           class="border-primary-highlight"
@@ -81,7 +105,8 @@
           </q-btn-dropdown>
         </div>
       </div>
-      <!-- Dialogs-->
+
+      <!-- Document dialogs-->
       <knowledge-base-rename-document-dialog
         v-model="showRenameDocument"
         :name="selectedDocument?.name ?? ''"
@@ -93,7 +118,23 @@
         @save="deleteDocument(selectedDocument!)"
       >
         <q-card-section class="row">
-          <span>Are you sure you want to delete the the document {{ selectedDocument!.name }}?</span>
+          <span>Are you sure you want to delete the document {{ selectedDocument!.name }}?</span>
+        </q-card-section>
+      </ltai-dialog>
+
+      <!-- Knowledge base dialogs -->
+      <knowledge-base-rename-dialog
+        v-model="showRenameKnowledgeBase"
+        :name="knowledgeBaseRef.name"
+        @save="(newName: string) => renameKnowledgeBase(newName)"
+      />
+      <ltai-dialog
+        v-model="showDeleteKnowledgeBaseConfirmation"
+        title="Delete knowledge base"
+        @save="deleteKnowledgeBase"
+      >
+        <q-card-section class="row">
+          <span>Are you sure you want to delete the knowledge base "{{ knowledgeBaseRef.name }}" ?</span>
         </q-card-section>
       </ltai-dialog>
     </div>
@@ -113,6 +154,7 @@ import LtaiDialog from 'components/libertai/LtaiDialog.vue';
 import KnowledgeBaseRenameDocumentDialog from 'components/dialog/KnowledgeBaseRenameDocumentDialog.vue';
 import { processDocument } from 'src/utils/knowledge/document';
 import { decryptFile, encryptFile } from 'src/utils/encryption';
+import KnowledgeBaseRenameDialog from 'components/dialog/KnowledgeBaseRenameDialog.vue';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -125,6 +167,8 @@ const knowledgeStore = useKnowledgeStore();
 const knowledgeBaseRef = ref<KnowledgeBase | undefined>(undefined);
 const knowledgeBaseIdentifierRef = ref<KnowledgeBaseIdentifier | undefined>(undefined);
 const selectedDocument = ref<KnowledgeDocument | undefined>(undefined);
+const showRenameKnowledgeBase = ref(false);
+const showDeleteKnowledgeBaseConfirmation = ref(false);
 const showRenameDocument = ref(false);
 const showDeleteDocumentConfirmation = ref(false);
 
@@ -228,11 +272,7 @@ const downloadDocument = async (document: KnowledgeDocument) => {
 };
 
 const renameDocument = async (document: KnowledgeDocument, newName: string) => {
-  if (
-    knowledgeBaseRef.value === undefined ||
-    knowledgeBaseIdentifierRef.value === undefined ||
-    accountStore.alephStorage === null
-  ) {
+  if (knowledgeBaseRef.value === undefined || knowledgeBaseIdentifierRef.value === undefined) {
     return;
   }
 
@@ -256,6 +296,23 @@ const renameDocument = async (document: KnowledgeDocument, newName: string) => {
 };
 
 const deleteDocument = async (document: KnowledgeDocument) => {
+  if (knowledgeBaseRef.value === undefined || knowledgeBaseIdentifierRef.value === undefined) {
+    return;
+  }
+
+  try {
+    await knowledgeStore.deleteKnowledgeDocument(document, knowledgeBaseRef.value, knowledgeBaseIdentifierRef.value);
+
+    knowledgeBaseRef.value.documents = knowledgeBaseRef.value.documents.filter((d) => d.id !== document.id);
+  } catch (error) {
+    $q.notify({
+      message: (error as Error)?.message ?? 'Document deletion failed, please try again',
+      color: 'negative',
+    });
+  }
+};
+
+const renameKnowledgeBase = async (newName: string) => {
   if (
     knowledgeBaseRef.value === undefined ||
     knowledgeBaseIdentifierRef.value === undefined ||
@@ -265,18 +322,38 @@ const deleteDocument = async (document: KnowledgeDocument) => {
   }
 
   try {
-    await accountStore.alephStorage.deleteFile(document.store.item_hash);
-
-    knowledgeBaseRef.value.documents = knowledgeBaseRef.value.documents.filter((d) => d.id !== document.id);
     await knowledgeStore.updateKnowledgeBase(
-      JSON.parse(JSON.stringify(knowledgeBaseRef.value)),
+      JSON.parse(JSON.stringify({ ...knowledgeBaseRef.value, name: newName })),
       knowledgeBaseIdentifierRef.value,
     );
+
+    knowledgeBaseRef.value.name = newName;
   } catch (error) {
     $q.notify({
-      message: (error as Error)?.message ?? 'Document deletion failed, please try again',
+      message: (error as Error)?.message ?? 'Knowledge base renaming failed, please try again',
       color: 'negative',
     });
   }
+};
+
+const deleteKnowledgeBase = async () => {
+  if (
+    knowledgeBaseRef.value === undefined ||
+    knowledgeBaseIdentifierRef.value === undefined ||
+    accountStore.alephStorage === null
+  ) {
+    return;
+  }
+
+  const success = await knowledgeStore.deleteKnowledgeBase(knowledgeBaseRef.value, knowledgeBaseIdentifierRef.value);
+  if (!success) {
+    $q.notify({
+      message: 'Knowledge base deletion failed, please try again',
+      color: 'negative',
+    });
+    return;
+  }
+
+  await router.push({ path: '/knowledge-base' });
 };
 </script>

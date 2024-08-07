@@ -121,6 +121,7 @@ import dayjs from 'dayjs';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 import { searchDocuments } from 'src/utils/knowledge/embedding';
 import { useKnowledgeStore } from 'stores/knowledge';
+import { KnowledgeSearchResult } from 'src/types/knowledge';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -215,24 +216,17 @@ async function generatePersonaMessage() {
     // Set loading state
     isLoadingRef.value = true;
 
-    let searchResultMessages: Message[] = [];
+    let knowledgeSearchResults: KnowledgeSearchResult[] = [];
 
     // Finding related knowledge document chunks
     if (knowledgeBaseIds.length > 0) {
       const documents = knowledgeStore.getDocumentsFrom(knowledgeBaseIds);
       const lastUserMessage = messages.findLast((message) => message.author === 'user')!;
-      const searchResults = await searchDocuments(lastUserMessage.content, documents);
-      console.log(searchResults);
-      searchResultMessages = searchResults.map(
-        (result): Message => ({
-          role: 'search-result',
-          content: result.content,
-        }),
-      );
+      knowledgeSearchResults = await searchDocuments(lastUserMessage.content, documents);
     }
 
     // Expand all the messages to inline any compatible attachments
-    const expandedMessages = messages
+    const allMessages = messages
       .map((message: UIMessage): Message[] => {
         const ret = [];
         // Push any attachments as messages ahead of the message itself
@@ -249,11 +243,15 @@ async function generatePersonaMessage() {
       })
       .flat();
 
-    // Append the search results to the messages
-    const allMessages: Message[] = [...expandedMessages, ...searchResultMessages];
-
     // Generate a stream of responses from the AI
-    for await (const output of inferenceEngine.generateAnswer(allMessages, model, persona, username, false)) {
+    for await (const output of inferenceEngine.generateAnswer(
+      allMessages,
+      model,
+      persona,
+      knowledgeSearchResults.map((result) => result.content),
+      username,
+      false,
+    )) {
       const stopped = output.stopped;
       let content = output.content;
       if (!stopped) {

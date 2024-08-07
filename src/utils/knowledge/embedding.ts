@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import { MarkdownTextSplitter, RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { KnowledgeDocument, KnowledgeDocumentChunk, KnowledgeSearchResult } from 'src/types/knowledge';
 import { distance } from 'ml-distance';
 
@@ -7,15 +7,12 @@ const DEFAULT_EMBEDDING_API_URL =
   'https://curated.aleph.cloud/vm/ee1b2a8e5bd645447739d8b234ef495c9a2b4d0b98317d510a3ccf822808ebe5/embedding';
 
 export const generateChunks = async (
+  fileType: string,
   content: string,
-  chunkSize = 500,
-  overlapSize = 100,
+  chunkSize: number = 500,
+  chunkOverlap: number = 100,
 ): Promise<KnowledgeDocumentChunk[]> => {
-  const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: chunkSize,
-    chunkOverlap: overlapSize,
-    separators: ['\n\n---\n\n', '\n\n', '\n', ' '],
-  });
+  const splitter = getTextSplitter(fileType, chunkSize, chunkOverlap);
 
   // Split into a list of LangChain documents
   const documentChunks = await splitter.createDocuments(
@@ -38,6 +35,23 @@ export const generateChunks = async (
   }
 
   return result;
+};
+
+const getTextSplitter = (
+  fileType: string,
+  chunkSize: number,
+  chunkOverlap: number,
+): MarkdownTextSplitter | RecursiveCharacterTextSplitter => {
+  switch (fileType) {
+    case 'text/markdown':
+      return new MarkdownTextSplitter();
+    default:
+      return new RecursiveCharacterTextSplitter({
+        chunkSize,
+        chunkOverlap,
+        separators: ['\n\n---\n\n', '\n\n', '\n', ' '],
+      });
+  }
 };
 
 export const searchDocuments = async (
@@ -67,7 +81,7 @@ export const searchDocuments = async (
 
 async function embed(content: string): Promise<number[]> {
   const tries = 3;
-  let timeout = 1000;
+  const timeout = 1000;
 
   const errors = [];
   for (let i = 0; i < tries; i++) {
@@ -81,7 +95,6 @@ async function embed(content: string): Promise<number[]> {
       errors.push(error);
       console.error(`Error embedding text: ${error}`);
       await new Promise((resolve) => setTimeout(resolve, timeout));
-      timeout *= 2;
     }
   }
   return [];
