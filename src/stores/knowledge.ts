@@ -93,7 +93,11 @@ export const useKnowledgeStore = defineStore('knowledge', {
 
       await alephStorage.deleteFile(document.store.item_hash);
       if (updateKnowledgeBase) {
-        await this.updateKnowledgeBase(knowledgeBase, kbIdentifier);
+        const newKnowledgeBase: KnowledgeBase = {
+          ...knowledgeBase,
+          documents: knowledgeBase.documents.filter((d) => d.id !== document.id),
+        };
+        await this.updateKnowledgeBase(newKnowledgeBase, kbIdentifier);
       }
     },
 

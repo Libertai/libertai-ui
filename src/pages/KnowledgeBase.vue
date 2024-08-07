@@ -1,5 +1,5 @@
 <template>
-  <section v-if="knowledgeBaseRef" class="max-sm:tw-mx-4 md:tw-mx-10 tw-space-y-4 tw-my-5">
+  <section v-if="knowledgeBaseRef" class="max-sm:tw-mx-4 sm:tw-mx-10 tw-space-y-4 tw-my-5">
     <q-btn class="tw-w-10 tw-h-10" to="/knowledge-base" unelevated>
       <ltai-icon name="svguse:icons.svg#arrow-left" />
     </q-btn>
@@ -41,7 +41,14 @@
           <span>Upload document</span>
         </q-btn>
         <!-- Hidden document upload -->
-        <input ref="documentUpload" accept=".txt,.md,.pdf" hidden multiple type="file" @change="uploadDocuments" />
+        <input
+          ref="documentUpload"
+          :accept="supportedInputFiles"
+          hidden
+          multiple
+          type="file"
+          @change="uploadDocuments"
+        />
       </div>
     </div>
 
@@ -55,7 +62,7 @@
 
         <p class="tw-font-bold tw-text-base">{{ document.name }}</p>
         <div class="tw-ml-auto tw-flex tw-items-center tw-gap-4">
-          <p>{{ filesize(document.size, { round: 0 }) }}</p>
+          <p class="max-sm:tw-hidden">{{ filesize(document.size, { round: 0 }) }}</p>
           <q-btn class="tw-w-10 tw-h-10" disable unelevated>
             <ltai-icon name="svguse:icons.svg#chat" />
           </q-btn>
@@ -155,6 +162,7 @@ import KnowledgeBaseRenameDocumentDialog from 'components/dialog/KnowledgeBaseRe
 import { processDocument } from 'src/utils/knowledge/document';
 import { decryptFile, encryptFile } from 'src/utils/encryption';
 import KnowledgeBaseRenameDialog from 'components/dialog/KnowledgeBaseRenameDialog.vue';
+import { supportedInputFiles } from 'src/utils/knowledge/parsing';
 
 const $q = useQuasar();
 const route = useRoute();
