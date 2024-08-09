@@ -11,7 +11,7 @@
 const { configure } = require('quasar/wrappers');
 const { nodePolyfills } = require('vite-plugin-node-polyfills');
 
-module.exports = configure(function (/* ctx */) {
+module.exports = configure(function (ctx) {
   return {
     eslint: {
       // fix: true,
@@ -71,10 +71,9 @@ module.exports = configure(function (/* ctx */) {
           viteConf.plugins = [];
         }
         viteConf.plugins = [...viteConf.plugins, nodePolyfills()];
-        viteConf.define = {
-          ...viteConf.define,
-          'process.browser': true,
-        };
+        if (ctx.dev) {
+          viteConf.define['process.browser'] = true;
+        }
       },
 
       // vueRouterBase,
