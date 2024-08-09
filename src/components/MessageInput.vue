@@ -32,7 +32,7 @@
           color="white"
           dense
           flat
-          icon="img:icons/svg/attachment.svg"
+          icon="img:icons/attachment.svg"
           round
           @click="($refs.messageAttachmentsUpload as any).click()"
         >
@@ -41,7 +41,9 @@
       </template>
       <template #append>
         <!--<q-btn round dense flat icon="img:icons/mic.svg" @click="sendMessage" color="" class="" />-->
-        <q-btn dense flat icon="img:icons/send.svg" round @click="sendMessage" />
+        <q-btn dense flat round @click="sendMessage">
+          <ltai-icon dark-color="purple-700" light-color="purple-700" name="svguse:icons.svg#send" />
+        </q-btn>
       </template>
 
       <template v-if="hint !== ''" #hint>
@@ -51,7 +53,7 @@
     <!-- Hidden attachments upload -->
     <input
       ref="messageAttachmentsUpload"
-      accept=".txt,.md,.pdf"
+      :accept="supportedInputFiles"
       hidden
       multiple
       type="file"
@@ -61,10 +63,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { processFile } from 'src/utils/attachments';
+import { PropType, ref, watch } from 'vue';
 import { MessageAttachment, SendMessageParams } from 'src/types/chats';
+import { processAttachment } from 'src/utils/knowledge/attachments';
 import { useQuasar } from 'quasar';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import { supportedInputFiles } from 'src/utils/knowledge/parsing';
 
 const props = defineProps({
   isLoading: {
@@ -75,7 +79,26 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  additionalAttachment: {
+    type: Object as PropType<File>,
+    default: undefined,
+  },
 });
+
+watch(
+  () => props.additionalAttachment,
+  async (additionalAttachmentFile: File | undefined) => {
+    if (!additionalAttachmentFile) {
+      return;
+    }
+    const attachmentData = await processAttachmentFile(additionalAttachmentFile);
+    if (!attachmentData) {
+      return;
+    }
+    attachments.value = attachments.value.concat([attachmentData]);
+  },
+  { immediate: true },
+);
 
 const $q = useQuasar();
 
@@ -91,18 +114,25 @@ const processMessageAttachments = async (event: any) => {
 
   await Promise.all(
     Array.from(target.files as FileList).map(async (file) => {
-      try {
-        const fileData = await processFile(file);
-        attachmentsData.push(fileData);
-      } catch (error) {
-        $q.notify({
-          message: (error as Error)?.message ?? 'File processing failed, please try again',
-          color: 'negative',
-        });
+      const attachment = await processAttachmentFile(file);
+      if (!attachment) {
+        return;
       }
+      attachmentsData.push(attachment);
     }),
   );
   attachments.value = attachments.value.concat(attachmentsData);
+};
+
+const processAttachmentFile = async (file: File): Promise<MessageAttachment | undefined> => {
+  try {
+    return await processAttachment(file);
+  } catch (error) {
+    $q.notify({
+      message: (error as Error)?.message ?? 'File processing failed, please try again',
+      color: 'negative',
+    });
+  }
 };
 
 const removeAttachment = (attachmentId: string) => {

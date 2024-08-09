@@ -9,16 +9,14 @@
       unelevated
       @click="connect({ connector: config.connectors[0] })"
     >
-      <q-icon class="text-dark" left size="xs">
-        <img alt="wallet" src="~assets/wallet.svg" />
-      </q-icon>
+      <ltai-icon dark-color="white" left light-color="white" name="svguse:icons.svg#wallet" size="xs" />
       Connect Wallet
     </q-btn>
     <q-btn-dropdown
       v-else
       :label="`${account.address.value?.slice(0, 4)}...${account.address.value?.slice(-2)}`"
       class="border-primary-highlight gt-sm"
-      icon="img:icons/svg/avatar.svg"
+      icon="img:icons/avatar.svg"
       no-caps
       rounded
       text-color="primary"
@@ -51,6 +49,7 @@ import { useAccount, useConnect, useDisconnect } from '@wagmi/vue';
 import { watchAccount } from '@wagmi/vue/actions';
 import { config } from 'src/config/wagmi';
 import { watchEffect } from 'vue';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 
 const accountStore = useAccountStore();
 

@@ -3,7 +3,7 @@
     :icon="'img:' + getPersonaAvatarUrl(selectedPersona.avatar.ipfs_hash)"
     :label="selectedPersona.name"
     class="no-shadow rounded-img personas-dropdown q-py-sm icon-md"
-    dropdown-icon="img:icons/svg/chevron-down.svg"
+    dropdown-icon="img:icons/chevron-down.svg"
     no-caps
     rounded
     text-color="primary"

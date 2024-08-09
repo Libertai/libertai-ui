@@ -3,21 +3,22 @@
     <h4 class="text-h4 text-semibold tw-mb-5">Persona Management</h4>
     <p>Click on a persona to edit</p>
     <div class="tw-my-4 tw-flex md:tw-justify-end">
-      <q-btn
-        icon="img:icons/svg/add.svg"
-        label="Create persona"
-        no-caps
-        rounded
-        unelevated
-        @click="createPersona = true"
-      />
+      <q-btn no-caps rounded unelevated @click="createPersona = true">
+        <ltai-icon left name="svguse:icons.svg#add" />
+        <span>Create persona</span>
+      </q-btn>
       <persona-dialog
         v-model="createPersona"
         :base-persona="basePersonaCreate"
         title="Create persona"
         @save-persona="
           (persona: BasePersonaEdition) => {
-            personasStore.personas.push({ ...persona, allowEdit: true, hidden: false, id: uuidv4() });
+            personasStore.personas.push({
+              ...persona,
+              allowEdit: true,
+              hidden: false,
+              id: uuidv4(),
+            });
           }
         "
       />
@@ -41,13 +42,13 @@
       <input ref="importPersonaUpload" accept="*.json" hidden type="file" @change="importPersona" />
       <q-btn
         :disabled="accountStore.ltaiBalance < 100"
-        icon="img:icons/svg/import.svg"
-        label="Import persona"
         no-caps
         rounded
         unelevated
         @click="($refs['importPersonaUpload'] as any).click()"
       >
+        <ltai-icon left name="svguse:icons.svg#import" />
+        <span>Import persona</span>
         <q-tooltip v-if="tokenGatingMessage !== undefined">{{ tokenGatingMessage }}</q-tooltip>
       </q-btn>
     </div>
@@ -69,45 +70,32 @@
 
         <div class="tw-grid tw-grid-cols-5 tw-gap-x-4 tw-w-40 tw-mx-auto">
           <q-btn unelevated @click="startChatWithPersona(persona)">
-            <q-icon size="xs">
-              <img alt="new chat" src="/icons/svg/chat.svg" />
-            </q-icon>
+            <ltai-icon name="svguse:icons.svg#chat" size="xs" />
             <q-tooltip>New chat</q-tooltip>
           </q-btn>
 
           <q-btn :disabled="!persona.allowEdit" unelevated @click="startEditingPersona(persona)">
-            <q-icon size="xs">
-              <img :src="`icons/svg/settings.svg`" alt="settings" />
-            </q-icon>
+            <ltai-icon name="svguse:icons.svg#settings" size="xs" />
             <q-tooltip>Edit persona</q-tooltip>
           </q-btn>
 
           <q-btn :disabled="accountStore.ltaiBalance < 100" unelevated @click="exportPersona(persona)">
-            <q-icon size="xs">
-              <img alt="export" src="/icons/svg/download.svg" />
-            </q-icon>
+            <ltai-icon name="svguse:icons.svg#download" size="xs" />
             <q-tooltip v-if="tokenGatingMessage === undefined">Export</q-tooltip>
             <q-tooltip v-else>{{ `Export (${tokenGatingMessage})` }}</q-tooltip>
           </q-btn>
 
           <q-btn v-if="persona.allowEdit" unelevated @click="deletePersona(persona)">
-            <q-icon size="xs">
-              <img alt="delete" src="/icons/svg/delete.svg" />
-            </q-icon>
+            <ltai-icon name="svguse:icons.svg#delete" size="xs" />
             <q-tooltip>Delete</q-tooltip>
           </q-btn>
           <q-btn v-else unelevated @click="reversePersonaVisibility(persona)">
-            <q-icon size="xs">
-              <img v-if="persona.hidden" alt="hide" src="/icons/svg/show.svg" />
-              <img v-else alt="hide" src="/icons/svg/hide.svg" />
-            </q-icon>
+            <ltai-icon :name="`svguse:icons.svg#${persona.hidden ? 'eye' : 'eye-slash'}`" size="xs" />
             <q-tooltip>Hide</q-tooltip>
           </q-btn>
 
           <q-btn unelevated @click="duplicatePersona(persona)">
-            <q-icon size="xs">
-              <img alt="duplicate" src="/icons/svg/duplicate.svg" />
-            </q-icon>
+            <ltai-icon name="svguse:icons.svg#duplicate" size="xs" />
             <q-tooltip>Duplicate</q-tooltip>
           </q-btn>
         </div>
@@ -128,6 +116,7 @@ import { exportFile } from 'quasar';
 import { getTokenGatingMessage } from 'src/utils/messages';
 import { z } from 'zod';
 import { BasePersonaEdition, UIPersona } from 'src/types/personas';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 
 const personasStore = usePersonasStore();
 const accountStore = useAccountStore();
@@ -176,6 +165,7 @@ const personaExportImportSchema = z.object({
       item_hash: z.string(),
       ipfs_hash: z.string(),
     }),
+    knowledgeBases: z.array(z.string()),
   }),
 });
 type PersonaExportImportSchema = z.infer<typeof personaExportImportSchema>;
@@ -188,6 +178,7 @@ const exportPersona = (persona: UIPersona) => {
       name: persona.name,
       role: persona.role,
       avatar: persona.avatar,
+      knowledgeBases: persona.knowledgeBases,
     },
   };
 

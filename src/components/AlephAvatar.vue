@@ -63,7 +63,7 @@ const emit = defineEmits(['editAvatar']);
   top: 0;
   bottom: 0;
   width: 100%;
-  background: url('/icons/svg/edit.svg') center no-repeat;
+  background: url('/icons/edit.svg') center no-repeat;
   background-size: 25px;
 }
 

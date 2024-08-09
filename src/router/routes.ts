@@ -9,7 +9,6 @@ const routes = [
         name: 'new-chat',
         component: () => import('pages/NewChat.vue'),
       },
-      // chat view with chat id
       {
         path: 'chat/:id',
         name: 'chat',
@@ -21,14 +20,17 @@ const routes = [
         name: 'tokens-detail',
         component: () => import('pages/TokensDetail.vue'),
       },
-      // knowledge db
       {
-        path: 'knowledge-db',
-        component: () => import('src/pages/KnowledgeBase.vue'),
+        path: 'knowledge-base',
+        component: () => import('pages/KnowledgeBasesList.vue'),
+      },
+      {
+        path: 'knowledge-base/:id',
+        component: () => import('pages/KnowledgeBase.vue'),
       },
       {
         path: 'persona-management',
-        component: () => import('src/pages/PersonaManagement.vue'),
+        component: () => import('pages/PersonaManagement.vue'),
       },
     ],
   },

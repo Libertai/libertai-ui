@@ -3,7 +3,7 @@
     :label="selectedModel.name"
     class="text-semibold icon-md border-primary-highlight"
     color="primary"
-    dropdown-icon="img:icons/svg/chevron-down_lighten.svg"
+    dropdown-icon="img:icons/chevron-down_lighten.svg"
     no-caps
     rounded
     size="md"
@@ -21,9 +21,9 @@
         <q-item-section>
           <q-item-label class="tw-flex tw-space-x-1">
             <span>{{ model.name }}</span>
-            <img v-if="model.premium" alt="premium" src="../../assets/star.svg" width="16" />
-            <q-tooltip v-if="model.premium && accountStore.ltaiBalance < 100"
-              >Premium model ({{ tokenGatingMessage }})
+            <ltai-icon v-if="model.premium" name="svguse:icons.svg#star" size="xs" />
+            <q-tooltip v-if="model.premium && accountStore.ltaiBalance < 100">
+              Premium model ({{ tokenGatingMessage }})
             </q-tooltip>
           </q-item-label>
         </q-item-section>
@@ -38,6 +38,7 @@ import { useAccountStore } from 'stores/account';
 import { computed, PropType } from 'vue';
 import { getTokenGatingMessage } from 'src/utils/messages';
 import { UIModel } from 'src/utils/models';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 
 const modelsStore = useModelsStore();
 const accountStore = useAccountStore();

@@ -10,16 +10,13 @@
         exact-active-class="bg-secondary item-active"
       >
         <q-item-section side>
-          <q-btn v-if="route.params?.id === chat.id" class="tw-p-1" flat icon="img:icons/svg/msg_active.svg" size="sm">
-          </q-btn>
-          <q-btn
-            v-if="route.params?.id !== chat.id"
-            :icon="`img:icons/svg/msg${$q.dark.mode ? '_lighten' : ''}.svg`"
+          <ltai-icon
+            :dark-color="route.params?.id === chat.id ? 'primary' : undefined"
+            :light-color="route.params?.id === chat.id ? 'primary' : 'grey'"
             class="tw-p-1"
-            flat
-            size="sm"
-          >
-          </q-btn>
+            name="svguse:icons.svg#message"
+            size="xs"
+          />
         </q-item-section>
 
         <q-item-section>
@@ -37,7 +34,7 @@
             <q-list>
               <q-item v-close-popup clickable @click="openChatSettings(chat)">
                 <q-item-section avatar>
-                  <q-avatar :icon="`img:icons/svg/settings${$q.dark.mode ? '_lighten' : ''}.svg`" />
+                  <ltai-icon class="tw-mx-auto" name="svguse:icons.svg#settings" />
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>Settings</q-item-label>
@@ -46,7 +43,7 @@
 
               <q-item v-close-popup clickable @click="deleteChatConfirm(chat.id)">
                 <q-item-section avatar>
-                  <q-avatar :icon="`img:icons/delete${$q.dark.mode ? '_lighten' : ''}.svg`" />
+                  <ltai-icon class="tw-mx-auto" name="svguse:icons.svg#delete" />
                 </q-item-section>
                 <q-item-section>
                   <q-item-label>Delete</q-item-label>
@@ -57,19 +54,11 @@
         </q-item-section>
       </q-item>
     </q-scroll-area>
-    <q-dialog v-model="deleteChatConfirmAction">
-      <q-card>
-        <q-card-section class="row items-center">
-          <q-avatar color="primary" icon="delete" text-color="white" />
-          <span class="q-ml-xl">Are you sure you want to delete the current chat conversation?</span>
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn v-close-popup class="border-primary-highlight" label="Cancel" rounded text-color="dark-mode-text" />
-          <q-btn v-close-popup color="primary" label="Confirm" rounded @click="deleteChat(deleteChatId!)" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <ltai-dialog v-model="deleteChatConfirmAction" title="Delete chat" @save="deleteChat(deleteChatId!)">
+      <q-card-section class="row">
+        <span>Are you sure you want to delete the current chat conversation?</span>
+      </q-card-section>
+    </ltai-dialog>
     <chat-settings-dialog v-model="showChatSettings" :chat="settingsChat" @save-chat="saveChatSettings" />
   </q-list>
 </template>
@@ -81,6 +70,8 @@ import { useRoute, useRouter } from 'vue-router';
 import { nextTick, ref } from 'vue';
 import ChatSettingsDialog from 'components/dialog/ChatSettingsDialog.vue';
 import { Chat } from 'src/types/chats';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import LtaiDialog from 'components/libertai/LtaiDialog.vue';
 
 const chatsStore = useChatsStore();
 const route = useRoute();
@@ -111,6 +102,7 @@ function saveChatSettings(newChat: Chat) {
     username: newChat.username,
     modelId: newChat.modelId,
     persona: JSON.parse(JSON.stringify(newChat.persona)),
+    knowledgeBases: JSON.parse(JSON.stringify(newChat.knowledgeBases)),
   });
   router.go(0);
 }
