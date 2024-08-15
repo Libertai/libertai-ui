@@ -374,7 +374,7 @@ async function setChat(chatId: string) {
   const title = loadedChat.title;
   if (title === defaultChatTopic || title === '') {
     // Set the chat name based on the first message
-    await setChatName(loadedChat.messages[0].content);
+    setChatName(loadedChat.messages[0].content);
   }
 
   // Determine if there is a message we need to respond to
