@@ -9,5 +9,5 @@ export const processDocument = async (file: File): Promise<Omit<KnowledgeDocumen
 
   const chunks = await generateChunks(fileInfo.type, fileInfo.content);
 
-  return { ...fileInfo, id: uuidv4(), name: file.name, size: file.size, chunks };
+  return { ...fileInfo, id: uuidv4(), name: file.name, size: file.size, chunks, path: '/' };
 };

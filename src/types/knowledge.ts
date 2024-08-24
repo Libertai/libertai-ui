@@ -18,6 +18,7 @@ const knowledgeDocumentSchema = z.object({
   type: z.string(),
   chunks: z.array(knowledgeDocumentChunk),
   size: z.number(),
+  path: z.string(),
   store: z.object({
     item_hash: z.string(),
     ipfs_hash: z.string(),
