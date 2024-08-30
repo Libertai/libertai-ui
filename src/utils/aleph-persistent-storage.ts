@@ -1,9 +1,10 @@
 import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
-import { ETHAccount, getAccountFromProvider, importAccountFromPrivateKey } from '@aleph-sdk/ethereum';
+import { BaseAccount, getAccountFromProvider, importAccountFromPrivateKey } from '@aleph-sdk/base';
 import web3 from 'web3';
 import { ItemType } from '@aleph-sdk/message';
-import { signMessage } from '@wagmi/core';
+import { type Config, getConnectorClient, signMessage } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
+import type { Account, Chain, Client, Transport } from 'viem';
 import { SignMessageReturnType } from 'viem';
 import {
   KnowledgeBase,
@@ -14,6 +15,8 @@ import {
 import { decrypt, encrypt, generateIv, generateKey } from 'src/utils/encryption';
 import { PrivateKey } from 'eciesjs';
 import { decryptKnowledgeBaseIdentifiers, encryptKnowledgeBaseIdentifiers } from 'src/utils/knowledge/encryption';
+import { providers } from 'ethers';
+import { base } from '@wagmi/vue/chains';
 
 // Aleph keys and channels settings
 const SECURITY_AGGREGATE_KEY = 'security';
@@ -23,10 +26,26 @@ const LIBERTAI_SETTINGS_KEY = `${LIBERTAI_CHANNEL}-settings`;
 const LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY = `${LIBERTAI_CHANNEL}-knowledge-base-identifiers-test-12`;
 const LIBERTAI_KNOWLEDGE_BASE_POST_TYPE = `${LIBERTAI_CHANNEL}-knowledge-base-test-12`;
 
+export function clientToProvider(client: Client<Transport, Chain, Account>) {
+  const { chain, transport } = client;
+  const network = {
+    chainId: chain.id,
+    name: chain.name,
+    ensAddress: chain.contracts?.ensRegistry?.address,
+  };
+  return new providers.Web3Provider(transport, network);
+}
+
+/** Action to convert a Viem Client to an ethers.js Web3Provider. */
+export async function getEthersProvider(config: Config, { chainId }: { chainId?: number } = { chainId: base.id }) {
+  const client = await getConnectorClient(config, { chainId });
+  return clientToProvider(client);
+}
+
 export class AlephPersistentStorage {
   constructor(
     /* eslint-disable-next-line no-unused-vars */
-    private account: ETHAccount,
+    private account: BaseAccount,
     /* eslint-disable-next-line no-unused-vars */
     private subAccountClient: AuthenticatedAlephHttpClient,
     // eslint-disable-next-line no-unused-vars
@@ -47,7 +66,9 @@ export class AlephPersistentStorage {
     const encryptionPrivateKey = PrivateKey.fromHex(privateKey);
 
     const subAccount = importAccountFromPrivateKey(privateKey);
-    const account = await getAccountFromProvider(window.ethereum);
+    const provider = await getEthersProvider(config);
+
+    const account = await getAccountFromProvider(provider);
     const accountClient = new AuthenticatedAlephHttpClient(account, process.env.ALEPH_API_URL);
     const subAccountClient = new AuthenticatedAlephHttpClient(subAccount, process.env.ALEPH_API_URL);
 
@@ -57,8 +78,8 @@ export class AlephPersistentStorage {
   }
 
   static async getSecurityPermission(
-    account: ETHAccount,
-    subAccount: ETHAccount,
+    account: BaseAccount,
+    subAccount: BaseAccount,
     accountClient: AuthenticatedAlephHttpClient,
   ) {
     try {
