@@ -1,6 +1,12 @@
 <template>
   <section class="max-sm:tw-mx-4 sm:tw-mx-10 tw-my-5">
-    <h4 class="text-h4 text-semibold tw-mb-5">Knowledge base</h4>
+    <div class="tw-flex tw-mb-5 tw-items-center tw-space-x-2">
+      <h4 class="text-h4 text-semibold">Knowledge base</h4>
+      <a href="https://docs.libertai.io/chat/documents/knowledge-base" target="_blank">
+        <ltai-icon name="help_outline" size="xs" />
+      </a>
+    </div>
+
     <p>Manage your knowledge bases</p>
     <div class="tw-mt-4 tw-mb-8 tw-flex md:tw-justify-end">
       <q-btn class="border-primary-highlight" no-caps rounded unelevated @click="createKnowledgeDialog = true">
