@@ -1,5 +1,5 @@
 <template>
-  <div class="markdown-component" v-html="renderedContent"></div>
+  <div class="markdown-message" v-html="renderedContent"></div>
 </template>
 
 <script lang="ts" setup>
@@ -46,3 +46,9 @@ watch(
   },
 );
 </script>
+
+<style scoped>
+.markdown-message :deep(a) {
+  text-decoration: revert;
+}
+</style>
