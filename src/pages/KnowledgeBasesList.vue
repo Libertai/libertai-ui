@@ -38,15 +38,30 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import KnowledgeBaseCreationDialog from 'components/dialog/KnowledgeBaseCreationDialog.vue';
 import { useKnowledgeStore } from 'stores/knowledge';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 import dayjs from 'dayjs';
+import { useAccount } from '@wagmi/vue';
+import { useQuasar } from 'quasar';
+import { useRouter } from 'vue-router';
+
+const $q = useQuasar();
+const router = useRouter();
+const account = useAccount();
 
 const knowledgeStore = useKnowledgeStore();
 
 const createKnowledgeDialog = ref(false);
+
+onMounted(async () => {
+  if (!account.isConnected.value) {
+    $q.notify({ message: 'Account not connected', color: 'negative' });
+    await router.push({ path: '/' });
+    return;
+  }
+});
 
 const createKnowledgeBase = (name: string) => {
   knowledgeStore.createKnowledgeBase(name);
