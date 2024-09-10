@@ -18,10 +18,11 @@ import { decryptKnowledgeBaseIdentifiers, encryptKnowledgeBaseIdentifiers } from
 // Aleph keys and channels settings
 const SECURITY_AGGREGATE_KEY = 'security';
 const MESSAGE = 'LibertAI';
-const LIBERTAI_CHANNEL = 'libertai-chat-ui';
-const LIBERTAI_SETTINGS_KEY = `${LIBERTAI_CHANNEL}-settings`;
-const LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY = `${LIBERTAI_CHANNEL}-knowledge-base-identifiers-test-12`;
-const LIBERTAI_KNOWLEDGE_BASE_POST_TYPE = `${LIBERTAI_CHANNEL}-knowledge-base-test-12`;
+const LIBERTAI_GENERAL_CHANNEL = 'libertai';
+const LIBERTAI_UI_CHANNEL = 'libertai-chat-ui';
+const LIBERTAI_SETTINGS_KEY = `${LIBERTAI_UI_CHANNEL}-settings`;
+const LIBERTAI_KNOWLEDGE_BASE_IDENTIFIERS_KEY = `${LIBERTAI_GENERAL_CHANNEL}-knowledge-base-identifiers`;
+const LIBERTAI_KNOWLEDGE_BASE_POST_TYPE = `${LIBERTAI_GENERAL_CHANNEL}-knowledge-base`;
 
 export class AlephPersistentStorage {
   constructor(
@@ -79,8 +80,8 @@ export class AlephPersistentStorage {
           (authorization: SecurityAuthorization) =>
             authorization.address === subAccount.address &&
             authorization.types === undefined &&
-            authorization.channels !== undefined &&
-            authorization.channels.includes(LIBERTAI_CHANNEL),
+            authorization.channels?.includes(LIBERTAI_GENERAL_CHANNEL) &&
+            authorization.channels?.includes(LIBERTAI_UI_CHANNEL),
         )
       ) {
         const oldAuthorizations = securitySettings.authorizations.filter(
@@ -94,7 +95,7 @@ export class AlephPersistentStorage {
               ...oldAuthorizations,
               {
                 address: subAccount.address,
-                channels: [LIBERTAI_CHANNEL],
+                channels: [LIBERTAI_GENERAL_CHANNEL, LIBERTAI_UI_CHANNEL],
               },
             ],
           },
@@ -108,7 +109,7 @@ export class AlephPersistentStorage {
           authorizations: [
             {
               address: subAccount.address,
-              channels: [LIBERTAI_CHANNEL],
+              channels: [LIBERTAI_GENERAL_CHANNEL, LIBERTAI_UI_CHANNEL],
             },
           ],
         },
@@ -122,7 +123,7 @@ export class AlephPersistentStorage {
         key: LIBERTAI_SETTINGS_KEY,
         content,
         address: this.account.address,
-        channel: LIBERTAI_CHANNEL,
+        channel: LIBERTAI_UI_CHANNEL,
       });
     } catch (error) {
       console.error(`Saving settings on Aleph failed: ${error}`);
@@ -143,7 +144,7 @@ export class AlephPersistentStorage {
     const message = await this.subAccountClient.createStore({
       fileObject: file,
       storageEngine: ItemType.ipfs,
-      channel: LIBERTAI_CHANNEL,
+      channel: LIBERTAI_GENERAL_CHANNEL,
     });
     return message;
   }
@@ -189,7 +190,7 @@ export class AlephPersistentStorage {
         postType: LIBERTAI_KNOWLEDGE_BASE_POST_TYPE,
         content: encryptedKb,
         address: this.account.address,
-        channel: LIBERTAI_CHANNEL,
+        channel: LIBERTAI_GENERAL_CHANNEL,
         storageEngine: ItemType.storage,
       });
 
@@ -227,7 +228,7 @@ export class AlephPersistentStorage {
         ref: kbIdentifier.post_hash,
         content: encryptedKb,
         address: this.account.address,
-        channel: LIBERTAI_CHANNEL,
+        channel: LIBERTAI_GENERAL_CHANNEL,
         storageEngine: ItemType.storage,
       });
     } catch (error) {
@@ -238,7 +239,10 @@ export class AlephPersistentStorage {
 
   async fetchKnowledgeBase(postHash: string, encryptionKey: Buffer, iv: Buffer): Promise<KnowledgeBase | undefined> {
     try {
-      const response = await this.subAccountClient.getPost({ hashes: [postHash], channels: [LIBERTAI_CHANNEL] });
+      const response = await this.subAccountClient.getPost({
+        hashes: [postHash],
+        channels: [LIBERTAI_GENERAL_CHANNEL],
+      });
 
       const decryptedContent = decrypt(response.content, encryptionKey, iv);
       const parsedKnowledgeBase = knowledgeSchema.safeParse(JSON.parse(decryptedContent));
@@ -281,7 +285,7 @@ export class AlephPersistentStorage {
         data: kbIdentifiers,
       },
       address: this.account.address,
-      channel: LIBERTAI_CHANNEL,
+      channel: LIBERTAI_GENERAL_CHANNEL,
     });
   }
 }
