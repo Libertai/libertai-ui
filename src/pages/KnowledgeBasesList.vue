@@ -16,7 +16,12 @@
       <knowledge-base-creation-dialog v-model="createKnowledgeDialog" @create="createKnowledgeBase" />
     </div>
 
-    <div class="tw-space-y-4">
+    <div v-if="knowledgeStore.knowledgeBases.length === 0" class="tw-mx-auto tw-mt-10 tw-w-fit">
+      <img alt="No knowledge base" src="/assets/empty-states/knowledge-base.png" />
+      <p class="tw-text-lg text-purple-700 tw-w-fit tw-mx-auto">No Knowledge Base created</p>
+      <p class="text-primary tw-w-fit tw-mx-auto">Create a Knowledge Base to get started</p>
+    </div>
+    <div v-else class="tw-space-y-4">
       <RouterLink
         v-for="knowledgeBase of knowledgeStore.knowledgeBases"
         :key="knowledgeBase.id"
