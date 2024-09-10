@@ -52,6 +52,14 @@
       </div>
     </div>
 
+    <empty-state
+      v-if="knowledgeBaseRef.documents.length === 0"
+      description="Upload a document to get started"
+      image-alt="No document"
+      image-link="/assets/empty-states/knowledge-document.png"
+      title="No documents uploaded"
+    />
+
     <div class="tw-space-y-4">
       <div
         v-for="document of knowledgeBaseRef.documents"
@@ -172,6 +180,7 @@ import { decryptFile, encryptFile } from 'src/utils/encryption';
 import KnowledgeBaseRenameDialog from 'components/dialog/KnowledgeBaseRenameDialog.vue';
 import { supportedInputFiles } from 'src/utils/knowledge/parsing';
 import { MAX_ATTACHMENT_SIZE } from 'src/utils/knowledge/attachments';
+import EmptyState from 'components/EmptyState.vue';
 
 const $q = useQuasar();
 const route = useRoute();
