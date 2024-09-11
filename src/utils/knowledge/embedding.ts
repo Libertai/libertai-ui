@@ -44,9 +44,30 @@ const getTextSplitter = (
 ): MarkdownTextSplitter | RecursiveCharacterTextSplitter => {
   switch (fileType) {
     case 'markdown':
+    case 'html':
+    case 'cpp':
+    case 'go':
+    case 'java':
+    case 'js':
+    case 'php':
+    case 'proto':
+    case 'rst':
+    case 'scala':
+    case 'swift':
+    case 'sol':
       return RecursiveCharacterTextSplitter.fromLanguage(fileType);
+    case 'ts':
+      return RecursiveCharacterTextSplitter.fromLanguage('js');
+    case 'py':
+      return RecursiveCharacterTextSplitter.fromLanguage('python');
+    case 'rb':
+      return RecursiveCharacterTextSplitter.fromLanguage('ruby');
+    case 'rs':
+      return RecursiveCharacterTextSplitter.fromLanguage('rust');
     case 'md':
       return RecursiveCharacterTextSplitter.fromLanguage('markdown');
+    case 'htm':
+      return RecursiveCharacterTextSplitter.fromLanguage('html');
     default:
       return new RecursiveCharacterTextSplitter({
         chunkSize,

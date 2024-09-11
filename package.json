@@ -42,7 +42,6 @@
     "localforage": "^1.10.0",
     "marked": "^14.0.0",
     "marked-highlight": "^2.1.4",
-    "mime": "^4.0.4",
     "ml-distance": "^4.0.1",
     "pdfjs-dist": "^4.5.136",
     "pinia": "^2.2.1",
