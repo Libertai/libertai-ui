@@ -11,7 +11,7 @@
 const { configure } = require('quasar/wrappers');
 const { nodePolyfills } = require('vite-plugin-node-polyfills');
 
-module.exports = configure(function (/* ctx */) {
+module.exports = configure(function (ctx) {
   return {
     eslint: {
       // fix: true,
@@ -30,7 +30,7 @@ module.exports = configure(function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['wagmi'],
+    boot: ['utils', 'wagmi'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
     css: ['app.scss', 'tailwind.css'],
@@ -71,6 +71,9 @@ module.exports = configure(function (/* ctx */) {
           viteConf.plugins = [];
         }
         viteConf.plugins = [...viteConf.plugins, nodePolyfills()];
+        if (ctx.dev) {
+          viteConf.define['process.browser'] = true;
+        }
       },
 
       // vueRouterBase,
@@ -81,7 +84,7 @@ module.exports = configure(function (/* ctx */) {
 
       // publicPath: '/',
       // analyze: true,
-      // env: {},
+      env: require('dotenv').config().parsed,
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,

@@ -1,5 +1,5 @@
 <template>
-  <div class="markdown-component" v-html="renderedContent"></div>
+  <div class="markdown-message" v-html="renderedContent"></div>
 </template>
 
 <script lang="ts" setup>
@@ -33,7 +33,6 @@ const marked = new Marked(
 const renderedContent = ref('');
 
 async function updateContent(content: string) {
-  // content = DOMPurify.sanitize(content);
   renderedContent.value = DOMPurify.sanitize(await marked.parse(content));
 }
 
@@ -47,3 +46,9 @@ watch(
   },
 );
 </script>
+
+<style scoped>
+.markdown-message :deep(a) {
+  text-decoration: revert;
+}
+</style>

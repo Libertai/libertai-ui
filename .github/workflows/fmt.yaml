@@ -1,28 +1,17 @@
 name: FormatCheck
 
-on:
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
+on: push
 
 jobs:
   format-check:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js 18
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/npm
-          key: ${{ runner.OS }}-npm-${{ hashFiles('**/npm.lock') }}
-          restore-keys: |
-            ${{ runner.OS }}-npm-
+          node-version: 20
+          cache: 'npm'
       - name: Install dependencies
         run: npm install
       - name: Lint

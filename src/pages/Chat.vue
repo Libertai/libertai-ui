@@ -36,7 +36,7 @@
               <span v-if="message.author === 'user'">{{ chatRef.username }}</span>
               <span v-else>{{ chatRef.persona.name }}</span>
 
-              <span class="bull-date">{{ formatDate(message.timestamp) }}</span>
+              <span class="bull-date">{{ dayjs().to(message.timestamp) }}</span>
             </q-item-label>
             <!-- Display any attachments -->
             <q-item-label v-if="message.attachments && message.attachments.length > 0">
@@ -44,7 +44,7 @@
                 v-for="attachment in message.attachments"
                 :key="attachment.id"
                 class="tw-mr-1 bg-primary text-white"
-                icon="img:icons/svg/attachment.svg"
+                icon="img:icons/attachment.svg"
               >
                 {{ attachment.title }}
               </q-chip>
@@ -79,22 +79,12 @@
               <q-tooltip>Regenerate</q-tooltip>
             </q-btn>
             <!-- Allow copying the message to the clipboard -->
-            <q-btn
-              :icon="`img:icons/svg/copy${$q.dark.mode ? '_lighten' : ''}.svg`"
-              dense
-              flat
-              size="sm"
-              @click="copyMessage(message)"
-            >
+            <q-btn dense flat size="sm" @click="copyMessage(message)">
+              <ltai-icon name="svguse:icons.svg#copy" />
               <q-tooltip>Copy</q-tooltip>
             </q-btn>
-            <q-btn
-              :icon="`img:icons/svg/edit${$q.dark.mode ? '_lighten' : ''}.svg`"
-              dense
-              flat
-              size="sm"
-              @click="editMessage(($refs['message-' + message_index] as any)[0])"
-            >
+            <q-btn dense flat size="sm" @click="editMessage(($refs['message-' + message_index] as any)[0])">
+              <ltai-icon name="svguse:icons.svg#pencil" />
               <q-tooltip>Edit</q-tooltip>
             </q-btn>
           </div>
@@ -105,24 +95,12 @@
     <div class="tw-mx-4">
       <message-input :is-loading="isLoadingRef" class="col" @send-message="sendMessage" />
     </div>
-
-    <!-- This should really not pass the ref, but it's a quick fix for now -->
-    <!--    <q-dialog v-model="showKnowledgeUploaderRef" position="bottom">-->
-    <!--      <KnowledgeStoreUploader-->
-    <!--        :chat-ref="chatRef"-->
-    <!--        auto-upload-->
-    <!--        label="Auto KnowledgeStoreUploader"-->
-    <!--        multiple-->
-    <!--        url="http://localhost:4444/upload"-->
-    <!--        @attachment-added="addAttachment"-->
-    <!--      />-->
-    <!--    </q-dialog>-->
   </q-page>
 </template>
 
 <script lang="ts" setup>
 import 'highlight.js/styles/devibeans.css';
-import { copyToClipboard, date, DateUnitOptions, useQuasar } from 'quasar';
+import { copyToClipboard, useQuasar } from 'quasar';
 import { nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -139,6 +117,11 @@ import axios from 'axios';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
 import { useSettingsStore } from 'stores/settings';
 import { Chat, SendMessageParams, UIMessage } from 'src/types/chats';
+import dayjs from 'dayjs';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import { searchDocuments } from 'src/utils/knowledge/embedding';
+import { useKnowledgeStore } from 'stores/knowledge';
+import { KnowledgeSearchResult } from 'src/types/knowledge';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -147,14 +130,13 @@ const router = useRouter();
 // App state
 const chatsStore = useChatsStore();
 const modelsStore = useModelsStore();
-// const knowledgeStore = useKnowledgeStore();
 const settingsStore = useSettingsStore();
+const knowledgeStore = useKnowledgeStore();
 
 // Local page state
 const isLoadingRef = ref(false);
 const scrollAreaRef = ref<HTMLDivElement>();
 const enableEditRef = ref(false);
-// const showKnowledgeUploaderRef = ref(false);
 
 const chatRef = ref<Chat>();
 
@@ -206,9 +188,9 @@ async function generatePersonaMessage() {
   }
 
   const chatId = chatRef.value.id;
-  // const chatTags = chatRef.value.tags;
   const username = chatRef.value.username;
-  const messages = JSON.parse(JSON.stringify(chatRef.value.messages));
+  const messages: UIMessage[] = JSON.parse(JSON.stringify(chatRef.value.messages));
+  const knowledgeBaseIds = chatRef.value.knowledgeBases;
   const persona = chatRef.value.persona;
 
   const modelId = chatRef.value.modelId;
@@ -234,52 +216,26 @@ async function generatePersonaMessage() {
     // Set loading state
     isLoadingRef.value = true;
 
-    // NOTE: assuming last message is guaranteed to be non-empty and the user's last message
-    // Get the last message from the user
-    // const lastMessage = messages[messages.length - 1];
-    // const searchResultMessages: Message[] = [];
-    // const searchResults = await knowledgeStore.searchDocuments(lastMessage.content, chatTags);
-    // searchResults.forEach((result) => {
-    //   searchResultMessages.push({
-    //     role: 'search-result',
-    //     content: result.content,
-    //   });
-    // });
+    let knowledgeSearchResults: KnowledgeSearchResult[] = [];
+
+    // Finding related knowledge document chunks
+    if (knowledgeBaseIds.length > 0) {
+      const documents = knowledgeStore.getDocumentsFromBases(knowledgeBaseIds);
+      const lastUserMessage = messages.findLast((message) => message.author === 'user')!;
+      knowledgeSearchResults = await searchDocuments(lastUserMessage.content, documents);
+    }
 
     // Expand all the messages to inline any compatible attachments
-    const expandedMessages = messages
+    const allMessages = messages
       .map((message: UIMessage): Message[] => {
         const ret = [];
         // Push any attachments as messages ahead of the message itself
         message.attachments?.forEach((attachment) => {
-          if (attachment.content) {
-            ret.push({
-              role: 'attachment',
-              content: `[${attachment.title}](${attachment.content})`,
-            });
-          }
-          // else if (attachment.documentId) {
-          //   ret.push({
-          //     role: 'attachment',
-          //     content: `[${attachment.title}](document-id-${attachment.documentId})`,
-          //   });
-          // }
+          ret.push({
+            role: 'attachment',
+            content: `[${attachment.title}](${attachment.content})`,
+          });
         });
-
-        // Push what search results we found based on the message
-        // TODO: this should probably be a more generic tool-call or llm-chain-link
-        // TODO: this should probably link back to the document id
-        // TODO: I should probably write these below messages in the log
-        //  Really these search results should get attached to the message that
-        //   lead to them being queried
-        // if (message.searchResults) {
-        //   message.searchResults.forEach((result: Message) => {
-        //     ret.push({
-        //       role: 'search-result',
-        //       content: result.content,
-        //     });
-        //   });
-        // }
 
         // Push the message itself
         ret.push(message);
@@ -287,11 +243,15 @@ async function generatePersonaMessage() {
       })
       .flat();
 
-    // Append the search results to the messages
-    const allMessages: Message[] = [...expandedMessages /*...searchResultMessages */];
-
     // Generate a stream of responses from the AI
-    for await (const output of inferenceEngine.generateAnswer(allMessages, model, persona, username, false)) {
+    for await (const output of inferenceEngine.generateAnswer(
+      allMessages,
+      model,
+      persona,
+      knowledgeSearchResults.map((result) => result.content),
+      username,
+      false,
+    )) {
       const stopped = output.stopped;
       let content = output.content;
       if (!stopped) {
@@ -417,39 +377,6 @@ async function clearCookies() {
   await axios.get('https://curated.aleph.cloud/change-pool', {
     withCredentials: true,
   });
-}
-
-// function openKnowledgeUploader() {
-//   showKnowledgeUploaderRef.value = true;
-// }
-
-// TODO: Replace this by using dayjs
-function formatDate(d: string | undefined) {
-  const dateObj = d ? new Date(d) : new Date();
-  const currentDate = new Date();
-  const timeDiff = currentDate.getTime() / 1000 - dateObj.getTime() / 1000;
-
-  let unit: DateUnitOptions = 'hours';
-  let txtUnit = 'h';
-  if (timeDiff < 60) {
-    unit = 'seconds';
-    txtUnit = 's';
-  } else if (timeDiff < 3600) {
-    unit = 'minutes';
-    txtUnit = 'm';
-  } else if (timeDiff < 86400) {
-    unit = 'hours';
-    txtUnit = 'h';
-  } else if (timeDiff < 2592000) {
-    unit = 'days';
-    txtUnit = 'd';
-  } else if (timeDiff > 2592000) {
-    unit = 'months';
-    txtUnit = 'month';
-  }
-
-  const diff = date.getDateDiff(currentDate, dateObj, unit);
-  return diff + txtUnit;
 }
 </script>
 <style>

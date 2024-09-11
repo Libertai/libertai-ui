@@ -1,8 +1,16 @@
-// import { boot } from 'quasar/wrappers';
-// import KnowledgeStoreUploader from 'components/KnowledgeStoreUploader.ts';
-// "async" is optional;
-// more info on params: https://v2.quasar.dev/quasar-cli/boot-files
-// export default boot(async ({ _app }) => {
-//   // something to do
-//   // app.component('KnowledgeStoreUploader', KnowledgeStoreUploader);
-// });
+import { boot } from 'quasar/wrappers';
+
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+// @ts-expect-error
+import workerSrc from 'pdfjs-dist/build/pdf.worker?worker&url';
+import * as pdfjs from 'pdfjs-dist';
+
+export default boot(() => {
+  dayjs.extend(localizedFormat);
+  dayjs.extend(relativeTime);
+
+  pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
+});

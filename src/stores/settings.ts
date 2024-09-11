@@ -64,7 +64,7 @@ export const useSettingsStore = defineStore('settings', {
       const account: any = useAccountStore();
 
       if (account.alephStorage !== null) {
-        await account.alephStorage.save(settings);
+        await account.alephStorage.saveSettings(settings);
       }
     },
   },
