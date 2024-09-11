@@ -1,8 +1,7 @@
-import mime from 'mime';
 import * as pdfjs from 'pdfjs-dist';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
 
-export const supportedInputFiles = ['.txt', '.md', '.pdf'].join(',');
+export const supportedInputFiles = ['.txt', '.md', '.markdown', '.pdf'].join(',');
 
 const extractTextFromPdfFile = async (file: File): Promise<string> => {
   const pdfUrl = URL.createObjectURL(file);
@@ -27,15 +26,16 @@ const extractTextFromPdfFile = async (file: File): Promise<string> => {
 
 export const extractFileContent = async (file: File): Promise<{ type: string; content: string }> => {
   let extractedText = '';
-  const fileType = mime.getType(file.name) ?? file.type;
+  const fileType = file.name.split('.').pop();
 
   try {
     switch (fileType) {
-      case 'application/pdf':
+      case 'pdf':
         extractedText = await extractTextFromPdfFile(file);
         break;
-      case 'text/markdown':
-      case 'text/plain':
+      case 'markdown':
+      case 'md':
+      case 'txt':
         extractedText = await new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = (event) => resolve(event.target!.result as string);

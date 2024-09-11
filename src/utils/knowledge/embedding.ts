@@ -43,8 +43,10 @@ const getTextSplitter = (
   chunkOverlap: number,
 ): MarkdownTextSplitter | RecursiveCharacterTextSplitter => {
   switch (fileType) {
-    case 'text/markdown':
-      return new MarkdownTextSplitter();
+    case 'markdown':
+      return RecursiveCharacterTextSplitter.fromLanguage(fileType);
+    case 'md':
+      return RecursiveCharacterTextSplitter.fromLanguage('markdown');
     default:
       return new RecursiveCharacterTextSplitter({
         chunkSize,
