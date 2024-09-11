@@ -16,8 +16,9 @@
       <knowledge-base-creation-dialog v-model="createKnowledgeDialog" @create="createKnowledgeBase" />
     </div>
 
+    <q-linear-progress v-if="!knowledgeStore.isLoaded" indeterminate />
     <empty-state
-      v-if="knowledgeStore.knowledgeBases.length === 0"
+      v-else-if="knowledgeStore.knowledgeBases.length === 0"
       description="Create a Knowledge Base to get started"
       image-alt="No knowledge base"
       image-link="/assets/empty-states/knowledge-base.png"

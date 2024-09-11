@@ -1,5 +1,6 @@
 <template>
-  <section v-if="knowledgeBaseRef" class="max-sm:tw-mx-4 sm:tw-mx-10 tw-space-y-4 tw-my-5">
+  <q-linear-progress v-if="!knowledgeStore.isLoaded" class="tw-mt-20" indeterminate />
+  <section v-else-if="knowledgeBaseRef" class="max-sm:tw-mx-4 sm:tw-mx-10 tw-space-y-4 tw-my-5">
     <q-btn class="tw-w-10 tw-h-10" to="/knowledge-base" unelevated>
       <ltai-icon name="svguse:icons.svg#arrow-left" />
     </q-btn>
@@ -161,6 +162,7 @@
         </q-card-section>
       </ltai-dialog>
     </div>
+    <q-linear-progress v-if="uploadInProgress" indeterminate />
   </section>
 </template>
 <script lang="ts" setup>
@@ -197,6 +199,7 @@ const showRenameKnowledgeBase = ref(false);
 const showDeleteKnowledgeBaseConfirmation = ref(false);
 const showRenameDocument = ref(false);
 const showDeleteDocumentConfirmation = ref(false);
+const uploadInProgress = ref(false);
 
 watch(
   () => route.params.id as string,
@@ -256,6 +259,8 @@ const uploadDocuments = async (event: any) => {
   const encryptionKey = Buffer.from(knowledgeBaseIdentifierRef.value.encryption.key);
   const encryptionIv = Buffer.from(knowledgeBaseIdentifierRef.value.encryption.iv);
 
+  uploadInProgress.value = true;
+
   await Promise.all(
     Array.from(target.files as FileList).map(async (file) => {
       try {
@@ -275,6 +280,7 @@ const uploadDocuments = async (event: any) => {
       }
     }),
   );
+  uploadInProgress.value = false;
 
   knowledgeBaseRef.value.documents = knowledgeBaseRef.value.documents.concat(documents);
 
