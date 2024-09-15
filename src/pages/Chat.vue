@@ -53,8 +53,10 @@
             <q-item-label class="tw-block">
               <MarkdownRenderer
                 :class="message.author === 'user' ? '' : 'message-content'"
-                :content="message.content"
-                breaks
+                :content="
+                  message.content +
+                  (!message.stopped && isLoadingRef && message.content !== '' ? ' *[writing ...]*' : '')
+                "
               />
               <!-- Display the loading spinner if the message is still loading -->
               <q-spinner-bars v-if="!message.stopped && isLoadingRef" color="white" size="2em" />
@@ -77,6 +79,16 @@
               @click="regenerateMessage()"
             >
               <q-tooltip>Regenerate</q-tooltip>
+            </q-btn>
+            <q-btn
+              v-if="isLoadingRef && message.author === 'ai' && message_index === chatRef.messages.length - 1"
+              dense
+              flat
+              size="sm"
+              @click="stopGeneration()"
+            >
+              <ltai-icon name="stop" />
+              <q-tooltip>Stop</q-tooltip>
             </q-btn>
             <!-- Allow copying the message to the clipboard -->
             <q-btn dense flat size="sm" @click="copyMessage(message)">
@@ -137,6 +149,7 @@ const knowledgeStore = useKnowledgeStore();
 const isLoadingRef = ref(false);
 const scrollAreaRef = ref<HTMLDivElement>();
 const enableEditRef = ref(false);
+const shouldStopGeneration = ref(false);
 
 const chatRef = ref<Chat>();
 
@@ -252,10 +265,11 @@ async function generatePersonaMessage() {
       username,
       false,
     )) {
-      const stopped = output.stopped;
+      const stopped = output.stopped || shouldStopGeneration.value;
       let content = output.content;
-      if (!stopped) {
-        content += ' *[writing ...]*';
+      if (stopped) {
+        shouldStopGeneration.value = false;
+        break;
       }
       // Update the local state include updates
       response.content = content;
@@ -266,7 +280,7 @@ async function generatePersonaMessage() {
       scrollBottom();
     }
     // A successful response! Append the chat to long term storage.
-    chatsStore.appendModelResponse(chatId, response.content, [] /*searchResults*/);
+    chatsStore.appendModelResponse(chatId, response.content, []);
   } catch (error) {
     console.error('generatePersonaMessage error: ', error);
     response.error = error;
@@ -277,7 +291,6 @@ async function generatePersonaMessage() {
   }
 }
 
-// TODO: arbitrary message regeneration
 // Regenerate the last message from the AI
 async function regenerateMessage() {
   if (chatRef.value === undefined) {
@@ -295,6 +308,14 @@ async function regenerateMessage() {
     chatsStore.popChatMessages(chatId);
   }
   await generatePersonaMessage();
+}
+
+function stopGeneration() {
+  if (chatRef.value === undefined) {
+    return;
+  }
+
+  shouldStopGeneration.value = true;
 }
 
 async function sendMessage({ content, attachments }: SendMessageParams) {
