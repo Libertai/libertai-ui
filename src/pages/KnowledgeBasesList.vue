@@ -16,7 +16,7 @@
       <knowledge-base-creation-dialog v-model="createKnowledgeDialog" @create="createKnowledgeBase" />
     </div>
 
-    <q-linear-progress v-if="!knowledgeStore.isLoaded" indeterminate />
+    <q-linear-progress v-if="!knowledgeStore.isLoaded || isLoading" indeterminate />
     <empty-state
       v-else-if="knowledgeStore.knowledgeBases.length === 0"
       description="Create a Knowledge Base to get started"
@@ -63,6 +63,7 @@ const account = useAccount();
 const knowledgeStore = useKnowledgeStore();
 
 const createKnowledgeDialog = ref(false);
+const isLoading = ref(false);
 
 onMounted(async () => {
   if (!account.isConnected.value) {
@@ -72,7 +73,9 @@ onMounted(async () => {
   }
 });
 
-const createKnowledgeBase = (name: string) => {
-  knowledgeStore.createKnowledgeBase(name);
+const createKnowledgeBase = async (name: string) => {
+  isLoading.value = true;
+  await knowledgeStore.createKnowledgeBase(name);
+  isLoading.value = false;
 };
 </script>
