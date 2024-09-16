@@ -267,13 +267,15 @@ async function generatePersonaMessage() {
     )) {
       const stopped = output.stopped || shouldStopGeneration.value;
       let content = output.content;
+
+      // Update the local state include updates
+      response.content = content;
+      response.stopped = stopped;
+
       if (stopped) {
         shouldStopGeneration.value = false;
         break;
       }
-      // Update the local state include updates
-      response.content = content;
-      response.stopped = stopped;
 
       chatRef.value.messages = [...chatRef.value.messages];
       // Scroll to the bottom of the chat
