@@ -1,4 +1,4 @@
-# Libertai UI (libertai-ui)
+# LibertAI UI (libertai-ui)
 
 A UI for decentralized AI
 
