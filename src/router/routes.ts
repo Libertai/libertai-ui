@@ -32,6 +32,10 @@ const routes = [
         path: 'persona-management',
         component: () => import('pages/PersonaManagement.vue'),
       },
+      {
+        path: 'subscriptions',
+        component: () => import('pages/Subscriptions.vue'),
+      },
     ],
   },
 

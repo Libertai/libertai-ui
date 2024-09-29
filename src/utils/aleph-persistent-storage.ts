@@ -34,7 +34,7 @@ export class AlephPersistentStorage {
     private encryptionPrivateKey: PrivateKey,
   ) {}
 
-  static async signBaseMessage() {
+  static signBaseMessage() {
     return signMessage(config, { message: MESSAGE });
   }
 
