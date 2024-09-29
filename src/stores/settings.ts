@@ -60,7 +60,7 @@ export const useSettingsStore = defineStore('settings', {
     },
 
     async persistOnAleph(settings: SettingsPersistedOnAleph) {
-      const account: any = useAccountStore();
+      const account = useAccountStore();
 
       if (account.alephStorage !== null) {
         await account.alephStorage.saveSettings(settings);
