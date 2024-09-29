@@ -6,6 +6,7 @@ import { config } from 'src/config/wagmi';
 import { base } from '@wagmi/vue/chains';
 import { useTokensStore } from 'stores/tokens';
 import { useKnowledgeStore } from 'stores/knowledge';
+import { useSubscriptionStore } from 'stores/subscription';
 
 const LTAI_BASE_ADDRESS = '0xF8B1b47AA748F5C7b5D0e80C726a843913EB573a';
 
@@ -23,12 +24,13 @@ export const useAccountStore = defineStore('account', {
     async onAccountChange() {
       const tokensStore = useTokensStore();
       const knowledgeStore = useKnowledgeStore();
+      const subscriptionsStore = useSubscriptionStore();
 
       this.ltaiBalance = await this.getLTAIBalance();
 
       await this.initAlephStorage();
-      await tokensStore.update();
-      await knowledgeStore.load();
+
+      await Promise.all([tokensStore.update(), knowledgeStore.load(), subscriptionsStore.load()]);
     },
 
     async initAlephStorage() {

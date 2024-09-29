@@ -79,6 +79,16 @@ export type ValidationError = {
     type: string;
 };
 
+export type GetUserSubscriptionsSubscriptionsGetData = {
+    query: {
+        address: string;
+    };
+};
+
+export type GetUserSubscriptionsSubscriptionsGetResponse = (GetUserSubscriptionsResponse);
+
+export type GetUserSubscriptionsSubscriptionsGetError = (HTTPValidationError);
+
 export type SubscribeHoldSubscriptionPostData = {
     body: HoldPostSubscriptionBody;
 };
@@ -112,13 +122,3 @@ export type HoldSubscriptionMessagesHoldMessageGetError = (HTTPValidationError);
 export type RefreshSubsRefreshPostResponse = (SubsPostRefreshSubscriptionsResponse);
 
 export type RefreshSubsRefreshPostError = unknown;
-
-export type GetUserSubscriptionsSubscriptionsGetData = {
-    query: {
-        address: string;
-    };
-};
-
-export type GetUserSubscriptionsSubscriptionsGetResponse = (GetUserSubscriptionsResponse);
-
-export type GetUserSubscriptionsSubscriptionsGetError = (HTTPValidationError);
