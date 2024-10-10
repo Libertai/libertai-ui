@@ -1,7 +1,28 @@
 import * as pdfjs from 'pdfjs-dist';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
 
-export const supportedInputFiles = ['.txt', '.md', '.markdown', '.pdf'].join(',');
+export const supportedInputFiles = [
+  '.txt',
+  '.md',
+  '.markdown',
+  '.pdf',
+  '.html',
+  '.htm',
+  '.cpp',
+  '.go',
+  '.java',
+  '.js',
+  '.ts',
+  '.php',
+  '.proto',
+  '.py',
+  '.rst',
+  '.rb',
+  '.rs',
+  '.scala',
+  '.swift',
+  '.sol',
+].join(',');
 
 const extractTextFromPdfFile = async (file: File): Promise<string> => {
   const pdfUrl = URL.createObjectURL(file);
@@ -36,6 +57,22 @@ export const extractFileContent = async (file: File): Promise<{ type: string; co
       case 'markdown':
       case 'md':
       case 'txt':
+      case 'html':
+      case 'htm':
+      case 'cpp':
+      case 'go':
+      case 'java':
+      case 'js':
+      case 'ts':
+      case 'php':
+      case 'proto':
+      case 'py':
+      case 'rst':
+      case 'rb':
+      case 'rs':
+      case 'scala':
+      case 'swift':
+      case 'sol':
         extractedText = await new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = (event) => resolve(event.target!.result as string);
