@@ -1,11 +1,14 @@
 import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
-import { BaseAccount, getAccountFromProvider, importAccountFromPrivateKey } from '@aleph-sdk/base';
+import {
+  BaseAccount,
+  getAccountFromProvider as getBaseAccountFromProvider,
+  importAccountFromPrivateKey as importBaseAccountFromPrivateKey,
+} from '@aleph-sdk/base';
 import web3 from 'web3';
 import { ItemType } from '@aleph-sdk/message';
-import { type Config, getConnectorClient, signMessage } from '@wagmi/core';
+import { type Config, getConnectorClient, signMessage as signWagmiMessage } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
 import type { Account, Chain, Client, Transport } from 'viem';
-import { SignMessageReturnType } from 'viem';
 import {
   KnowledgeBase,
   KnowledgeBaseIdentifier,
@@ -17,6 +20,9 @@ import { PrivateKey } from 'eciesjs';
 import { decryptKnowledgeBaseIdentifiers, encryptKnowledgeBaseIdentifiers } from 'src/utils/knowledge/encryption';
 import { providers } from 'ethers';
 import { base } from '@wagmi/vue/chains';
+import { useWallet } from 'solana-wallets-vue';
+import { AccountChain } from 'stores/account';
+import { getAccountFromProvider as getSolAccountFromProvider, SOLAccount } from '@aleph-sdk/solana';
 
 // Aleph keys and channels settings
 const SECURITY_AGGREGATE_KEY = 'security';
@@ -46,18 +52,26 @@ export async function getEthersProvider(config: Config, { chainId }: { chainId?:
 export class AlephPersistentStorage {
   constructor(
     /* eslint-disable-next-line no-unused-vars */
-    private account: BaseAccount,
+    private account: BaseAccount | SOLAccount,
     /* eslint-disable-next-line no-unused-vars */
     private subAccountClient: AuthenticatedAlephHttpClient,
     // eslint-disable-next-line no-unused-vars
     private encryptionPrivateKey: PrivateKey,
   ) {}
 
-  static async signBaseMessage() {
-    return signMessage(config, { message: MESSAGE });
+  static async signMessage(chain: AccountChain): Promise<`0x${string}` | string> {
+    switch (chain) {
+      case 'base':
+        return signWagmiMessage(config, { message: MESSAGE });
+      case 'solana':
+        /* eslint-disable no-case-declarations */
+        const { signMessage: signSolanaMessage } = useWallet();
+        const signature = await signSolanaMessage.value!(Buffer.from(MESSAGE));
+        return Buffer.from(signature.buffer).toString();
+    }
   }
 
-  static async initialize(hash: SignMessageReturnType) {
+  static async initialize(hash: string, chain: AccountChain) {
     const privateKey = web3.utils.sha3(hash);
 
     if (privateKey === undefined) {
@@ -66,10 +80,10 @@ export class AlephPersistentStorage {
     }
     const encryptionPrivateKey = PrivateKey.fromHex(privateKey);
 
-    const subAccount = importAccountFromPrivateKey(privateKey);
-    const provider = await getEthersProvider(config);
+    const subAccount = importBaseAccountFromPrivateKey(privateKey);
 
-    const account = await getAccountFromProvider(provider);
+    const account = await this.getAlephAccount(chain);
+
     const accountClient = new AuthenticatedAlephHttpClient(account, process.env.ALEPH_API_URL);
     const subAccountClient = new AuthenticatedAlephHttpClient(subAccount, process.env.ALEPH_API_URL);
 
@@ -79,7 +93,7 @@ export class AlephPersistentStorage {
   }
 
   static async getSecurityPermission(
-    account: BaseAccount,
+    account: BaseAccount | SOLAccount,
     subAccount: BaseAccount,
     accountClient: AuthenticatedAlephHttpClient,
   ) {
@@ -134,6 +148,21 @@ export class AlephPersistentStorage {
             },
           ],
         },
+      });
+    }
+  }
+
+  private static async getAlephAccount(chain: AccountChain): Promise<BaseAccount | SOLAccount> {
+    if (chain === 'base') {
+      const provider = await getEthersProvider(config);
+      return getBaseAccountFromProvider(provider);
+    } else {
+      const { publicKey, connected, connect, signMessage } = useWallet();
+      return getSolAccountFromProvider({
+        publicKey: publicKey.value!,
+        connected: connected.value!,
+        connect,
+        signMessage: signMessage.value!,
       });
     }
   }

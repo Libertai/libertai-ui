@@ -51,21 +51,22 @@ import KnowledgeBaseCreationDialog from 'components/dialog/KnowledgeBaseCreation
 import { useKnowledgeStore } from 'stores/knowledge';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 import dayjs from 'dayjs';
-import { useAccount } from '@wagmi/vue';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
 import EmptyState from 'components/EmptyState.vue';
+import { useAccountStore } from 'stores/account';
 
 const $q = useQuasar();
 const router = useRouter();
-const account = useAccount();
+
+const accountStore = useAccountStore();
 
 const knowledgeStore = useKnowledgeStore();
 
 const createKnowledgeDialog = ref(false);
 
 onMounted(async () => {
-  if (!account.isConnected.value) {
+  if (accountStore.account === null) {
     $q.notify({ message: 'Account not connected', color: 'negative' });
     await router.push({ path: '/' });
     return;
