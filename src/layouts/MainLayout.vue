@@ -13,7 +13,7 @@
 
         <div class="row q-gutter-x-sm">
           <q-btn
-            v-if="!account.isConnected.value"
+            v-if="accountStore.account === null"
             :class="$q.screen.gt.sm ? '' : 'float-right q-pa-sm'"
             no-caps
             rounded
@@ -30,14 +30,14 @@
             :text-color="$q.screen.gt.sm ? 'white' : 'black'"
             :to="{
               name: 'tokens-detail',
-              params: { address: account.address.value },
+              params: { address: accountStore!.account.address },
             }"
             no-caps
             rounded
             unelevated
           >
             <ltai-icon v-if="!$q.screen.gt.sm" left name="svguse:icons.svg#tokens-star" />
-            <span :key="account.address.value"
+            <span :key="accountStore!.account.address"
               >{{ accountStore.ltaiBalance.toFixed(0) }} <span v-if="$q.screen.gt.sm">$LTAI</span></span
             >
           </q-btn>
@@ -101,7 +101,6 @@
 import { ref } from 'vue';
 import AccountButton from 'src/components/AccountButton.vue';
 import UserSettingsDialog from 'components/dialog/UserSettingsDialog.vue';
-import { useAccount } from '@wagmi/vue';
 import { useAccountStore } from 'stores/account';
 import ChatsList from 'components/ChatsList.vue';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
@@ -109,10 +108,7 @@ import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 const leftDrawerOpen = ref(false);
 const showUserSettingsDialog = ref(false);
 
-// Setup Stores
 const accountStore = useAccountStore();
-
-const account = useAccount();
 
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;

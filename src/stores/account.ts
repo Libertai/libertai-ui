@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { AlephPersistentStorage } from 'src/utils/aleph-persistent-storage';
 import { useSettingsStore } from 'stores/settings';
-import { getAccount, getBalance } from '@wagmi/core';
+import { getBalance } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
 import { base } from '@wagmi/vue/chains';
 import { useTokensStore } from 'stores/tokens';
@@ -12,15 +12,25 @@ const LTAI_BASE_ADDRESS = '0xF8B1b47AA748F5C7b5D0e80C726a843913EB573a';
 type AccountStoreState = {
   alephStorage: AlephPersistentStorage | null;
   ltaiBalance: number;
+  account: Account | null;
 };
+
+type Account = {
+  address: string | `0x${string}`;
+  chain: AccountChain;
+};
+
+export type AccountChain = 'base' | 'solana';
 
 export const useAccountStore = defineStore('account', {
   state: (): AccountStoreState => ({
     alephStorage: null,
     ltaiBalance: 0,
+    account: null,
   }),
   actions: {
-    async onAccountChange() {
+    async onAccountChange(newAccount: Account) {
+      this.account = newAccount;
       const tokensStore = useTokensStore();
       const knowledgeStore = useKnowledgeStore();
 
@@ -32,19 +42,20 @@ export const useAccountStore = defineStore('account', {
     },
 
     async initAlephStorage() {
-      const account = getAccount(config);
       const settingsStore = useSettingsStore();
 
-      if (account.address === undefined) {
+      if (this.account === null) {
         return;
       }
 
-      const hash = settingsStore.signatureHash[account.address] ?? (await AlephPersistentStorage.signBaseMessage());
+      const hash =
+        settingsStore.signatureHash[this.account.address] ??
+        (await AlephPersistentStorage.signMessage(this.account.chain));
       if (settingsStore.isSignatureHashStored) {
-        settingsStore.signatureHash[account.address] = hash;
+        settingsStore.signatureHash[this.account.address] = hash;
       }
 
-      const alephStorage = await AlephPersistentStorage.initialize(hash);
+      const alephStorage = await AlephPersistentStorage.initialize(hash, this.account.chain);
       if (!alephStorage) {
         return;
       }
@@ -56,14 +67,13 @@ export const useAccountStore = defineStore('account', {
     },
 
     async getLTAIBalance(): Promise<number> {
-      const account = getAccount(config);
-
-      if (account.address === undefined) {
+      if (this.account === null || this.account.chain === 'solana') {
         return 0;
       }
 
+      // TODO: handle solana
       const balance = await getBalance(config, {
-        address: account.address,
+        address: this.account.address as `0x${string}`,
         token: LTAI_BASE_ADDRESS,
         chainId: base.id,
       });
@@ -72,6 +82,7 @@ export const useAccountStore = defineStore('account', {
     },
 
     onDisconnect() {
+      this.account = null;
       this.alephStorage = null;
       this.ltaiBalance = 0;
     },

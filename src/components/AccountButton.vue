@@ -1,6 +1,22 @@
 <template>
   <div style="display: inline-block">
-    <q-btn-dropdown v-if="!account.isConnected.value" color="primary" label="Connect wallet" no-caps rounded unelevated>
+    <wallet-modal-provider :dark="!!$q.dark.mode" container="body">
+      <template #default="modalScope">
+        <slot v-bind="modalScope">
+          <q-btn ref="openSolanaModal" class="tw-hidden" @click="modalScope.openModal" />
+        </slot>
+      </template>
+    </wallet-modal-provider>
+
+    <q-btn-dropdown
+      v-if="accountStore.account === null"
+      auto-close
+      color="primary"
+      label="Connect wallet"
+      no-caps
+      rounded
+      unelevated
+    >
       <q-btn
         v-for="connector in config.connectors"
         :key="connector.uid"
@@ -8,15 +24,26 @@
         no-caps
         rounded
         unelevated
-        @click="connect({ connector })"
+        @click="wagmiConnect({ connector })"
       >
         <ltai-icon :name="getConnectorIconName(connector.id)" class="tw-mr-1" />
         <span>{{ connector.name }}</span>
       </q-btn>
+      <q-btn
+        key="solana"
+        class="row tw-mx-auto"
+        no-caps
+        rounded
+        unelevated
+        @click="($refs.openSolanaModal as HTMLButtonElement).click()"
+      >
+        <ltai-icon :name="getConnectorIconName('solana')" class="tw-mr-1" />
+        <span>Solana</span>
+      </q-btn>
     </q-btn-dropdown>
     <q-btn-dropdown
       v-else
-      :label="`${account.address.value?.slice(0, 4)}...${account.address.value?.slice(-2)}`"
+      :label="`${accountStore.account.address?.slice(0, 4)}...${accountStore.account.address?.slice(-2)}`"
       class="border-primary-highlight gt-sm"
       icon="img:icons/avatar.svg"
       no-caps
@@ -26,7 +53,7 @@
     >
       <div class="row no-wrap q-pa-md q-pt-none">
         <div class="column items-center">
-          <div class="text-small tw-mb-1">{{ account.address.value }}</div>
+          <div class="text-small tw-mb-1">{{ accountStore.account.address }}</div>
 
           <q-btn
             v-close-popup
@@ -50,32 +77,57 @@ import { useAccountStore } from 'stores/account';
 import { useAccount, useConnect, useDisconnect } from '@wagmi/vue';
 import { watchAccount } from '@wagmi/vue/actions';
 import { config } from 'src/config/wagmi';
-import { watchEffect } from 'vue';
+import { watch, watchEffect } from 'vue';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import { useWallet, WalletModalProvider } from 'solana-wallets-vue';
 
 const accountStore = useAccountStore();
 
-const account = useAccount();
-const { connect } = useConnect();
-const { disconnect } = useDisconnect();
+// wagmi
+const wagmiAccount = useAccount();
+const { connect: wagmiConnect } = useConnect();
+const { disconnect: wagmiDisconnect } = useDisconnect();
 
-if (account.isConnected.value) {
-  accountStore.onAccountChange();
+// solana
+const { publicKey: solanaPubKey, disconnect: solanaDisconnect } = useWallet();
+
+// wagmi account already connected
+if (wagmiAccount.isConnected.value) {
+  accountStore.onAccountChange({ address: wagmiAccount.address.value!, chain: 'base' });
+}
+// solana account already connected
+if (solanaPubKey.value !== null) {
+  accountStore.onAccountChange({ address: solanaPubKey.value.toBase58(), chain: 'solana' });
 }
 
+// watching wagmi account changes
 watchEffect((onCleanup) => {
   const unwatch = watchAccount(config, {
     async onChange(newAccount) {
       if (newAccount.address === undefined) {
-        accountStore.onDisconnect();
+        if (accountStore.account?.chain !== 'solana') {
+          accountStore.onDisconnect();
+        }
         return;
       }
 
-      await accountStore.onAccountChange();
+      await accountStore.onAccountChange({ address: newAccount.address, chain: 'base' });
     },
   });
   onCleanup(unwatch);
 });
+
+// watching solana account changes
+watch(
+  () => solanaPubKey.value,
+  (newValue) => {
+    if (newValue === null) {
+      accountStore.onDisconnect();
+    } else if (newValue.toBase58() !== accountStore.account?.address) {
+      accountStore.onAccountChange({ address: newValue.toBase58(), chain: 'solana' });
+    }
+  },
+);
 
 const getConnectorIconName = (connectorId: string): string => {
   switch (connectorId) {
@@ -85,8 +137,28 @@ const getConnectorIconName = (connectorId: string): string => {
       return 'svguse:icons.svg#metamask';
     case 'walletConnect':
       return 'svguse:icons.svg#walletConnect';
+    case 'solana':
+      return 'svguse:icons.svg#solana';
     default:
       return 'svguse:icons.svg#wallet';
   }
+};
+
+const disconnect = () => {
+  const account = accountStore.account;
+
+  if (account === null) {
+    return;
+  }
+
+  switch (account.chain) {
+    case 'base':
+      wagmiDisconnect();
+      break;
+    case 'solana':
+      solanaDisconnect();
+      break;
+  }
+  accountStore.onDisconnect();
 };
 </script>

@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { useAccountStore } from 'stores/account';
-import { SignMessageReturnType } from 'viem';
 import { Dark } from 'quasar';
 
 type Settings = {
@@ -12,7 +11,7 @@ type Settings = {
   };
   isSignatureHashStored: boolean;
   // Address to hash (to support multiple accounts/wallets)
-  signatureHash: Record<string, SignMessageReturnType>;
+  signatureHash: Record<string, string>;
 };
 
 type SettingsPersistedOnAleph = Omit<Settings, 'signatureHash'>;

@@ -171,7 +171,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { KnowledgeBase, KnowledgeBaseIdentifier, KnowledgeDocument } from 'src/types/knowledge';
 import { useKnowledgeStore } from 'stores/knowledge';
 import { exportFile, useQuasar } from 'quasar';
-import { useAccount } from '@wagmi/vue';
 import { useAccountStore } from 'stores/account';
 import { filesize } from 'filesize';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
@@ -187,7 +186,6 @@ import EmptyState from 'components/EmptyState.vue';
 const $q = useQuasar();
 const route = useRoute();
 const router = useRouter();
-const account = useAccount();
 
 const accountStore = useAccountStore();
 const knowledgeStore = useKnowledgeStore();
@@ -210,7 +208,7 @@ watch(
 );
 
 async function loadKnowledgeBase(id: string) {
-  if (!account.isConnected.value) {
+  if (accountStore.account === null) {
     $q.notify({ message: 'Account not connected', color: 'negative' });
     await router.push({ path: '/' });
     return;

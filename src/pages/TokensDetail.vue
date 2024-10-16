@@ -67,15 +67,14 @@
 import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useTokensStore } from 'stores/tokens';
-import { useAccount } from '@wagmi/vue';
 import web3 from 'web3';
 import { useQuasar } from 'quasar';
 
 const route = useRoute();
 const router = useRouter();
+
 const tokensStore = useTokensStore();
 
-const account = useAccount();
 const $q = useQuasar();
 
 // got address as an address part from vue router
@@ -102,17 +101,6 @@ watch(
   },
   {
     immediate: true,
-  },
-);
-watch(
-  () => account.address.value as string,
-  async (newAddress: string, oldAddress: string) => {
-    if (oldAddress === address.value) {
-      await router.push({
-        name: 'tokens-detail',
-        params: { address: newAddress },
-      });
-    }
   },
 );
 </script>
