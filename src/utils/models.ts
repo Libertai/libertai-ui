@@ -113,10 +113,10 @@ export const defaultModels: UIModel[] = [
     premium: false,
   },
 
-  // Llama 3 Instruct (70B, genius, slow)
+  // Nemotron (70B, genius, slow)
   {
     id: '173ad7b5-4aa9-4ccd-8fdd-f8122499c2cb',
-    name: 'Llama 3 Instruct (70B, genius, slow)',
+    name: 'Nemotron (70B, genius, slow)',
     ...modelDefaults,
     // Set our apiUrl
     apiUrl:
