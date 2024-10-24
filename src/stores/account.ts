@@ -3,7 +3,6 @@ import { AlephPersistentStorage } from 'src/utils/aleph-persistent-storage';
 import { useSettingsStore } from 'stores/settings';
 import { getAccount, getBalance } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
-import { base } from '@wagmi/vue/chains';
 import { useTokensStore } from 'stores/tokens';
 import { useKnowledgeStore } from 'stores/knowledge';
 import { useSubscriptionStore } from 'stores/subscription';
@@ -68,7 +67,7 @@ export const useAccountStore = defineStore('account', {
       const balance = await getBalance(config, {
         address: account.address,
         token: LTAI_BASE_ADDRESS,
-        chainId: base.id,
+        chainId: env.WAGMI_BASE_ID,
       });
 
       return Number(balance.formatted);
