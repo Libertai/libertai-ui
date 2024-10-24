@@ -20,6 +20,7 @@ import { PrivateKey } from 'eciesjs';
 import { decryptKnowledgeBaseIdentifiers, encryptKnowledgeBaseIdentifiers } from 'src/utils/knowledge/encryption';
 import { providers } from 'ethers';
 import { base } from '@wagmi/vue/chains';
+import env from 'src/config/env';
 import { useWallet } from 'solana-wallets-vue';
 import { AccountChain } from 'stores/account';
 import { getAccountFromProvider as getSolAccountFromProvider, SOLAccount } from '@aleph-sdk/solana';
@@ -84,8 +85,8 @@ export class AlephPersistentStorage {
 
     const account = await this.getAlephAccount(chain);
 
-    const accountClient = new AuthenticatedAlephHttpClient(account, process.env.ALEPH_API_URL);
-    const subAccountClient = new AuthenticatedAlephHttpClient(subAccount, process.env.ALEPH_API_URL);
+    const accountClient = new AuthenticatedAlephHttpClient(account, env.ALEPH_API_URL);
+    const subAccountClient = new AuthenticatedAlephHttpClient(subAccount, env.ALEPH_API_URL);
 
     await AlephPersistentStorage.getSecurityPermission(account, subAccount, accountClient);
 
