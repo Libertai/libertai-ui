@@ -7,7 +7,7 @@ type TokensStoreState = {
   estimated_3yr_tokens: Record<string, number>;
 };
 
-const AGGREGATE_PUBLISHER_ADDRESS = '0xCBFc3EeC41CBBfCAcc50337d712890C47a14ba99';
+const AGGREGATE_PUBLISHER_ADDRESS = process.env.LTAI_PUBLISHER_ADDRESS || '0xCBFc3EeC41CBBfCAcc50337d712890C47a14ba99';
 const AGGREGATE_KEYS = ['tokens', 'pending_tokens', 'estimated_3yr_tokens'];
 
 export const useTokensStore = defineStore('tokens', {
