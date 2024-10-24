@@ -60,35 +60,14 @@
 
       <chats-list />
 
-      <q-item v-for="item in sidebarItems" :key="item.link" :to="item.link">
-        <q-item-section class="tw-flex tw-flex-row tw-justify-start tw-items-center">
-          <ltai-icon :name="item.icon" class="tw-w-6 tw-h-6 tw-block" />
-          <p class="tw-pl-2">{{ item.title }}</p>
-        </q-item-section>
-      </q-item>
-
-      <!-- socials and support links (follow us, support, disclaimer) -->
-      <q-list class="q-pt-md flex">
-        <q-item class="q-mx-auto" href="https://x.com/libertai_dai" target="_blank">
-          <q-item-section avatar>
-            <img alt="Twitter - X" src="/icons/twitter-x.svg" width="32px" />
+      <div class="tw-mb-5">
+        <q-item v-for="item in sidebarItems" :key="item.link" :to="item.link">
+          <q-item-section class="tw-flex tw-flex-row tw-justify-start tw-items-center">
+            <ltai-icon :name="item.icon" class="tw-w-6 tw-h-6 tw-block" />
+            <p class="tw-pl-2">{{ item.title }}</p>
           </q-item-section>
         </q-item>
-        <q-item class="q-mx-auto" href="https://t.me/libertai" target="_blank">
-          <q-item-section avatar>
-            <img alt="Telegram" src="/icons/telegram.svg" width="32px" />
-          </q-item-section>
-        </q-item>
-        <q-item class="q-mx-auto" href="https://aleph.im" target="_blank">
-          <q-item-section avatar>
-            <img alt="Aleph" src="/icons/aleph.svg" width="32px" />
-          </q-item-section>
-        </q-item>
-      </q-list>
-      <!-- powered by aleph.im -->
-      <q-item clickable href="https://aleph.im" target="_blank">
-        <img :src="`icons/powered-by${$q.dark.mode ? '_lighten' : ''}.svg`" alt="aleph.im" />
-      </q-item>
+      </div>
     </q-drawer>
 
     <q-page-container>
@@ -116,6 +95,11 @@ function toggleLeftDrawer() {
 
 const sidebarItems = [
   {
+    link: '/subscriptions',
+    icon: 'svguse:icons.svg#subscription-star',
+    title: 'Subscriptions',
+  },
+  {
     link: '/knowledge-base',
     icon: 'svguse:icons.svg#book',
     title: 'Knowledge base',
@@ -124,6 +108,11 @@ const sidebarItems = [
     link: '/persona-management',
     icon: 'svguse:icons.svg#robot',
     title: 'Persona management',
+  },
+  {
+    link: '/account',
+    icon: 'svguse:icons.svg#account',
+    title: 'Account settings',
   },
 ];
 </script>

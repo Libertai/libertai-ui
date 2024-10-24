@@ -66,17 +66,53 @@ export type SubscriptionChain = 'base';
 /**
  * An enumeration.
  */
-export type SubscriptionProvider = 'hold' | 'subs';
+export type SubscriptionProvider = 'hold' | 'subs' | 'vouchers';
 
 /**
  * An enumeration.
  */
-export type SubscriptionType = 'standard';
+export type SubscriptionType = 'pro' | 'advanced' | 'agent';
 
 export type ValidationError = {
     loc: Array<(string | number)>;
     msg: string;
     type: string;
+};
+
+export type VouchersCreatedSubscription = {
+    account: SubscriptionAccount;
+    type: SubscriptionType;
+    end_time: number;
+    post_hash: string;
+    subscription_id: string;
+};
+
+export type VouchersDeleteSubscribeBody = {
+    subscription_ids: Array<(string)>;
+};
+
+export type VouchersDeleteSubscriptionResponse = {
+    cancelled_subscriptions: Array<(string)>;
+    not_found_subscriptions: Array<(string)>;
+};
+
+export type VouchersPostRefreshSubscriptionsResponse = {
+    cancelled_subscriptions: Array<(string)>;
+};
+
+export type VouchersPostSubscribeBody = {
+    subscriptions: Array<VouchersSubscription>;
+    password: string;
+};
+
+export type VouchersPostSubscriptionResponse = {
+    created_subscriptions: Array<VouchersCreatedSubscription>;
+};
+
+export type VouchersSubscription = {
+    account: SubscriptionAccount;
+    type: SubscriptionType;
+    end_time: number;
 };
 
 export type GetUserSubscriptionsSubscriptionsGetData = {
@@ -122,3 +158,23 @@ export type HoldSubscriptionMessagesHoldMessageGetError = (HTTPValidationError);
 export type RefreshSubsRefreshPostResponse = (SubsPostRefreshSubscriptionsResponse);
 
 export type RefreshSubsRefreshPostError = unknown;
+
+export type SubscribeVouchersSubscriptionPostData = {
+    body: VouchersPostSubscribeBody;
+};
+
+export type SubscribeVouchersSubscriptionPostResponse = (VouchersPostSubscriptionResponse);
+
+export type SubscribeVouchersSubscriptionPostError = (HTTPValidationError);
+
+export type CancelVouchersSubscriptionsVouchersSubscriptionDeleteData = {
+    body: VouchersDeleteSubscribeBody;
+};
+
+export type CancelVouchersSubscriptionsVouchersSubscriptionDeleteResponse = (VouchersDeleteSubscriptionResponse);
+
+export type CancelVouchersSubscriptionsVouchersSubscriptionDeleteError = (HTTPValidationError);
+
+export type RefreshActiveVouchersSubscriptionsVouchersRefreshPostResponse = (VouchersPostRefreshSubscriptionsResponse);
+
+export type RefreshActiveVouchersSubscriptionsVouchersRefreshPostError = unknown;

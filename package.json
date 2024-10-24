@@ -43,7 +43,6 @@
     "filesize": "^10.1.4",
     "highlight.js": "^11.10.0",
     "langchain": "^0.2.13",
-    "localforage": "^1.10.0",
     "marked": "^14.0.0",
     "marked-highlight": "^2.1.4",
     "mime": "^4.0.4",
