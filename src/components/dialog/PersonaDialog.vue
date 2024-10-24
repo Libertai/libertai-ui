@@ -38,11 +38,11 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref, toRaw, watch } from 'vue';
 import AlephAvatar from 'components/AlephAvatar.vue';
-import { BasePersonaEdition, defaultBasePersona } from 'src/types/personas';
 import LtaiDialog from 'components/libertai/LtaiDialog.vue';
 import KnowledgeBasesSelector from 'components/select/KnowledgeBasesSelector.vue';
+import { BasePersonaEdition, defaultBasePersona } from 'src/types/personas';
+import { PropType, ref, toRaw, watch } from 'vue';
 
 const props = defineProps({
   title: {

@@ -57,22 +57,22 @@
   </q-page>
 </template>
 <script lang="ts" setup>
+import KnowledgeBasesSelector from 'components/select/KnowledgeBasesSelector.vue';
+import ModelSelector from 'components/select/ModelSelector.vue';
+import PersonaDropdown from 'components/select/PersonaSelector.vue';
+import MessageInput from 'src/components/MessageInput.vue';
+import { SendMessageParams } from 'src/types/chats';
+import { UIPersona } from 'src/types/personas';
 import { defaultChatTopic } from 'src/utils/chat';
-import { useModelsStore } from 'stores/models';
+import { UIModel } from 'src/utils/models';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
 import { useChatsStore } from 'stores/chats';
+import { useKnowledgeStore } from 'stores/knowledge';
+import { useModelsStore } from 'stores/models';
 import { usePersonasStore } from 'stores/personas';
 import { useSettingsStore } from 'stores/settings';
 import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import MessageInput from 'src/components/MessageInput.vue';
-import PersonaDropdown from 'components/select/PersonaSelector.vue';
-import { getPersonaAvatarUrl } from 'src/utils/personas';
-import ModelSelector from 'components/select/ModelSelector.vue';
-import { UIModel } from 'src/utils/models';
-import { UIPersona } from 'src/types/personas';
-import { SendMessageParams } from 'src/types/chats';
-import KnowledgeBasesSelector from 'components/select/KnowledgeBasesSelector.vue';
-import { useKnowledgeStore } from 'stores/knowledge';
 
 const router = useRouter();
 

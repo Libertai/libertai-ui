@@ -19,8 +19,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useKnowledgeStore } from 'stores/knowledge';
 import { KnowledgeBase } from 'src/types/knowledge';
+import { useKnowledgeStore } from 'stores/knowledge';
 
 const knowledgeStore = useKnowledgeStore();
 

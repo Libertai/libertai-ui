@@ -112,28 +112,24 @@
 
 <script lang="ts" setup>
 import 'highlight.js/styles/devibeans.css';
-import { copyToClipboard, useQuasar } from 'quasar';
-import { nextTick, onMounted, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-
-import { defaultChatTopic, inferChatTopic } from 'src/utils/chat';
-
 import { LlamaCppApiEngine, Message } from '@libertai/libertai-js';
-
-import { useChatsStore } from 'stores/chats';
-import { useModelsStore } from 'stores/models';
-
+import axios from 'axios';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import dayjs from 'dayjs';
+import { copyToClipboard, useQuasar } from 'quasar';
 import MarkdownRenderer from 'src/components/MarkdownRenderer.vue';
 import MessageInput from 'src/components/MessageInput.vue';
-import axios from 'axios';
-import { getPersonaAvatarUrl } from 'src/utils/personas';
-import { useSettingsStore } from 'stores/settings';
 import { Chat, SendMessageParams, UIMessage } from 'src/types/chats';
-import dayjs from 'dayjs';
-import LtaiIcon from 'components/libertai/LtaiIcon.vue';
-import { searchDocuments } from 'src/utils/knowledge/embedding';
-import { useKnowledgeStore } from 'stores/knowledge';
 import { KnowledgeSearchResult } from 'src/types/knowledge';
+import { defaultChatTopic, inferChatTopic } from 'src/utils/chat';
+import { searchDocuments } from 'src/utils/knowledge/embedding';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
+import { useChatsStore } from 'stores/chats';
+import { useKnowledgeStore } from 'stores/knowledge';
+import { useModelsStore } from 'stores/models';
+import { useSettingsStore } from 'stores/settings';
+import { nextTick, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const $q = useQuasar();
 const route = useRoute();

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { useAccountStore } from 'stores/account';
 import { Dark } from 'quasar';
+import { useAccountStore } from 'stores/account';
 
 type Settings = {
   darkmode: boolean;

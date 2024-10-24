@@ -1,7 +1,8 @@
-import { boot } from 'quasar/wrappers';
-import { WagmiPlugin } from '@wagmi/vue';
-import { config } from '../config/wagmi';
 import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
+import { WagmiPlugin } from '@wagmi/vue';
+import { boot } from 'quasar/wrappers';
+
+import { config } from '../config/wagmi';
 
 export default boot(({ app }) => {
   const queryClient = new QueryClient();

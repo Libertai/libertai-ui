@@ -10,8 +10,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
 import LtaiDialog from 'components/libertai/LtaiDialog.vue';
+import { ref } from 'vue';
 
 const emit = defineEmits<{ create: [name: string] }>();
 

@@ -33,12 +33,12 @@
 </template>
 
 <script lang="ts" setup>
-import { useModelsStore } from 'stores/models';
-import { useAccountStore } from 'stores/account';
-import { computed, PropType } from 'vue';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 import { getTokenGatingMessage } from 'src/utils/messages';
 import { UIModel } from 'src/utils/models';
-import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import { useAccountStore } from 'stores/account';
+import { useModelsStore } from 'stores/models';
+import { computed, PropType } from 'vue';
 
 const modelsStore = useModelsStore();
 const accountStore = useAccountStore();

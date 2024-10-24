@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia';
 import { AlephPersistentStorage } from 'src/utils/aleph-persistent-storage';
-import { useSettingsStore } from 'stores/settings';
 import { getBalance } from '@wagmi/core';
-import { config } from 'src/config/wagmi';
-import { useTokensStore } from 'stores/tokens';
-import { useKnowledgeStore } from 'stores/knowledge';
-import { useSubscriptionStore } from 'stores/subscription';
 import env from 'src/config/env';
+import { config } from 'src/config/wagmi';
+import { useKnowledgeStore } from 'stores/knowledge';
+import { useSettingsStore } from 'stores/settings';
+import { useSubscriptionStore } from 'stores/subscription';
+import { useTokensStore } from 'stores/tokens';
 
 const LTAI_BASE_ADDRESS = env.LTAI_BASE_ADDRESS as `0x${string}`;
 
