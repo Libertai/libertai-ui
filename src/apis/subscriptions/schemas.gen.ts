@@ -192,7 +192,11 @@ export const SubscriptionAccountSchema = {
     },
     type: 'object',
     required: ['address', 'chain'],
-    title: 'SubscriptionAccount'
+    title: 'SubscriptionAccount',
+    example: {
+        address: '0x0000000000000000000000000000000000000000',
+        chain: 'base'
+    }
 } as const;
 
 export const SubscriptionChainSchema = {
@@ -204,14 +208,14 @@ export const SubscriptionChainSchema = {
 
 export const SubscriptionProviderSchema = {
     type: 'string',
-    enum: ['hold', 'subs'],
+    enum: ['hold', 'subs', 'vouchers'],
     title: 'SubscriptionProvider',
     description: 'An enumeration.'
 } as const;
 
 export const SubscriptionTypeSchema = {
     type: 'string',
-    enum: ['standard'],
+    enum: ['pro', 'advanced', 'agent'],
     title: 'SubscriptionType',
     description: 'An enumeration.'
 } as const;
@@ -244,4 +248,134 @@ export const ValidationErrorSchema = {
     type: 'object',
     required: ['loc', 'msg', 'type'],
     title: 'ValidationError'
+} as const;
+
+export const VouchersCreatedSubscriptionSchema = {
+    properties: {
+        account: {
+            '$ref': '#/components/schemas/SubscriptionAccount'
+        },
+        type: {
+            '$ref': '#/components/schemas/SubscriptionType'
+        },
+        end_time: {
+            type: 'integer',
+            title: 'End Time'
+        },
+        post_hash: {
+            type: 'string',
+            title: 'Post Hash'
+        },
+        subscription_id: {
+            type: 'string',
+            title: 'Subscription Id'
+        }
+    },
+    type: 'object',
+    required: ['account', 'type', 'end_time', 'post_hash', 'subscription_id'],
+    title: 'VouchersCreatedSubscription'
+} as const;
+
+export const VouchersDeleteSubscribeBodySchema = {
+    properties: {
+        subscription_ids: {
+            items: {
+                type: 'string'
+            },
+            type: 'array',
+            title: 'Subscription Ids'
+        }
+    },
+    type: 'object',
+    required: ['subscription_ids'],
+    title: 'VouchersDeleteSubscribeBody'
+} as const;
+
+export const VouchersDeleteSubscriptionResponseSchema = {
+    properties: {
+        cancelled_subscriptions: {
+            items: {
+                type: 'string'
+            },
+            type: 'array',
+            title: 'Cancelled Subscriptions'
+        },
+        not_found_subscriptions: {
+            items: {
+                type: 'string'
+            },
+            type: 'array',
+            title: 'Not Found Subscriptions'
+        }
+    },
+    type: 'object',
+    required: ['cancelled_subscriptions', 'not_found_subscriptions'],
+    title: 'VouchersDeleteSubscriptionResponse'
+} as const;
+
+export const VouchersPostRefreshSubscriptionsResponseSchema = {
+    properties: {
+        cancelled_subscriptions: {
+            items: {
+                type: 'string'
+            },
+            type: 'array',
+            title: 'Cancelled Subscriptions'
+        }
+    },
+    type: 'object',
+    required: ['cancelled_subscriptions'],
+    title: 'VouchersPostRefreshSubscriptionsResponse'
+} as const;
+
+export const VouchersPostSubscribeBodySchema = {
+    properties: {
+        subscriptions: {
+            items: {
+                '$ref': '#/components/schemas/VouchersSubscription'
+            },
+            type: 'array',
+            title: 'Subscriptions'
+        },
+        password: {
+            type: 'string',
+            title: 'Password'
+        }
+    },
+    type: 'object',
+    required: ['subscriptions', 'password'],
+    title: 'VouchersPostSubscribeBody'
+} as const;
+
+export const VouchersPostSubscriptionResponseSchema = {
+    properties: {
+        created_subscriptions: {
+            items: {
+                '$ref': '#/components/schemas/VouchersCreatedSubscription'
+            },
+            type: 'array',
+            title: 'Created Subscriptions'
+        }
+    },
+    type: 'object',
+    required: ['created_subscriptions'],
+    title: 'VouchersPostSubscriptionResponse'
+} as const;
+
+export const VouchersSubscriptionSchema = {
+    properties: {
+        account: {
+            '$ref': '#/components/schemas/SubscriptionAccount'
+        },
+        type: {
+            '$ref': '#/components/schemas/SubscriptionType'
+        },
+        end_time: {
+            type: 'integer',
+            title: 'End Time'
+        }
+    },
+    type: 'object',
+    required: ['account', 'type', 'end_time'],
+    title: 'VouchersSubscription'
 } as const;
