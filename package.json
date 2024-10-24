@@ -16,10 +16,10 @@
     "npm": "10.x"
   },
   "scripts": {
-    "lint": "eslint --ext .js,.ts,.vue ./",
-    "lint:fix": "eslint --fix --ext .js,.ts,.vue ./",
-    "format": "prettier --check \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
-    "format:fix": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
+    "lint:check": "eslint --ext .js,.ts,.vue ./",
+    "lint": "eslint --fix --ext .js,.ts,.vue ./",
+    "format:check": "prettier --check \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
+    "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "dev": "quasar dev",
     "build": "quasar build",
     "generate-subscriptions-client": "openapi-ts --input http://localhost:8000/openapi.json --output ./src/apis/subscriptions --client @hey-api/client-axios"
