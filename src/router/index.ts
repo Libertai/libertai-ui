@@ -1,5 +1,6 @@
 import { route } from 'quasar/wrappers';
 import { createMemoryHistory, createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
+
 import routes from './routes';
 
 /*
@@ -29,7 +30,7 @@ export default route(function (/* { store, ssrContext } */) {
   });
 
   Router.beforeEach(async (_to, _from, next) => {
-    // @TODO ensure pinia+persist storage ready
+    // TODO ensure pinia+persist storage ready
     // something like await storageReady
     next();
   });

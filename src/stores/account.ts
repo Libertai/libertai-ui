@@ -1,13 +1,14 @@
-import { defineStore } from 'pinia';
-import { AlephPersistentStorage } from 'src/utils/aleph-persistent-storage';
-import { useSettingsStore } from 'stores/settings';
 import { getAccount, getBalance } from '@wagmi/core';
+import { defineStore } from 'pinia';
+import env from 'src/config/env';
 import { config } from 'src/config/wagmi';
-import { base } from '@wagmi/vue/chains';
-import { useTokensStore } from 'stores/tokens';
+import { AlephPersistentStorage } from 'src/utils/aleph-persistent-storage';
 import { useKnowledgeStore } from 'stores/knowledge';
+import { useSettingsStore } from 'stores/settings';
+import { useSubscriptionStore } from 'stores/subscription';
+import { useTokensStore } from 'stores/tokens';
 
-const LTAI_BASE_ADDRESS = '0xF8B1b47AA748F5C7b5D0e80C726a843913EB573a';
+const LTAI_BASE_ADDRESS = env.LTAI_BASE_ADDRESS as `0x${string}`;
 
 type AccountStoreState = {
   alephStorage: AlephPersistentStorage | null;
@@ -23,12 +24,13 @@ export const useAccountStore = defineStore('account', {
     async onAccountChange() {
       const tokensStore = useTokensStore();
       const knowledgeStore = useKnowledgeStore();
+      const subscriptionsStore = useSubscriptionStore();
 
       this.ltaiBalance = await this.getLTAIBalance();
 
       await this.initAlephStorage();
-      await tokensStore.update();
-      await knowledgeStore.load();
+
+      await Promise.all([tokensStore.update(), knowledgeStore.load(), subscriptionsStore.load()]);
     },
 
     async initAlephStorage() {
@@ -65,7 +67,7 @@ export const useAccountStore = defineStore('account', {
       const balance = await getBalance(config, {
         address: account.address,
         token: LTAI_BASE_ADDRESS,
-        chainId: base.id,
+        chainId: env.WAGMI_BASE_ID,
       });
 
       return Number(balance.formatted);

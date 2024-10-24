@@ -105,18 +105,18 @@
 </template>
 
 <script lang="ts" setup>
+import PersonaDialog from 'components/dialog/PersonaDialog.vue';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import { exportFile } from 'quasar';
+import { BasePersonaEdition, UIPersona } from 'src/types/personas';
+import { getTokenGatingMessage } from 'src/utils/messages';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
+import { useAccountStore } from 'stores/account';
 import { usePersonasStore } from 'stores/personas';
+import { v4 as uuidv4 } from 'uuid';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { v4 as uuidv4 } from 'uuid';
-import { getPersonaAvatarUrl } from 'src/utils/personas';
-import PersonaDialog from 'components/dialog/PersonaDialog.vue';
-import { useAccountStore } from 'stores/account';
-import { exportFile } from 'quasar';
-import { getTokenGatingMessage } from 'src/utils/messages';
 import { z } from 'zod';
-import { BasePersonaEdition, UIPersona } from 'src/types/personas';
-import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 
 const personasStore = usePersonasStore();
 const accountStore = useAccountStore();

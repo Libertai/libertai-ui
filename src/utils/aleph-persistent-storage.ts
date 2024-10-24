@@ -1,10 +1,10 @@
 import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
 import { ETHAccount, getAccountFromProvider, importAccountFromPrivateKey } from '@aleph-sdk/ethereum';
-import web3 from 'web3';
 import { ItemType } from '@aleph-sdk/message';
 import { signMessage } from '@wagmi/core';
+import { PrivateKey } from 'eciesjs';
+import env from 'src/config/env';
 import { config } from 'src/config/wagmi';
-import { SignMessageReturnType } from 'viem';
 import {
   KnowledgeBase,
   KnowledgeBaseIdentifier,
@@ -12,8 +12,9 @@ import {
   knowledgeSchema,
 } from 'src/types/knowledge';
 import { decrypt, encrypt, generateIv, generateKey } from 'src/utils/encryption';
-import { PrivateKey } from 'eciesjs';
 import { decryptKnowledgeBaseIdentifiers, encryptKnowledgeBaseIdentifiers } from 'src/utils/knowledge/encryption';
+import { SignMessageReturnType } from 'viem';
+import web3 from 'web3';
 
 // Aleph keys and channels settings
 const SECURITY_AGGREGATE_KEY = 'security';
@@ -34,7 +35,7 @@ export class AlephPersistentStorage {
     private encryptionPrivateKey: PrivateKey,
   ) {}
 
-  static async signBaseMessage() {
+  static signBaseMessage() {
     return signMessage(config, { message: MESSAGE });
   }
 
@@ -49,8 +50,8 @@ export class AlephPersistentStorage {
 
     const subAccount = importAccountFromPrivateKey(privateKey);
     const account = await getAccountFromProvider(window.ethereum);
-    const accountClient = new AuthenticatedAlephHttpClient(account, process.env.ALEPH_API_URL);
-    const subAccountClient = new AuthenticatedAlephHttpClient(subAccount, process.env.ALEPH_API_URL);
+    const accountClient = new AuthenticatedAlephHttpClient(account, env.ALEPH_API_URL);
+    const subAccountClient = new AuthenticatedAlephHttpClient(subAccount, env.ALEPH_API_URL);
 
     await AlephPersistentStorage.getSecurityPermission(account, subAccount, accountClient);
 

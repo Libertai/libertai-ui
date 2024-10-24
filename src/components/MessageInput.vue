@@ -63,12 +63,12 @@
 </template>
 
 <script lang="ts" setup>
-import { PropType, ref, watch } from 'vue';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import { useQuasar } from 'quasar';
 import { MessageAttachment, SendMessageParams } from 'src/types/chats';
 import { processAttachment } from 'src/utils/knowledge/attachments';
-import { useQuasar } from 'quasar';
-import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 import { supportedInputFiles } from 'src/utils/knowledge/parsing';
+import { PropType, ref, watch } from 'vue';
 
 const props = defineProps({
   isLoading: {

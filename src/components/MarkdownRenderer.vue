@@ -3,11 +3,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import DOMPurify from 'dompurify';
+import hljs from 'highlight.js';
 import { Marked } from 'marked';
 import { markedHighlight } from 'marked-highlight';
-import hljs from 'highlight.js';
-import DOMPurify from 'dompurify';
+import { ref, watch } from 'vue';
 
 const props = defineProps({
   content: {

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
+import { Dark } from 'quasar';
 import { useAccountStore } from 'stores/account';
 import { SignMessageReturnType } from 'viem';
-import { Dark } from 'quasar';
 
 type Settings = {
   darkmode: boolean;
@@ -61,7 +61,7 @@ export const useSettingsStore = defineStore('settings', {
     },
 
     async persistOnAleph(settings: SettingsPersistedOnAleph) {
-      const account: any = useAccountStore();
+      const account = useAccountStore();
 
       if (account.alephStorage !== null) {
         await account.alephStorage.saveSettings(settings);

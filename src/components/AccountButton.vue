@@ -44,12 +44,12 @@
 </template>
 
 <script lang="ts" setup>
-import { useAccountStore } from 'stores/account';
 import { useAccount, useConnect, useDisconnect } from '@wagmi/vue';
 import { watchAccount } from '@wagmi/vue/actions';
-import { config } from 'src/config/wagmi';
-import { watchEffect } from 'vue';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import { config } from 'src/config/wagmi';
+import { useAccountStore } from 'stores/account';
+import { watchEffect } from 'vue';
 
 const accountStore = useAccountStore();
 

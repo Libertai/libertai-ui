@@ -64,14 +64,14 @@
 </template>
 
 <script lang="ts" setup>
-import { storeToRefs } from 'pinia';
-import { useChatsStore } from 'stores/chats';
-import { useRoute, useRouter } from 'vue-router';
-import { nextTick, ref } from 'vue';
 import ChatSettingsDialog from 'components/dialog/ChatSettingsDialog.vue';
-import { Chat } from 'src/types/chats';
-import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 import LtaiDialog from 'components/libertai/LtaiDialog.vue';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import { storeToRefs } from 'pinia';
+import { Chat } from 'src/types/chats';
+import { useChatsStore } from 'stores/chats';
+import { nextTick, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const chatsStore = useChatsStore();
 const route = useRoute();

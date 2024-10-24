@@ -64,12 +64,12 @@
 </template>
 
 <script lang="ts" setup>
+import { useAccount } from '@wagmi/vue';
+import { useQuasar } from 'quasar';
+import { useTokensStore } from 'stores/tokens';
 import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useTokensStore } from 'stores/tokens';
-import { useAccount } from '@wagmi/vue';
 import web3 from 'web3';
-import { useQuasar } from 'quasar';
 
 const route = useRoute();
 const router = useRouter();

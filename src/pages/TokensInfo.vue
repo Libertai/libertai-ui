@@ -113,8 +113,8 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, onMounted, ref } from 'vue';
 import { useTokensStore } from 'stores/tokens';
+import { nextTick, onMounted, ref } from 'vue';
 import web3 from 'web3';
 
 const tokensStore = useTokensStore();
