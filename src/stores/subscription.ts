@@ -1,3 +1,4 @@
+import { getAccount, signMessage } from '@wagmi/core';
 import { defineStore } from 'pinia';
 import {
   BaseSubscription,
@@ -6,7 +7,6 @@ import {
   subscribeHoldSubscriptionPost,
   SubscriptionType,
 } from 'src/apis/subscriptions';
-import { getAccount, signMessage } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
 
 type SubscriptionState = {

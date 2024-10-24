@@ -32,10 +32,10 @@
 </template>
 
 <script lang="ts" setup>
-import { usePersonasStore } from 'stores/personas';
-import { getPersonaAvatarUrl } from 'src/utils/personas';
-import { PropType } from 'vue';
 import { UIPersona } from 'src/types/personas';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
+import { usePersonasStore } from 'stores/personas';
+import { PropType } from 'vue';
 
 const personasStore = usePersonasStore();
 

@@ -39,18 +39,18 @@
 </template>
 
 <script lang="ts" setup>
-import { useSettingsStore } from 'stores/settings';
-import { ref, watch } from 'vue';
-import { getPersonaAvatarUrl } from 'src/utils/personas';
-import { Chat } from 'src/types/chats';
-import { UIModel } from 'src/utils/models';
-import ModelSelector from 'components/select/ModelSelector.vue';
-import { useModelsStore } from 'stores/models';
-import { UIPersona } from 'src/types/personas';
-import PersonaDropdown from 'components/select/PersonaSelector.vue';
-import { usePersonasStore } from 'stores/personas';
 import LtaiDialog from 'components/libertai/LtaiDialog.vue';
 import KnowledgeBasesSelector from 'components/select/KnowledgeBasesSelector.vue';
+import ModelSelector from 'components/select/ModelSelector.vue';
+import PersonaDropdown from 'components/select/PersonaSelector.vue';
+import { Chat } from 'src/types/chats';
+import { UIPersona } from 'src/types/personas';
+import { UIModel } from 'src/utils/models';
+import { getPersonaAvatarUrl } from 'src/utils/personas';
+import { useModelsStore } from 'stores/models';
+import { usePersonasStore } from 'stores/personas';
+import { useSettingsStore } from 'stores/settings';
+import { ref, watch } from 'vue';
 
 const { avatar } = useSettingsStore();
 const personasStore = usePersonasStore();

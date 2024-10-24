@@ -1,10 +1,10 @@
 import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
 import { ETHAccount, getAccountFromProvider, importAccountFromPrivateKey } from '@aleph-sdk/ethereum';
-import web3 from 'web3';
 import { ItemType } from '@aleph-sdk/message';
 import { signMessage } from '@wagmi/core';
+import { PrivateKey } from 'eciesjs';
+import env from 'src/config/env';
 import { config } from 'src/config/wagmi';
-import { SignMessageReturnType } from 'viem';
 import {
   KnowledgeBase,
   KnowledgeBaseIdentifier,
@@ -12,9 +12,9 @@ import {
   knowledgeSchema,
 } from 'src/types/knowledge';
 import { decrypt, encrypt, generateIv, generateKey } from 'src/utils/encryption';
-import { PrivateKey } from 'eciesjs';
 import { decryptKnowledgeBaseIdentifiers, encryptKnowledgeBaseIdentifiers } from 'src/utils/knowledge/encryption';
-import env from 'src/config/env';
+import { SignMessageReturnType } from 'viem';
+import web3 from 'web3';
 
 // Aleph keys and channels settings
 const SECURITY_AGGREGATE_KEY = 'security';

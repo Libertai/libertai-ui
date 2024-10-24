@@ -1,5 +1,5 @@
 <template>
-  <authenticated>
+  <authenticated-page>
     <section class="max-sm:tw-mx-4 sm:tw-mx-10 tw-my-5">
       <div class="tw-flex tw-mb-5 tw-items-center tw-space-x-2">
         <h4 class="text-h4 text-semibold">Knowledge base</h4>
@@ -44,17 +44,17 @@
         </RouterLink>
       </div>
     </section>
-  </authenticated>
+  </authenticated-page>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
 import KnowledgeBaseCreationDialog from 'components/dialog/KnowledgeBaseCreationDialog.vue';
-import { useKnowledgeStore } from 'stores/knowledge';
+import EmptyState from 'components/EmptyState.vue';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 import dayjs from 'dayjs';
-import EmptyState from 'components/EmptyState.vue';
-import Authenticated from 'layouts/Authenticated.vue';
+import AuthenticatedPage from 'layouts/AuthenticatedPage.vue';
+import { useKnowledgeStore } from 'stores/knowledge';
+import { ref } from 'vue';
 
 const knowledgeStore = useKnowledgeStore();
 

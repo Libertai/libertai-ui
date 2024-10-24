@@ -1,6 +1,6 @@
-import { v4 as uuidv4 } from 'uuid';
 import { MessageAttachment } from 'src/types/chats';
 import { extractFileContent } from 'src/utils/knowledge/parsing';
+import { v4 as uuidv4 } from 'uuid';
 
 export const MAX_ATTACHMENT_SIZE = 4 * 1024; // 4 KiB
 

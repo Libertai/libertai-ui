@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
+import { personasMigrations } from 'src/migrations/personas';
+import { UIPersona } from 'src/types/personas';
 
 import { defaultPersonas } from '../utils/personas';
-import { UIPersona } from 'src/types/personas';
-import { personasMigrations } from 'src/migrations/personas';
 
 type PersonasStoreState = {
   version: number;

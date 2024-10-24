@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia';
 import { AlephHttpClient } from '@aleph-sdk/client';
+import { defineStore } from 'pinia';
 import env from 'src/config/env';
 
 type TokensStoreState = {

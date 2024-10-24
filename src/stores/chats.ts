@@ -1,8 +1,8 @@
-import { v4 as uuidv4 } from 'uuid';
 import { defineStore } from 'pinia';
 import { chatsMigrations } from 'src/migrations/chats';
 import { Chat, MessageAttachment, UIMessage } from 'src/types/chats';
 import { UIPersona } from 'src/types/personas';
+import { v4 as uuidv4 } from 'uuid';
 
 const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
 

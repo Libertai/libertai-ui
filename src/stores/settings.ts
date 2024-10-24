@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
+import { Dark } from 'quasar';
 import { useAccountStore } from 'stores/account';
 import { SignMessageReturnType } from 'viem';
-import { Dark } from 'quasar';
 
 type Settings = {
   darkmode: boolean;
