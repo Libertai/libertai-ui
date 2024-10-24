@@ -29,7 +29,7 @@ export default route(function (/* { store, ssrContext } */) {
   });
 
   Router.beforeEach(async (_to, _from, next) => {
-    // @TODO ensure pinia+persist storage ready
+    // TODO ensure pinia+persist storage ready
     // something like await storageReady
     next();
   });
