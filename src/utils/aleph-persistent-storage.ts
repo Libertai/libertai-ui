@@ -14,6 +14,7 @@ import {
 import { decrypt, encrypt, generateIv, generateKey } from 'src/utils/encryption';
 import { PrivateKey } from 'eciesjs';
 import { decryptKnowledgeBaseIdentifiers, encryptKnowledgeBaseIdentifiers } from 'src/utils/knowledge/encryption';
+import env from 'src/config/env';
 
 // Aleph keys and channels settings
 const SECURITY_AGGREGATE_KEY = 'security';
@@ -49,8 +50,8 @@ export class AlephPersistentStorage {
 
     const subAccount = importAccountFromPrivateKey(privateKey);
     const account = await getAccountFromProvider(window.ethereum);
-    const accountClient = new AuthenticatedAlephHttpClient(account, process.env.ALEPH_API_URL);
-    const subAccountClient = new AuthenticatedAlephHttpClient(subAccount, process.env.ALEPH_API_URL);
+    const accountClient = new AuthenticatedAlephHttpClient(account, env.ALEPH_API_URL);
+    const subAccountClient = new AuthenticatedAlephHttpClient(subAccount, env.ALEPH_API_URL);
 
     await AlephPersistentStorage.getSecurityPermission(account, subAccount, accountClient);
 
