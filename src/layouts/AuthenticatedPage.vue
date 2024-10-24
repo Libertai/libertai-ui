@@ -1,11 +1,13 @@
 <template>
-  <slot v-if="account.isConnected.value" />
+  <q-page>
+    <slot v-if="account.isConnected.value" />
+  </q-page>
 </template>
 
 <script lang="ts" setup>
 import { useAccount } from '@wagmi/vue';
-import { onMounted } from 'vue';
 import { useQuasar } from 'quasar';
+import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 const $q = useQuasar();

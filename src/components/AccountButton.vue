@@ -73,13 +73,13 @@
 </template>
 
 <script lang="ts" setup>
-import { useAccountStore } from 'stores/account';
 import { useAccount, useConnect, useDisconnect } from '@wagmi/vue';
 import { watchAccount } from '@wagmi/vue/actions';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 import { config } from 'src/config/wagmi';
 import { watch, watchEffect } from 'vue';
-import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 import { useWallet, WalletModalProvider } from 'solana-wallets-vue';
+import { useAccountStore } from 'stores/account';
 
 const accountStore = useAccountStore();
 

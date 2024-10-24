@@ -1,5 +1,5 @@
 <template>
-  <authenticated>
+  <authenticated-page>
     <q-linear-progress v-if="!knowledgeStore.isLoaded" class="tw-mt-20" indeterminate />
     <section v-else-if="knowledgeBaseRef" class="max-sm:tw-mx-4 sm:tw-mx-10 tw-space-y-4 tw-my-5">
       <q-btn class="tw-w-10 tw-h-10" to="/knowledge-base" unelevated>
@@ -165,26 +165,26 @@
       </div>
       <q-linear-progress v-if="uploadInProgress" indeterminate />
     </section>
-  </authenticated>
+  </authenticated-page>
 </template>
 <script lang="ts" setup>
+import KnowledgeBaseRenameDialog from 'components/dialog/KnowledgeBaseRenameDialog.vue';
+import KnowledgeBaseRenameDocumentDialog from 'components/dialog/KnowledgeBaseRenameDocumentDialog.vue';
+import EmptyState from 'components/EmptyState.vue';
+import LtaiDialog from 'components/libertai/LtaiDialog.vue';
+import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import { filesize } from 'filesize';
+import AuthenticatedPage from 'layouts/AuthenticatedPage.vue';
+import { exportFile, useQuasar } from 'quasar';
+import { KnowledgeBase, KnowledgeBaseIdentifier, KnowledgeDocument } from 'src/types/knowledge';
+import { decryptFile, encryptFile } from 'src/utils/encryption';
+import { MAX_ATTACHMENT_SIZE } from 'src/utils/knowledge/attachments';
+import { processDocument } from 'src/utils/knowledge/document';
+import { supportedInputFiles } from 'src/utils/knowledge/parsing';
+import { useAccountStore } from 'stores/account';
+import { useKnowledgeStore } from 'stores/knowledge';
 import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { KnowledgeBase, KnowledgeBaseIdentifier, KnowledgeDocument } from 'src/types/knowledge';
-import { useKnowledgeStore } from 'stores/knowledge';
-import { exportFile, useQuasar } from 'quasar';
-import { useAccountStore } from 'stores/account';
-import { filesize } from 'filesize';
-import LtaiIcon from 'components/libertai/LtaiIcon.vue';
-import LtaiDialog from 'components/libertai/LtaiDialog.vue';
-import KnowledgeBaseRenameDocumentDialog from 'components/dialog/KnowledgeBaseRenameDocumentDialog.vue';
-import { processDocument } from 'src/utils/knowledge/document';
-import { decryptFile, encryptFile } from 'src/utils/encryption';
-import KnowledgeBaseRenameDialog from 'components/dialog/KnowledgeBaseRenameDialog.vue';
-import { supportedInputFiles } from 'src/utils/knowledge/parsing';
-import { MAX_ATTACHMENT_SIZE } from 'src/utils/knowledge/attachments';
-import EmptyState from 'components/EmptyState.vue';
-import Authenticated from 'layouts/Authenticated.vue';
 
 const $q = useQuasar();
 const route = useRoute();

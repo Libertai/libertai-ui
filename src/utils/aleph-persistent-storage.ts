@@ -4,8 +4,8 @@ import {
   getAccountFromProvider as getBaseAccountFromProvider,
   importAccountFromPrivateKey as importBaseAccountFromPrivateKey,
 } from '@aleph-sdk/base';
-import web3 from 'web3';
 import { ItemType } from '@aleph-sdk/message';
+import { PrivateKey } from 'eciesjs';
 import { type Config, getConnectorClient, signMessage as signWagmiMessage } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
 import type { Account, Chain, Client, Transport } from 'viem';
@@ -16,8 +16,8 @@ import {
   knowledgeSchema,
 } from 'src/types/knowledge';
 import { decrypt, encrypt, generateIv, generateKey } from 'src/utils/encryption';
-import { PrivateKey } from 'eciesjs';
 import { decryptKnowledgeBaseIdentifiers, encryptKnowledgeBaseIdentifiers } from 'src/utils/knowledge/encryption';
+import web3 from 'web3';
 import { providers } from 'ethers';
 import { base } from '@wagmi/vue/chains';
 import env from 'src/config/env';

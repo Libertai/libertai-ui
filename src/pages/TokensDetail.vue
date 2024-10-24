@@ -68,7 +68,6 @@ import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useTokensStore } from 'stores/tokens';
 import web3 from 'web3';
-import { useQuasar } from 'quasar';
 
 const route = useRoute();
 const router = useRouter();

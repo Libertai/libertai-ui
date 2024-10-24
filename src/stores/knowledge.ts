@@ -1,9 +1,8 @@
 import { defineStore } from 'pinia';
-import { v4 as uuidv4 } from 'uuid';
-
 import { KnowledgeBase, KnowledgeBaseIdentifier, KnowledgeDocument } from 'src/types/knowledge';
-import { useAccountStore } from 'stores/account';
 import { decryptFile } from 'src/utils/encryption';
+import { useAccountStore } from 'stores/account';
+import { v4 as uuidv4 } from 'uuid';
 
 type KnowledgeStoreState = {
   knowledgeBases: KnowledgeBase[];

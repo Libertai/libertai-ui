@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { base, baseSepolia } from '@wagmi/vue/chains';
+import { z } from 'zod';
 
 const envSchema = z.object({
   ALEPH_API_URL: z.string().optional(),

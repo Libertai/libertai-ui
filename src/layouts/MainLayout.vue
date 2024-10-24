@@ -2,12 +2,15 @@
   <q-layout view="lHh Lpr lFf">
     <q-header class="bg-transparent q-mt-sm">
       <q-toolbar>
-        <q-btn aria-label="Menu" color="primary" dense flat icon="menu" round @click="toggleLeftDrawer" />
-
-        <q-btn class="tw-p-1" flat @click="showUserSettingsDialog = true">
-          <ltai-icon name="svguse:icons.svg#settings" size="xs" />
-        </q-btn>
-        <user-settings-dialog v-model="showUserSettingsDialog" />
+        <q-btn
+          aria-label="Menu"
+          color="primary"
+          dense
+          flat
+          icon="menu"
+          round
+          @click="generalStore.isSidebarOpen = !generalStore.isSidebarOpen"
+        />
 
         <q-space />
 
@@ -46,7 +49,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" class="flex-grow fit tw-flex tw-flex-col" show-if-above>
+    <q-drawer v-model="generalStore.isSidebarOpen" class="flex-grow fit tw-flex tw-flex-col" show-if-above>
       <!-- image link with the logo -->
       <q-item class="q-mb-md text-left" clickable to="/">
         <img :src="`icons/libertai_full${$q.dark.mode ? '_lighten' : ''}.svg`" alt="LibertAI" />
@@ -77,21 +80,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
 import AccountButton from 'src/components/AccountButton.vue';
-import UserSettingsDialog from 'components/dialog/UserSettingsDialog.vue';
-import { useAccountStore } from 'stores/account';
 import ChatsList from 'components/ChatsList.vue';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
-
-const leftDrawerOpen = ref(false);
-const showUserSettingsDialog = ref(false);
+import { useAccountStore } from 'stores/account';
+import { useGeneralStore } from 'stores/general';
 
 const accountStore = useAccountStore();
-
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
-}
+const generalStore = useGeneralStore();
 
 const sidebarItems = [
   {

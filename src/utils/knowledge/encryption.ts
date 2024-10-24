@@ -1,5 +1,5 @@
-import { KnowledgeBaseIdentifier } from 'src/types/knowledge';
 import { decrypt as eciesDecrypt, encrypt as eciesEncrypt, PrivateKey } from 'eciesjs';
+import { KnowledgeBaseIdentifier } from 'src/types/knowledge';
 import { BUFFER_ENCODING } from 'src/utils/encryption';
 
 export const encryptKnowledgeBaseIdentifiers = (
