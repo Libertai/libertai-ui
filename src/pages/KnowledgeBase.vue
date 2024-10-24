@@ -1,106 +1,17 @@
 <template>
-  <q-linear-progress v-if="!knowledgeStore.isLoaded" class="tw-mt-20" indeterminate />
-  <section v-else-if="knowledgeBaseRef" class="max-sm:tw-mx-4 sm:tw-mx-10 tw-space-y-4 tw-my-5">
-    <q-btn class="tw-w-10 tw-h-10" to="/knowledge-base" unelevated>
-      <ltai-icon name="svguse:icons.svg#arrow-left" />
-    </q-btn>
-    <div>
-      <div class="tw-flex tw-space-x-4">
-        <h4 class="text-h4 text-semibold">{{ knowledgeBaseRef.name }}</h4>
-
-        <q-btn-dropdown class="tw-p-1" dropdown-icon="more_horiz" unelevated>
-          <q-list>
-            <q-item v-close-popup clickable @click="showRenameKnowledgeBase = true">
-              <q-item-section avatar>
-                <ltai-icon class="tw-mx-auto" name="svguse:icons.svg#pencil" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Rename</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item v-close-popup clickable @click="showDeleteKnowledgeBaseConfirmation = true">
-              <q-item-section avatar>
-                <ltai-icon class="tw-mx-auto" name="svguse:icons.svg#delete" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Delete</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
-      </div>
-
-      <div class="tw-mt-4 tw-flex md:tw-justify-end">
-        <q-btn
-          class="border-primary-highlight"
-          no-caps
-          rounded
-          unelevated
-          @click="($refs.documentUpload as any).click()"
-        >
-          <ltai-icon left name="svguse:icons.svg#add" />
-          <span>Upload document</span>
-        </q-btn>
-        <!-- Hidden document upload -->
-        <input
-          ref="documentUpload"
-          :accept="supportedInputFiles"
-          hidden
-          multiple
-          type="file"
-          @change="uploadDocuments"
-        />
-      </div>
-    </div>
-
-    <empty-state
-      v-if="knowledgeBaseRef.documents.length === 0"
-      description="Upload a document to get started"
-      image-alt="No document"
-      image-link="/assets/empty-states/knowledge-document.png"
-      title="No documents uploaded"
-    />
-
-    <div class="tw-space-y-4">
-      <div
-        v-for="document of knowledgeBaseRef.documents"
-        :key="document.id"
-        class="tw-flex tw-border tw-items-center tw-rounded-lg tw-p-4"
-      >
-        <ltai-icon class="tw-h-5 tw-w-5 tw-mr-4" name="svguse:icons.svg#attachment" />
-
-        <p class="tw-font-bold tw-text-base">{{ document.name }}</p>
-        <div class="tw-ml-auto tw-flex tw-items-center tw-gap-4">
-          <p class="max-sm:tw-hidden">{{ filesize(document.size, { round: 0 }) }}</p>
-          <q-btn
-            :disable="document.size > MAX_ATTACHMENT_SIZE"
-            class="tw-w-10 tw-h-10"
-            unelevated
-            @click="chatWithDocument(document)"
-          >
-            <ltai-icon name="svguse:icons.svg#chat" />
-            <q-tooltip v-if="document.size > MAX_ATTACHMENT_SIZE">
-              Document is too big to be used as chat attachment
-            </q-tooltip>
-          </q-btn>
-
-          <q-btn class="tw-w-10 tw-h-10" unelevated @click="downloadDocument(document)">
-            <ltai-icon name="svguse:icons.svg#download" />
-            <q-tooltip>Download</q-tooltip>
-          </q-btn>
+  <authenticated>
+    <q-linear-progress v-if="!knowledgeStore.isLoaded" class="tw-mt-20" indeterminate />
+    <section v-else-if="knowledgeBaseRef" class="max-sm:tw-mx-4 sm:tw-mx-10 tw-space-y-4 tw-my-5">
+      <q-btn class="tw-w-10 tw-h-10" to="/knowledge-base" unelevated>
+        <ltai-icon name="svguse:icons.svg#arrow-left" />
+      </q-btn>
+      <div>
+        <div class="tw-flex tw-space-x-4">
+          <h4 class="text-h4 text-semibold">{{ knowledgeBaseRef.name }}</h4>
 
           <q-btn-dropdown class="tw-p-1" dropdown-icon="more_horiz" unelevated>
             <q-list>
-              <q-item
-                v-close-popup
-                clickable
-                @click="
-                  () => {
-                    selectedDocument = document;
-                    showRenameDocument = true;
-                  }
-                "
-              >
+              <q-item v-close-popup clickable @click="showRenameKnowledgeBase = true">
                 <q-item-section avatar>
                   <ltai-icon class="tw-mx-auto" name="svguse:icons.svg#pencil" />
                 </q-item-section>
@@ -108,16 +19,7 @@
                   <q-item-label>Rename</q-item-label>
                 </q-item-section>
               </q-item>
-              <q-item
-                v-close-popup
-                clickable
-                @click="
-                  () => {
-                    selectedDocument = document;
-                    showDeleteDocumentConfirmation = true;
-                  }
-                "
-              >
+              <q-item v-close-popup clickable @click="showDeleteKnowledgeBaseConfirmation = true">
                 <q-item-section avatar>
                   <ltai-icon class="tw-mx-auto" name="svguse:icons.svg#delete" />
                 </q-item-section>
@@ -128,42 +30,142 @@
             </q-list>
           </q-btn-dropdown>
         </div>
+
+        <div class="tw-mt-4 tw-flex md:tw-justify-end">
+          <q-btn
+            class="border-primary-highlight"
+            no-caps
+            rounded
+            unelevated
+            @click="($refs.documentUpload as any).click()"
+          >
+            <ltai-icon left name="svguse:icons.svg#add" />
+            <span>Upload document</span>
+          </q-btn>
+          <!-- Hidden document upload -->
+          <input
+            ref="documentUpload"
+            :accept="supportedInputFiles"
+            hidden
+            multiple
+            type="file"
+            @change="uploadDocuments"
+          />
+        </div>
       </div>
 
-      <!-- Document dialogs-->
-      <knowledge-base-rename-document-dialog
-        v-model="showRenameDocument"
-        :name="selectedDocument?.name ?? ''"
-        @save="(newName: string) => renameDocument(selectedDocument!, newName)"
+      <empty-state
+        v-if="knowledgeBaseRef.documents.length === 0"
+        description="Upload a document to get started"
+        image-alt="No document"
+        image-link="/assets/empty-states/knowledge-document.png"
+        title="No documents uploaded"
       />
-      <ltai-dialog
-        v-model="showDeleteDocumentConfirmation"
-        title="Delete document"
-        @save="deleteDocument(selectedDocument!)"
-      >
-        <q-card-section class="row">
-          <span>Are you sure you want to delete the document {{ selectedDocument!.name }}?</span>
-        </q-card-section>
-      </ltai-dialog>
 
-      <!-- Knowledge base dialogs -->
-      <knowledge-base-rename-dialog
-        v-model="showRenameKnowledgeBase"
-        :name="knowledgeBaseRef.name"
-        @save="(newName: string) => renameKnowledgeBase(newName)"
-      />
-      <ltai-dialog
-        v-model="showDeleteKnowledgeBaseConfirmation"
-        title="Delete knowledge base"
-        @save="deleteKnowledgeBase"
-      >
-        <q-card-section class="row">
-          <span>Are you sure you want to delete the knowledge base "{{ knowledgeBaseRef.name }}" ?</span>
-        </q-card-section>
-      </ltai-dialog>
-    </div>
-    <q-linear-progress v-if="uploadInProgress" indeterminate />
-  </section>
+      <div class="tw-space-y-4">
+        <div
+          v-for="document of knowledgeBaseRef.documents"
+          :key="document.id"
+          class="tw-flex tw-border tw-items-center tw-rounded-lg tw-p-4"
+        >
+          <ltai-icon class="tw-h-5 tw-w-5 tw-mr-4" name="svguse:icons.svg#attachment" />
+
+          <p class="tw-font-bold tw-text-base">{{ document.name }}</p>
+          <div class="tw-ml-auto tw-flex tw-items-center tw-gap-4">
+            <p class="max-sm:tw-hidden">{{ filesize(document.size, { round: 0 }) }}</p>
+            <q-btn
+              :disable="document.size > MAX_ATTACHMENT_SIZE"
+              class="tw-w-10 tw-h-10"
+              unelevated
+              @click="chatWithDocument(document)"
+            >
+              <ltai-icon name="svguse:icons.svg#chat" />
+              <q-tooltip v-if="document.size > MAX_ATTACHMENT_SIZE">
+                Document is too big to be used as chat attachment
+              </q-tooltip>
+            </q-btn>
+
+            <q-btn class="tw-w-10 tw-h-10" unelevated @click="downloadDocument(document)">
+              <ltai-icon name="svguse:icons.svg#download" />
+              <q-tooltip>Download</q-tooltip>
+            </q-btn>
+
+            <q-btn-dropdown class="tw-p-1" dropdown-icon="more_horiz" unelevated>
+              <q-list>
+                <q-item
+                  v-close-popup
+                  clickable
+                  @click="
+                    () => {
+                      selectedDocument = document;
+                      showRenameDocument = true;
+                    }
+                  "
+                >
+                  <q-item-section avatar>
+                    <ltai-icon class="tw-mx-auto" name="svguse:icons.svg#pencil" />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Rename</q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-item
+                  v-close-popup
+                  clickable
+                  @click="
+                    () => {
+                      selectedDocument = document;
+                      showDeleteDocumentConfirmation = true;
+                    }
+                  "
+                >
+                  <q-item-section avatar>
+                    <ltai-icon class="tw-mx-auto" name="svguse:icons.svg#delete" />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label>Delete</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </q-btn-dropdown>
+          </div>
+        </div>
+
+        <!-- Document dialogs-->
+        <knowledge-base-rename-document-dialog
+          v-model="showRenameDocument"
+          :name="selectedDocument?.name ?? ''"
+          @save="(newName: string) => renameDocument(selectedDocument!, newName)"
+        />
+        <ltai-dialog
+          v-model="showDeleteDocumentConfirmation"
+          title="Delete document"
+          @save="deleteDocument(selectedDocument!)"
+        >
+          <q-card-section class="row">
+            <span>Are you sure you want to delete the document {{ selectedDocument!.name }}?</span>
+          </q-card-section>
+        </ltai-dialog>
+
+        <!-- Knowledge base dialogs -->
+        <knowledge-base-rename-dialog
+          v-model="showRenameKnowledgeBase"
+          :name="knowledgeBaseRef.name"
+          @save="(newName: string) => renameKnowledgeBase(newName)"
+        />
+        <ltai-dialog
+          v-model="showDeleteKnowledgeBaseConfirmation"
+          title="Delete knowledge base"
+          @save="deleteKnowledgeBase"
+        >
+          <q-card-section class="row">
+            <span>Are you sure you want to delete the knowledge base "{{ knowledgeBaseRef.name }}" ?</span>
+          </q-card-section>
+        </ltai-dialog>
+      </div>
+      <q-linear-progress v-if="uploadInProgress" indeterminate />
+    </section>
+  </authenticated>
 </template>
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
@@ -182,6 +184,7 @@ import KnowledgeBaseRenameDialog from 'components/dialog/KnowledgeBaseRenameDial
 import { supportedInputFiles } from 'src/utils/knowledge/parsing';
 import { MAX_ATTACHMENT_SIZE } from 'src/utils/knowledge/attachments';
 import EmptyState from 'components/EmptyState.vue';
+import Authenticated from 'layouts/Authenticated.vue';
 
 const $q = useQuasar();
 const route = useRoute();
@@ -208,12 +211,6 @@ watch(
 );
 
 async function loadKnowledgeBase(id: string) {
-  if (accountStore.account === null) {
-    $q.notify({ message: 'Account not connected', color: 'negative' });
-    await router.push({ path: '/' });
-    return;
-  }
-
   if (!knowledgeStore.isLoaded) {
     // This page was loaded directly, auto connect allowed us to get the wallet,
     // but we didn't load KB yet, waiting for it
