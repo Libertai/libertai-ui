@@ -14,7 +14,7 @@
       unelevated
       @click="subscriptionsStore.holdSubscribe('pro')"
     >
-      New standard hold subscription
+      New Pro hold subscription
     </q-btn>
   </section>
 </template>

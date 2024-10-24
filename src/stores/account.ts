@@ -8,7 +8,7 @@ import { useTokensStore } from 'stores/tokens';
 import { useKnowledgeStore } from 'stores/knowledge';
 import { useSubscriptionStore } from 'stores/subscription';
 
-const LTAI_BASE_ADDRESS = '0xF8B1b47AA748F5C7b5D0e80C726a843913EB573a';
+const LTAI_BASE_ADDRESS = process.env.LTAI_BASE_ADDRESS || 'F8B1b47AA748F5C7b5D0e80C726a843913EB573a';
 
 type AccountStoreState = {
   alephStorage: AlephPersistentStorage | null;
@@ -66,7 +66,7 @@ export const useAccountStore = defineStore('account', {
 
       const balance = await getBalance(config, {
         address: account.address,
-        token: LTAI_BASE_ADDRESS,
+        token: `0x${LTAI_BASE_ADDRESS}`,
         chainId: base.id,
       });
 
