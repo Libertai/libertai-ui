@@ -12,7 +12,7 @@
       rounded
       text-color="dark-mode-text"
       unelevated
-      @click="subscriptionsStore.holdSubscribe('standard')"
+      @click="subscriptionsStore.holdSubscribe('pro')"
     >
       New standard hold subscription
     </q-btn>

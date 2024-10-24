@@ -3,9 +3,7 @@ import { defineStore } from 'pinia';
 import { chatsMigrations } from 'src/migrations/chats';
 import { Chat, MessageAttachment, UIMessage } from 'src/types/chats';
 import { UIPersona } from 'src/types/personas';
-import localforage from 'localforage';
 
-const CHATS_STORE_NAME = 'chats-store';
 const CHATS_STORE_PINIA_KEY = 'chats-store-pinia-key';
 
 type ChatsStoreState = {
@@ -23,7 +21,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
   persist: {
     paths: ['version', 'chats'],
     afterRestore: (ctx) => {
-      ctx.store.loadAndMigrateChats();
+      ctx.store.migrateChats();
     },
   },
   getters: {
@@ -37,22 +35,8 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
     },
   },
   actions: {
-    async loadAndMigrateChats() {
+    async migrateChats() {
       try {
-        // Legacy: Fetch chats stored with LocalForage
-        const localForageStore = localforage.createInstance({ name: CHATS_STORE_NAME });
-
-        const oldChats: Chat[] = [];
-        await localForageStore.iterate((chat: Chat) => {
-          oldChats.push(chat);
-        });
-        if (oldChats.length > 0) {
-          const oldIds = oldChats.map((c) => c.id);
-          this.chats = this.chats.filter((c) => !oldIds.includes(c.id)).concat(oldChats);
-        }
-        // Remove all the data now that we are done migrating it
-        await localForageStore.dropInstance({ name: CHATS_STORE_NAME });
-
         // Running migrations if needed
         if (this.version < chatsMigrations.length) {
           // Removing migrations already ran

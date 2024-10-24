@@ -58,11 +58,11 @@ export const useSubscriptionStore = defineStore('subscriptions', {
       const subscriptionResponse = await subscribeHoldSubscriptionPost({
         body: {
           signature: hash,
-          type: 'standard',
+          type: subscriptionType,
           account: { chain: 'base', address },
         },
       });
-      // TODO: handle errors and success
+      console.log(subscriptionResponse);
     },
   },
 });
