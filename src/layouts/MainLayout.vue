@@ -17,7 +17,8 @@
         <div class="row q-gutter-x-sm">
           <q-btn
             v-if="accountStore.account === null"
-            :class="$q.screen.gt.sm ? '' : 'float-right q-pa-sm'"
+                        :class="{ 'float-right q-pa-sm': !$q.screen.gt.sm }"
+
             no-caps
             rounded
             text-color="primary"
@@ -29,7 +30,7 @@
           </q-btn>
           <q-btn
             v-else
-            :class="$q.screen.gt.sm ? 'btn-gradient' : 'float-right q-pa-sm'"
+            :class="[$q.screen.gt.sm ? 'btn-gradient' : 'float-right q-pa-sm']"
             :text-color="$q.screen.gt.sm ? 'white' : 'black'"
             :to="{
               name: 'tokens-detail',

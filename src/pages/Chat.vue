@@ -6,7 +6,11 @@
         <!-- eslint-disable-next-line vue/valid-v-for -->
         <q-item
           v-for="(message, message_index) in chatRef.messages"
-          :class="`q-py-md q-my-md max-sm:tw-mx-2 sm:tw-mx-12 items-start dyn-container chat-item rounded-borders ${$q.dark.mode ? '' : message.author === 'user' ? 'bg-white' : 'bg-secondary'}`"
+          :class="{
+            'bg-white': !$q.dark.mode && message.author === 'user',
+            'bg-secondary': !$q.dark.mode && message.author !== 'user',
+          }"
+          class="q-py-md q-my-md max-sm:tw-mx-2 sm:tw-mx-12 items-start dyn-container chat-item rounded-borders"
         >
           <!-- Display the avatar of the user or the AI -->
           <q-item-section avatar>

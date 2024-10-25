@@ -1,7 +1,7 @@
 <template>
   <q-dialog class="q-pa-lg text-light tw-flex-grow">
     <q-card class="q-pa-md">
-      <q-card-actions :class="`flex flex-left text-semibold ${$q.dark.mode ? '' : 'text-purple-700'}`">
+      <q-card-actions :class="{ 'text-purple-700': !$q.dark.mode }" class="flex flex-left text-semibold">
         {{ title }}
         <q-space />
         <q-btn v-close-popup flat size="sm" unelevated>

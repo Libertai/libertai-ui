@@ -2,7 +2,7 @@
   <authenticated-page>
     <div class="tw-flex tw-items-center tw-justify-center tw-min-h-[inherit]">
       <q-card class="tw-m-auto tw-p-5">
-        <q-card-actions :class="`flex flex-left text-semibold ${$q.dark.mode ? '' : 'text-purple-700'}`">
+        <q-card-actions :class="{ 'text-purple-700': !$q.dark.mode }" class="flex flex-left text-semibold">
           User settings
           <q-space />
         </q-card-actions>

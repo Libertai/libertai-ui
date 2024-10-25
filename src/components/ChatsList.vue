@@ -27,7 +27,8 @@
 
         <q-item-section v-if="route.params?.id === chat.id" side>
           <q-btn-dropdown
-            :class="`tw-p-1 ${$q.dark.mode ? 'tw-text-black' : ''}`"
+            :class="{ 'tw-text-black': $q.dark.mode }"
+            class="tw-p-1"
             dropdown-icon="more_horiz"
             unelevated
           >

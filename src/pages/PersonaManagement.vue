@@ -57,7 +57,8 @@
       <q-card
         v-for="persona of personasStore.sortedPersonas"
         :key="persona.id"
-        :class="`persona-card ${persona.hidden ? 'bg-purple-50' : ' tw-bg-white'}`"
+        :class="[persona.hidden ? 'bg-purple-50' : ' tw-bg-white']"
+        class="persona-card"
       >
         <q-avatar class="tw-w-24 tw-h-24 tw-mx-auto">
           <img :src="getPersonaAvatarUrl(persona.avatar.ipfs_hash)" alt="avatar" />

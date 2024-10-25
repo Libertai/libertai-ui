@@ -20,19 +20,19 @@
         </q-card>
         <q-card class="col-12 column" flat>
           <q-card-section class="bg-purple-50 q-pa-xl row text-bold max-lg:tw-text-center">
-            <div :class="`text-h6 lg:tw-text-left ${$q.screen.gt.sm ? 'col-8' : 'col-12'}`">
+            <div :class="[$q.screen.gt.sm ? 'col-8' : 'col-12']" class="text-h6 lg:tw-text-left">
               <q-avatar class="q-mr-sm">
                 <img alt="libertai" src="/icons/libertai.svg" />
               </q-avatar>
               <span>Current $LTAI balance</span>
             </div>
 
-            <div :class="`tw-py-4 ${$q.screen.gt.sm ? 'col-4 column text-right' : 'col-12'}`">
+            <div :class="[$q.screen.gt.sm ? 'col-4 column text-right' : 'col-12']" class="tw-py-4">
               <span class="text-h4 text-bold">{{ tokensStore.getAddressTokens(address).toFixed(2) }}</span>
             </div>
           </q-card-section>
         </q-card>
-        <q-card :class="$q.screen.gt.sm ? 'col-6 column' : 'col-12'" flat>
+        <q-card :class="[$q.screen.gt.sm ? 'col-6 column' : 'col-12']" flat>
           <q-card-section class="bg-purple-50 q-pa-xl">
             <p class="text-h6 text-bold max-md:tw-text-center md:tw-text-left">Pending $LTAI</p>
             <p class="q-py-md md:tw-text-right max-md:tw-text-center">
@@ -42,7 +42,7 @@
             </p>
           </q-card-section>
         </q-card>
-        <q-card :class="$q.screen.gt.sm ? 'col-6 column' : 'col-12'" flat>
+        <q-card :class="[$q.screen.gt.sm ? 'col-6 column' : 'col-12']" flat>
           <q-card-section class="bg-purple-50 q-pa-xl">
             <p class="text-h6 text-bold md:tw-text-left max-md:tw-text-center">36 Month estimated $LTAI*</p>
             <p class="q-py-md md:tw-text-right max-md:tw-text-center">
