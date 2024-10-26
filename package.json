@@ -2,7 +2,7 @@
   "name": "libertai-ui",
   "version": "0.0.1",
   "description": "A UI for decentralized AI",
-  "productName": "Libertai UI",
+  "productName": "LibertAI UI",
   "author": "LibertAI Team",
   "contributors": [
     "David Amelekh <david.amelekh@protonmail.com>",
@@ -24,9 +24,9 @@
     "build": "quasar build"
   },
   "dependencies": {
-    "@aleph-sdk/client": "^1.0.6",
-    "@aleph-sdk/ethereum": "^1.0.3",
-    "@aleph-sdk/message": "^1.0.7",
+    "@aleph-sdk/base": "^1.1.0",
+    "@aleph-sdk/client": "^1.1.0",
+    "@aleph-sdk/message": "^1.1.0",
     "@libertai/libertai-js": "0.0.10",
     "@quasar/extras": "^1.16.12",
     "@tanstack/vue-query": "^5.51.21",
@@ -36,6 +36,7 @@
     "dompurify": "^3.1.6",
     "dotenv": "^16.4.5",
     "eciesjs": "^0.4.7",
+    "ethers": "^5.7.2",
     "filesize": "^10.1.4",
     "highlight.js": "^11.10.0",
     "langchain": "^0.2.13",
