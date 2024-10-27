@@ -32,6 +32,7 @@
     "@hey-api/client-axios": "^0.2.7",
     "@libertai/libertai-js": "0.0.10",
     "@quasar/extras": "^1.16.12",
+    "@solana/web3.js": "^1.95.4",
     "@tanstack/vue-query": "^5.51.21",
     "@wagmi/vue": "^0.0.36",
     "axios": "^1.7.3",

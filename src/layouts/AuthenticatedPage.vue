@@ -1,21 +1,21 @@
 <template>
   <q-page>
-    <slot v-if="account.isConnected.value" />
+    <slot v-if="accountStore.account !== null" />
   </q-page>
 </template>
 
 <script lang="ts" setup>
-import { useAccount } from '@wagmi/vue';
 import { useQuasar } from 'quasar';
+import { useAccountStore } from 'stores/account';
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 const $q = useQuasar();
 const router = useRouter();
-const account = useAccount();
+const accountStore = useAccountStore();
 
 onMounted(async () => {
-  if (!account.isConnected.value) {
+  if (accountStore.account === null) {
     $q.notify({ message: 'Account not connected', color: 'negative' });
     await router.push({ path: '/' });
     return;

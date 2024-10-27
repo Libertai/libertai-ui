@@ -17,8 +17,7 @@
         <div class="row q-gutter-x-sm">
           <q-btn
             v-if="accountStore.account === null"
-                        :class="{ 'float-right q-pa-sm': !$q.screen.gt.sm }"
-
+            :class="{ 'float-right q-pa-sm': !$q.screen.gt.sm }"
             no-caps
             rounded
             text-color="primary"
@@ -81,9 +80,9 @@
 </template>
 
 <script lang="ts" setup>
-import AccountButton from 'src/components/AccountButton.vue';
 import ChatsList from 'components/ChatsList.vue';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
+import AccountButton from 'src/components/AccountButton.vue';
 import { useAccountStore } from 'stores/account';
 import { useGeneralStore } from 'stores/general';
 

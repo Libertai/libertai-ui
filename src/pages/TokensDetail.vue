@@ -64,9 +64,10 @@
 </template>
 
 <script lang="ts" setup>
+import { useQuasar } from 'quasar';
+import { useTokensStore } from 'stores/tokens';
 import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useTokensStore } from 'stores/tokens';
 import web3 from 'web3';
 
 const route = useRoute();
