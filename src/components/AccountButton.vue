@@ -76,10 +76,10 @@
 import { useAccount, useConnect, useDisconnect } from '@wagmi/vue';
 import { watchAccount } from '@wagmi/vue/actions';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
-import { config } from 'src/config/wagmi';
-import { watch, watchEffect } from 'vue';
 import { useWallet, WalletModalProvider } from 'solana-wallets-vue';
+import { config } from 'src/config/wagmi';
 import { useAccountStore } from 'stores/account';
+import { watch, watchEffect } from 'vue';
 
 const accountStore = useAccountStore();
 

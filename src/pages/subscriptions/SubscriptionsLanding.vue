@@ -6,7 +6,7 @@
         <p class="tw-text-xs tw-font-semibold">Select a plan that suits your needs</p>
       </div>
 
-      <q-linear-progress v-if="!subscriptionsStore.isLoaded && account.isConnected.value" indeterminate />
+      <q-linear-progress v-if="!subscriptionsStore.isLoaded && accountStore.account !== null" indeterminate />
 
       <div class="lg:tw-flex tw-space-x-5 tw-hidden">
         <subscription-plan-card
@@ -58,10 +58,10 @@
 </template>
 
 <script lang="ts" setup>
-import { useAccount } from '@wagmi/vue';
 import SubscriptionPlanCard from 'components/card/SubscriptionPlanCard.vue';
 import { useQuasar } from 'quasar';
 import { subscriptionPlans, UISubscriptionPlan } from 'src/types/subscriptions';
+import { useAccountStore } from 'stores/account';
 import { useGeneralStore } from 'stores/general';
 import { useSubscriptionStore } from 'stores/subscription';
 import { computed, onMounted, ref } from 'vue';
@@ -69,7 +69,7 @@ import { useRouter } from 'vue-router';
 
 const subscriptionsStore = useSubscriptionStore();
 const generalStore = useGeneralStore();
-const account = useAccount();
+const accountStore = useAccountStore();
 const router = useRouter();
 const $q = useQuasar();
 
@@ -97,7 +97,7 @@ const subscribe = (subscriptionPlan: UISubscriptionPlan) => {
 };
 
 const displayedSubscriptionPlans = computed((): UISubscriptionPlan[] => {
-  const isLoggedIn = account.isConnected.value;
+  const isLoggedIn = accountStore.account !== null;
   const hasProSubscription = !!subscriptionsStore.subscriptions.find((subscription) => subscription.type === 'pro');
   const hasAdvancedSubscription = !!subscriptionsStore.subscriptions.find(
     (subscription) => subscription.type === 'advanced',

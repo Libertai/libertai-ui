@@ -1,14 +1,19 @@
 import type { Account, Chain, Client, Transport } from 'viem';
 
-import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
 import {
   BaseAccount,
   getAccountFromProvider as getBaseAccountFromProvider,
   importAccountFromPrivateKey as importBaseAccountFromPrivateKey,
 } from '@aleph-sdk/base';
+import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
 import { ItemType } from '@aleph-sdk/message';
-import { PrivateKey } from 'eciesjs';
+import { getAccountFromProvider as getSolAccountFromProvider, SOLAccount } from '@aleph-sdk/solana';
 import { type Config, getConnectorClient, signMessage as signWagmiMessage } from '@wagmi/core';
+import { base } from '@wagmi/vue/chains';
+import { PrivateKey } from 'eciesjs';
+import { providers } from 'ethers';
+import { useWallet } from 'solana-wallets-vue';
+import env from 'src/config/env';
 import { config } from 'src/config/wagmi';
 import {
   KnowledgeBase,
@@ -18,13 +23,8 @@ import {
 } from 'src/types/knowledge';
 import { decrypt, encrypt, generateIv, generateKey } from 'src/utils/encryption';
 import { decryptKnowledgeBaseIdentifiers, encryptKnowledgeBaseIdentifiers } from 'src/utils/knowledge/encryption';
-import web3 from 'web3';
-import { providers } from 'ethers';
-import { base } from '@wagmi/vue/chains';
-import env from 'src/config/env';
-import { useWallet } from 'solana-wallets-vue';
 import { AccountChain } from 'stores/account';
-import { getAccountFromProvider as getSolAccountFromProvider, SOLAccount } from '@aleph-sdk/solana';
+import web3 from 'web3';
 
 // Aleph keys and channels settings
 const SECURITY_AGGREGATE_KEY = 'security';
@@ -66,7 +66,6 @@ export class AlephPersistentStorage {
       case 'base':
         return signWagmiMessage(config, { message: MESSAGE });
       case 'solana':
-        /* eslint-disable no-case-declarations */
         const { signMessage: signSolanaMessage } = useWallet();
         const signature = await signSolanaMessage.value!(Buffer.from(MESSAGE));
         return Buffer.from(signature).toString('base64');

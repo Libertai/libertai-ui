@@ -1,14 +1,16 @@
-import { defineStore } from 'pinia';
-import { AlephPersistentStorage } from 'src/utils/aleph-persistent-storage';
+import * as solana from '@solana/web3.js';
 import { getBalance } from '@wagmi/core';
+import { defineStore } from 'pinia';
 import env from 'src/config/env';
 import { config } from 'src/config/wagmi';
+import { AlephPersistentStorage } from 'src/utils/aleph-persistent-storage';
 import { useKnowledgeStore } from 'stores/knowledge';
 import { useSettingsStore } from 'stores/settings';
 import { useSubscriptionStore } from 'stores/subscription';
 import { useTokensStore } from 'stores/tokens';
 
 const LTAI_BASE_ADDRESS = env.LTAI_BASE_ADDRESS as `0x${string}`;
+const LTAI_SOLANA_ADDRESS = env.LTAI_SOLANA_ADDRESS;
 
 type AccountStoreState = {
   alephStorage: AlephPersistentStorage | null;
@@ -73,18 +75,36 @@ export const useAccountStore = defineStore('account', {
     },
 
     async getLTAIBalance(): Promise<number> {
-      if (this.account === null || this.account.chain === 'solana') {
+      if (this.account === null) {
         return 0;
       }
 
-      // TODO: handle solana
-      const balance = await getBalance(config, {
-        address: this.account.address as `0x${string}`,
-        token: LTAI_BASE_ADDRESS,
-        chainId: env.WAGMI_BASE_ID,
-      });
+      switch (this.account.chain) {
+        case 'solana':
+          const connection = new solana.Connection(env.SOLANA_RPC);
+          const accountPublicKey = new solana.PublicKey(this.account.address);
+          const mintAccount = new solana.PublicKey(LTAI_SOLANA_ADDRESS);
 
-      return Number(balance.formatted);
+          const tokenAccount = await connection.getTokenAccountsByOwner(accountPublicKey, {
+            mint: mintAccount,
+          });
+
+          if (tokenAccount.value.length != 1) {
+            return 0;
+          }
+
+          const result = await connection.getTokenAccountBalance(tokenAccount.value[0].pubkey);
+          return result.value.uiAmount ?? 0;
+
+        case 'base':
+          const balance = await getBalance(config, {
+            address: this.account.address as `0x${string}`,
+            token: LTAI_BASE_ADDRESS,
+            chainId: env.WAGMI_BASE_ID,
+          });
+
+          return Number(balance.formatted);
+      }
     },
 
     onDisconnect() {
