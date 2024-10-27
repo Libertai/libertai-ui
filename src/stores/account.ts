@@ -30,6 +30,10 @@ export const useAccountStore = defineStore('account', {
   }),
   actions: {
     async onAccountChange(newAccount: Account) {
+      if (this.account !== null && this.account.address === newAccount.address) {
+        return;
+      }
+
       this.account = newAccount;
       const tokensStore = useTokensStore();
       const knowledgeStore = useKnowledgeStore();
