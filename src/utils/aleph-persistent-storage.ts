@@ -67,7 +67,7 @@ export class AlephPersistentStorage {
         /* eslint-disable no-case-declarations */
         const { signMessage: signSolanaMessage } = useWallet();
         const signature = await signSolanaMessage.value!(Buffer.from(MESSAGE));
-        return Buffer.from(signature.buffer).toString();
+        return Buffer.from(signature).toString('base64');
     }
   }
 
