@@ -1,3 +1,5 @@
+import type { Account, Chain, Client, Transport } from 'viem';
+
 import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
 import {
   BaseAccount,
@@ -8,7 +10,6 @@ import { ItemType } from '@aleph-sdk/message';
 import { PrivateKey } from 'eciesjs';
 import { type Config, getConnectorClient, signMessage as signWagmiMessage } from '@wagmi/core';
 import { config } from 'src/config/wagmi';
-import type { Account, Chain, Client, Transport } from 'viem';
 import {
   KnowledgeBase,
   KnowledgeBaseIdentifier,
