@@ -8,7 +8,13 @@ import {
 import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
 import { ItemType } from '@aleph-sdk/message';
 import { getAccountFromProvider as getSolAccountFromProvider, SOLAccount } from '@aleph-sdk/solana';
-import { type Config, getConnectorClient, signMessage as signWagmiMessage } from '@wagmi/core';
+import {
+  type Config,
+  getConnections,
+  getConnectorClient,
+  signMessage as signWagmiMessage,
+  switchChain,
+} from '@wagmi/core';
 import { base } from '@wagmi/vue/chains';
 import { PrivateKey } from 'eciesjs';
 import { providers } from 'ethers';
@@ -155,6 +161,13 @@ export class AlephPersistentStorage {
 
   private static async getAlephAccount(chain: AccountChain): Promise<BaseAccount | SOLAccount> {
     if (chain === 'base') {
+      const connections = getConnections(config);
+      if (connections.length === 0) {
+        throw Error('No wallet connection active');
+      }
+      if (connections[0].chainId !== env.WAGMI_BASE_ID) {
+        await switchChain(config, { chainId: env.WAGMI_BASE_ID });
+      }
       const provider = await getEthersProvider(config);
       return getBaseAccountFromProvider(provider);
     } else {

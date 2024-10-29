@@ -24,7 +24,7 @@ export const decrypt = (encryptedText: string, key: Buffer, iv: Buffer): string 
 
 export const encryptFile = async (file: File, key: Buffer, iv: Buffer): Promise<Buffer> => {
   const arrayBuffer = await file.arrayBuffer();
-  const bufferString = Buffer.from(arrayBuffer).toString('hex');
+  const bufferString = Buffer.from(arrayBuffer).toString(BUFFER_ENCODING);
   const encryptedString = encrypt(bufferString, key, iv);
   return Buffer.from(encryptedString);
 };
@@ -32,7 +32,7 @@ export const encryptFile = async (file: File, key: Buffer, iv: Buffer): Promise<
 export const decryptFile = (arrayBuffer: ArrayBuffer, key: Buffer, iv: Buffer): Buffer => {
   const fileBufferString = Buffer.from(arrayBuffer).toString();
   const decryptedString = decrypt(fileBufferString, key, iv);
-  return Buffer.from(decryptedString, 'hex');
+  return Buffer.from(decryptedString, BUFFER_ENCODING);
 };
 
 export const generateKey = () => Buffer.from(randomBytes(16).toString('hex'));
