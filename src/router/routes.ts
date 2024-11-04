@@ -40,6 +40,10 @@ const routes = [
         path: 'subscriptions/subscribe',
         component: () => import('pages/subscriptions/SubscriptionFlow.vue'),
       },
+      {
+        path: 'agents',
+        component: () => import('pages/Agents.vue'),
+      },
       { path: 'account', component: () => import('pages/AccountSettings.vue') },
     ],
   },

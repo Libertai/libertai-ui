@@ -8,6 +8,7 @@ import {
   SubscriptionType,
 } from 'src/apis/subscriptions';
 import { config } from 'src/config/wagmi';
+import { useAccountStore } from 'stores/account';
 
 type SubscriptionState = {
   subscriptions: BaseSubscription[];
@@ -21,14 +22,18 @@ export const useSubscriptionStore = defineStore('subscriptions', {
   }),
   actions: {
     async load() {
-      const account = getAccount(config);
-      const address = account.address;
+      const { account } = useAccountStore();
 
-      if (address === undefined) {
+      if (account === null) {
         return;
       }
 
-      const response = await getUserSubscriptionsSubscriptionsGet({ query: { address } });
+      const response = await getUserSubscriptionsSubscriptionsGet({
+        query: {
+          address: account.address,
+          chain: account.chain,
+        },
+      });
 
       this.subscriptions = response.data?.subscriptions ?? [];
       this.isLoaded = true;
