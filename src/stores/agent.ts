@@ -31,6 +31,7 @@ export const useAgentStore = defineStore('agents', {
       const activeAgentSubscriptions = subscriptions.filter((sub) => sub.is_active && sub.type === 'agent');
 
       if (activeAgentSubscriptions.length === 0) {
+        this.agents = [];
         this.isLoaded = true;
         return;
       }
@@ -45,7 +46,6 @@ export const useAgentStore = defineStore('agents', {
           }),
         )
       ).filter((agent) => agent !== undefined);
-      console.log(this.agents);
 
       this.isLoaded = true;
     },
@@ -70,7 +70,6 @@ export const useAgentStore = defineStore('agents', {
         },
       });
 
-      // TODO: handle errors in the call to this function
       if (secretResponse.data === undefined) {
         throw new Error(secretResponse.error.detail?.toString() ?? 'Unable to get the agent secret');
       }

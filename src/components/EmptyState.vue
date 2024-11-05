@@ -1,6 +1,6 @@
 <template>
   <div class="tw-mx-auto tw-mt-10 tw-w-fit">
-    <img :alt="imageAlt" :src="imageLink" />
+    <img :alt="imageAlt" :src="imageLink" class="tw-mx-auto" />
     <p class="tw-text-lg text-purple-700 tw-w-fit tw-mx-auto">{{ title }}</p>
     <p class="text-primary tw-w-fit tw-mx-auto">{{ description }}</p>
   </div>
