@@ -180,6 +180,50 @@ export const SubsPostRefreshSubscriptionsResponseSchema = {
     title: 'SubsPostRefreshSubscriptionsResponse'
 } as const;
 
+export const SubscriptionSchema = {
+    properties: {
+        id: {
+            type: 'string',
+            title: 'Id'
+        },
+        type: {
+            '$ref': '#/components/schemas/SubscriptionType'
+        },
+        provider: {
+            '$ref': '#/components/schemas/SubscriptionProvider'
+        },
+        started_at: {
+            type: 'integer',
+            title: 'Started At'
+        },
+        ended_at: {
+            type: 'integer',
+            title: 'Ended At'
+        },
+        is_active: {
+            type: 'boolean',
+            title: 'Is Active'
+        },
+        provider_data: {
+            type: 'object',
+            title: 'Provider Data'
+        },
+        account: {
+            '$ref': '#/components/schemas/SubscriptionAccount'
+        },
+        tags: {
+            items: {
+                type: 'string'
+            },
+            type: 'array',
+            title: 'Tags'
+        }
+    },
+    type: 'object',
+    required: ['id', 'type', 'provider', 'started_at', 'is_active', 'provider_data', 'account', 'tags'],
+    title: 'Subscription'
+} as const;
+
 export const SubscriptionAccountSchema = {
     properties: {
         address: {

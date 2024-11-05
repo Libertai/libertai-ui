@@ -53,6 +53,20 @@ export type SubsPostRefreshSubscriptionsResponse = {
     cancelled_subscriptions: Array<(string)>;
 };
 
+export type Subscription = {
+    id: string;
+    type: SubscriptionType;
+    provider: SubscriptionProvider;
+    started_at: number;
+    ended_at?: number;
+    is_active: boolean;
+    provider_data: {
+        [key: string]: unknown;
+    };
+    account: SubscriptionAccount;
+    tags: Array<(string)>;
+};
+
 export type SubscriptionAccount = {
     address: string;
     chain: SubscriptionChain;
@@ -125,6 +139,16 @@ export type GetUserSubscriptionsSubscriptionsGetData = {
 export type GetUserSubscriptionsSubscriptionsGetResponse = (GetUserSubscriptionsResponse);
 
 export type GetUserSubscriptionsSubscriptionsGetError = (HTTPValidationError);
+
+export type GetSubscriptionSubscriptionsSubscriptionIdGetData = {
+    path: {
+        subscription_id: string;
+    };
+};
+
+export type GetSubscriptionSubscriptionsSubscriptionIdGetResponse = (Subscription);
+
+export type GetSubscriptionSubscriptionsSubscriptionIdGetError = (HTTPValidationError);
 
 export type SubscribeHoldSubscriptionPostData = {
     body: HoldPostSubscriptionBody;

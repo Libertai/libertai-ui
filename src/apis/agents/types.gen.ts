@@ -17,6 +17,10 @@ export type GetAgentResponse = {
     last_update: number;
 };
 
+export type GetAgentSecretMessage = {
+    message: string;
+};
+
 export type GetAgentSecretResponse = {
     secret: string;
 };
@@ -100,3 +104,13 @@ export type GetAgentSecretAgentAgentIdSecretGetData = {
 export type GetAgentSecretAgentAgentIdSecretGetResponse = (GetAgentSecretResponse);
 
 export type GetAgentSecretAgentAgentIdSecretGetError = (HTTPValidationError);
+
+export type GetAgentSecretMessageAgentAgentIdSecretMessageGetData = {
+    path: {
+        agent_id: string;
+    };
+};
+
+export type GetAgentSecretMessageAgentAgentIdSecretMessageGetResponse = (GetAgentSecretMessage);
+
+export type GetAgentSecretMessageAgentAgentIdSecretMessageGetError = (HTTPValidationError);

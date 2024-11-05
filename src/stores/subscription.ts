@@ -1,4 +1,3 @@
-import { getAccount, signMessage } from '@wagmi/core';
 import { defineStore } from 'pinia';
 import {
   BaseSubscription,
@@ -7,8 +6,8 @@ import {
   subscribeHoldSubscriptionPost,
   SubscriptionType,
 } from 'src/apis/subscriptions';
-import { config } from 'src/config/wagmi';
 import { useAccountStore } from 'stores/account';
+import { useAgentStore } from 'stores/agent';
 
 type SubscriptionState = {
   subscriptions: BaseSubscription[];
@@ -23,6 +22,7 @@ export const useSubscriptionStore = defineStore('subscriptions', {
   actions: {
     async load() {
       const { account } = useAccountStore();
+      const agentStore = useAgentStore();
 
       if (account === null) {
         return;
@@ -37,13 +37,13 @@ export const useSubscriptionStore = defineStore('subscriptions', {
 
       this.subscriptions = response.data?.subscriptions ?? [];
       this.isLoaded = true;
+      agentStore.load().then();
     },
 
     async holdSubscribe(subscriptionType: SubscriptionType) {
-      const account = getAccount(config);
-      const address = account.address;
+      const { account, signMessage } = useAccountStore();
 
-      if (address === undefined) {
+      if (account === null) {
         return;
       }
 
@@ -58,13 +58,13 @@ export const useSubscriptionStore = defineStore('subscriptions', {
       }
 
       const messageToSign = messagesResponse.data.subscribe_message;
-      const hash = await signMessage(config, { message: messageToSign });
+      const hash = await signMessage(messageToSign);
 
       const subscriptionResponse = await subscribeHoldSubscriptionPost({
         body: {
           signature: hash,
           type: subscriptionType,
-          account: { chain: 'base', address },
+          account: { chain: 'base', address: account.address },
         },
       });
       console.log(subscriptionResponse);

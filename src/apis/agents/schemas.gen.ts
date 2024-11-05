@@ -58,6 +58,18 @@ export const GetAgentResponseSchema = {
     title: 'GetAgentResponse'
 } as const;
 
+export const GetAgentSecretMessageSchema = {
+    properties: {
+        message: {
+            type: 'string',
+            title: 'Message'
+        }
+    },
+    type: 'object',
+    required: ['message'],
+    title: 'GetAgentSecretMessage'
+} as const;
+
 export const GetAgentSecretResponseSchema = {
     properties: {
         secret: {
