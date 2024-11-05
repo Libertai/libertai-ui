@@ -31,10 +31,14 @@
             v-else
             :class="[$q.screen.gt.sm ? 'btn-gradient' : 'float-right q-pa-sm']"
             :text-color="$q.screen.gt.sm ? 'white' : 'black'"
-            :to="{
-              name: 'tokens-detail',
-              params: { address: accountStore!.account.address },
-            }"
+            :to="
+              accountStore!.account.chain === 'base'
+                ? {
+                    name: 'tokens-detail',
+                    params: { address: accountStore!.account.address },
+                  }
+                : undefined
+            "
             no-caps
             rounded
             unelevated
