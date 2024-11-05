@@ -8,13 +8,7 @@ import {
 import { AuthenticatedAlephHttpClient } from '@aleph-sdk/client';
 import { ItemType } from '@aleph-sdk/message';
 import { getAccountFromProvider as getSolAccountFromProvider, SOLAccount } from '@aleph-sdk/solana';
-import {
-  type Config,
-  getConnections,
-  getConnectorClient,
-  signMessage as signWagmiMessage,
-  switchChain,
-} from '@wagmi/core';
+import { type Config, getConnections, getConnectorClient, switchChain } from '@wagmi/core';
 import { base } from '@wagmi/vue/chains';
 import { PrivateKey } from 'eciesjs';
 import { providers } from 'ethers';
@@ -34,7 +28,7 @@ import web3 from 'web3';
 
 // Aleph keys and channels settings
 const SECURITY_AGGREGATE_KEY = 'security';
-const MESSAGE = 'LibertAI';
+export const LIBERTAI_MESSAGE = 'LibertAI';
 const LIBERTAI_GENERAL_CHANNEL = 'libertai';
 const LIBERTAI_UI_CHANNEL = 'libertai-chat-ui';
 const LIBERTAI_SETTINGS_KEY = `${LIBERTAI_UI_CHANNEL}-settings`;
@@ -66,17 +60,6 @@ export class AlephPersistentStorage {
     // eslint-disable-next-line no-unused-vars
     private encryptionPrivateKey: PrivateKey,
   ) {}
-
-  static async signMessage(chain: AccountChain): Promise<`0x${string}` | string> {
-    switch (chain) {
-      case 'base':
-        return signWagmiMessage(config, { message: MESSAGE });
-      case 'solana':
-        const { signMessage: signSolanaMessage } = useWallet();
-        const signature = await signSolanaMessage.value!(Buffer.from(MESSAGE));
-        return Buffer.from(signature).toString('base64');
-    }
-  }
 
   static async initialize(hash: string, chain: AccountChain) {
     const privateKey = web3.utils.sha3(hash);

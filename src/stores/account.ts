@@ -1,9 +1,10 @@
 import * as solana from '@solana/web3.js';
-import { getBalance } from '@wagmi/core';
+import { getBalance, signMessage as signWagmiMessage } from '@wagmi/core';
 import { defineStore } from 'pinia';
+import { useWallet } from 'solana-wallets-vue';
 import env from 'src/config/env';
 import { config } from 'src/config/wagmi';
-import { AlephPersistentStorage } from 'src/utils/aleph-persistent-storage';
+import { AlephPersistentStorage, LIBERTAI_MESSAGE } from 'src/utils/aleph-persistent-storage';
 import { useKnowledgeStore } from 'stores/knowledge';
 import { useSettingsStore } from 'stores/settings';
 import { useSubscriptionStore } from 'stores/subscription';
@@ -49,6 +50,21 @@ export const useAccountStore = defineStore('account', {
       await Promise.all([tokensStore.update(), knowledgeStore.load(), subscriptionsStore.load()]);
     },
 
+    async signMessage(message: string): Promise<`0x${string}` | string> {
+      if (this.account === null) {
+        throw Error('No account');
+      }
+
+      switch (this.account.chain) {
+        case 'base':
+          return signWagmiMessage(config, { message: message });
+        case 'solana':
+          const { signMessage: signSolanaMessage } = useWallet();
+          const signature = await signSolanaMessage.value!(Buffer.from(message));
+          return Buffer.from(signature).toString('base64');
+      }
+    },
+
     async initAlephStorage() {
       const settingsStore = useSettingsStore();
 
@@ -56,9 +72,7 @@ export const useAccountStore = defineStore('account', {
         return;
       }
 
-      const hash =
-        settingsStore.signatureHash[this.account.address] ??
-        (await AlephPersistentStorage.signMessage(this.account.chain));
+      const hash = settingsStore.signatureHash[this.account.address] ?? (await this.signMessage(LIBERTAI_MESSAGE));
       if (settingsStore.isSignatureHashStored) {
         settingsStore.signatureHash[this.account.address] = hash;
       }
