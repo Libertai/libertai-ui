@@ -13,7 +13,7 @@
       <q-linear-progress v-if="!agentStore.isLoaded" indeterminate />
       <div v-else-if="agentStore.agents.length === 0">
         <empty-state
-          description="Contact the team member if you wish to access to the private beta"
+          description="Contact the team if you wish to access the private beta"
           image-alt="No agents"
           image-link="/assets/empty-states/agents.png"
           title="No agents"
