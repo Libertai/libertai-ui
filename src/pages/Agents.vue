@@ -28,14 +28,7 @@
 
       <div v-else class="tw-mt-5 tw-space-y-4">
         <div v-for="agent of agentStore.agents" :key="agent.id">
-          <p>Agent {{ agent.id }}</p>
-          <a v-if="agent.vm_hash" :href="`https://aleph.sh/vm/${agent.vm_hash}`"
-            >https://aleph.sh/vm/{{ agent.vm_hash }}</a
-          >
-          <p v-else>Not yet deployed</p>
-          <p>Last update: {{ dayjs().to(dayjs.unix(agent.last_update)) }}</p>
-          <p v-if="agent.secret">Secret: {{ agent.secret }}</p>
-          <q-btn no-caps rounded @click="getAgentSecret(agent.id)">Get secret</q-btn>
+          <AgentCard :agent="agent" />
         </div>
       </div>
     </section>
@@ -43,24 +36,11 @@
 </template>
 
 <script lang="ts" setup>
+import AgentCard from 'components/card/AgentCard.vue';
 import EmptyState from 'components/EmptyState.vue';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
-import dayjs from 'dayjs';
 import AuthenticatedPage from 'layouts/AuthenticatedPage.vue';
-import { useQuasar } from 'quasar';
 import { useAgentStore } from 'stores/agent';
 
-const $q = useQuasar();
 const agentStore = useAgentStore();
-
-const getAgentSecret = async (agentId: string) => {
-  try {
-    await agentStore.getAgentSecret(agentId);
-  } catch (error) {
-    $q.notify({
-      message: (error as Error)?.message ?? 'Unable to get the agent secret',
-      color: 'negative',
-    });
-  }
-};
 </script>
