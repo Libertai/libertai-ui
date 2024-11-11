@@ -3,7 +3,7 @@
     <section class="max-sm:tw-mx-4 sm:tw-mx-10 tw-my-5">
       <div class="tw-flex tw-mb-5 tw-items-center tw-space-x-2">
         <h4 class="text-h4 text-semibold">Agents</h4>
-        <a href="https://docs.libertai.io/chat/documents/knowledge-base.html" target="_blank">
+        <a href="https://docs.libertai.io/agents" target="_blank">
           <ltai-icon name="help_outline" size="xs" />
         </a>
       </div>
