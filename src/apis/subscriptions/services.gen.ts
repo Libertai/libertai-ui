@@ -7,6 +7,7 @@ export const client = createClient(createConfig());
 
 /**
  * Get User Subscriptions
+ * Get all the subscriptions of a user
  */
 export const getUserSubscriptionsSubscriptionsGet = <ThrowOnError extends boolean = false>(options: Options<GetUserSubscriptionsSubscriptionsGetData, ThrowOnError>) => {
     return (options?.client ?? client).get<GetUserSubscriptionsSubscriptionsGetResponse, GetUserSubscriptionsSubscriptionsGetError, ThrowOnError>({
