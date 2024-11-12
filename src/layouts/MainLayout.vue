@@ -99,11 +99,11 @@ const sidebarItems = [
     icon: 'svguse:icons.svg#agents',
     title: 'Agents (private beta)',
   },
-  {
-    link: '/subscriptions',
-    icon: 'svguse:icons.svg#subscription-star',
-    title: 'Subscriptions',
-  },
+  // {
+  //   link: '/subscriptions',
+  //   icon: 'svguse:icons.svg#subscription-star',
+  //   title: 'Subscriptions',
+  // },
   {
     link: '/knowledge-base',
     icon: 'svguse:icons.svg#book',
