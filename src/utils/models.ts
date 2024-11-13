@@ -50,10 +50,21 @@ export const defaultModels: UIModel[] = [
   // Function call model
   {
     id: 'c237ead6-165e-4725-af4f-a1b50b770e1e',
-    name: 'Nous Hermes 2 Pro (Llama 3 8B, fast)',
+    name: 'Hermes 3 (Llama 3.1 8B, fast)',
     ...modelDefaults,
     apiUrl:
       'https://curated.aleph.cloud/vm/84df52ac4466d121ef3bb409bb14f315de7be4ce600e8948d71df6485aa5bcc3/completion',
+    promptFormat: promptFormatDefaults,
+    premium: false,
+  },
+
+  // Mistral Nemo
+  {
+    id: '7bcffd59-461e-41a8-8428-80bcb44a77cd',
+    name: 'Mistral Nemo (Instruct)',
+    ...modelDefaults,
+    apiUrl:
+      'https://curated.aleph.cloud/vm/2c4ad0bf343fb12924936cbc801732d95ce90f84cd895aa8bee82c0a062815c2/completion',
     promptFormat: promptFormatDefaults,
     premium: false,
   },
@@ -79,17 +90,6 @@ export const defaultModels: UIModel[] = [
     premium: false,
   },
 
-  // Mixtral
-  {
-    id: '068f9afc-281c-45b8-bea2-317d3c3bb469',
-    name: 'Mixtral (8x7B MOE, smart)',
-    ...modelDefaults,
-    apiUrl:
-      'https://curated.aleph.cloud/vm/cb6a4ae6bf93599b646aa54d4639152d6ea73eedc709ca547697c56608101fc7/completion',
-    promptFormat: promptFormatDefaults,
-    premium: false,
-  },
-
   // Phi-3-mini
   {
     id: 'b253aacf-cbbc-4e46-8187-74bfd5398d78',
@@ -99,17 +99,6 @@ export const defaultModels: UIModel[] = [
       'https://curated.aleph.cloud/vm/ad482633bac1f1fae071fb3908c49ebe8d30e3dbeb047051a8ee1b206f2ef830/completion',
     promptFormat: promptFormatPhi,
     maxTokens: 131072,
-    premium: false,
-  },
-
-  // Nous Hermes 2
-  {
-    id: '2f5219e5-d6e8-411a-b7a4-30dd3623e1e8',
-    name: 'Nous Hermes 2 (34B, smart)',
-    ...modelDefaults,
-    apiUrl:
-      'https://curated.aleph.cloud/vm/16a9f0f870c251719a0c63554cf02b6b8e4c2b4fee9987ddc3341a6507aef68d/completion',
-    promptFormat: promptFormatDefaults,
     premium: false,
   },
 
