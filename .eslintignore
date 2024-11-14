@@ -2,3 +2,4 @@
 /.quasar
 /node_modules
 /quasar.config.*.temporary.compiled*
+/src/apis

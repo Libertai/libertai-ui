@@ -13,6 +13,7 @@ export type DeleteAgentBody = {
 
 export type GetAgentResponse = {
     id: string;
+    subscription_id: string;
     vm_hash?: string;
     last_update: number;
 };
