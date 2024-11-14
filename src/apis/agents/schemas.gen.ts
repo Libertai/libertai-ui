@@ -44,6 +44,10 @@ export const GetAgentResponseSchema = {
             type: 'string',
             title: 'Id'
         },
+        subscription_id: {
+            type: 'string',
+            title: 'Subscription Id'
+        },
         vm_hash: {
             type: 'string',
             title: 'Vm Hash'
@@ -54,7 +58,7 @@ export const GetAgentResponseSchema = {
         }
     },
     type: 'object',
-    required: ['id', 'last_update'],
+    required: ['id', 'subscription_id', 'last_update'],
     title: 'GetAgentResponse'
 } as const;
 

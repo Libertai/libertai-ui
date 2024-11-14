@@ -30,7 +30,6 @@
         <span>{{ connector.name }}</span>
       </q-btn>
       <q-btn
-        v-if="false"
         key="solana"
         class="row tw-mx-auto"
         no-caps
