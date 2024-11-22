@@ -13,6 +13,14 @@ const envSchema = z.object({
   WAGMI_BASE_ID: z.union([z.literal(base.id), z.literal(baseSepolia.id)]).default(base.id),
 });
 
-const env = envSchema.parse(process.env);
+const env = envSchema.parse(
+  Object.keys(import.meta.env).reduce(
+    (acc, key) => ({
+      ...acc,
+      ...{ [key.replace('APP.', '')]: import.meta.env[key] },
+    }),
+    {},
+  ),
+);
 
 export default env;

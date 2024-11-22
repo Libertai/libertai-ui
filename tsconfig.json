@@ -4,7 +4,8 @@
     "allowJs": false,
     "baseUrl": ".",
     "target": "ESNext",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["node", "vite/client"]
   },
   "exclude": [
     "./dist",
