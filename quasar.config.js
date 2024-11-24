@@ -10,6 +10,7 @@
 
 const { configure } = require('quasar/wrappers');
 const { nodePolyfills } = require('vite-plugin-node-polyfills');
+const EnvironmentPlugin = require('vite-plugin-environment').default;
 
 module.exports = configure(function (ctx) {
   return {
@@ -70,7 +71,14 @@ module.exports = configure(function (ctx) {
         if (viteConf.plugins === undefined) {
           viteConf.plugins = [];
         }
-        viteConf.plugins = [...viteConf.plugins, nodePolyfills()];
+        viteConf.plugins = [
+          ...viteConf.plugins,
+          nodePolyfills(),
+          EnvironmentPlugin('all', {
+            prefix: 'APP.',
+            defineOn: 'import.meta.env',
+          }),
+        ];
         if (ctx.dev) {
           viteConf.define['process.browser'] = true;
         }
