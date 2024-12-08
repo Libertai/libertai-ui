@@ -27,9 +27,7 @@
       </div>
 
       <div v-else class="tw-mt-5 tw-space-y-4">
-        <div v-for="agent of agentStore.agents" :key="agent.id">
-          <AgentCard :agent="agent" />
-        </div>
+        <AgentCard v-for="agent of agentStore.agents" :key="agent.id" :agent="agent" />
       </div>
     </section>
   </authenticated-page>
