@@ -74,10 +74,7 @@ module.exports = configure(function (ctx) {
         viteConf.plugins = [
           ...viteConf.plugins,
           nodePolyfills(),
-          EnvironmentPlugin('all', {
-            prefix: 'APP.',
-            defineOn: 'import.meta.env',
-          }),
+          EnvironmentPlugin('all', { defineOn: 'import.meta.env' }),
         ];
         if (ctx.dev) {
           viteConf.define['process.browser'] = true;
