@@ -72,7 +72,7 @@ export const defaultModels: UIModel[] = [
   // Roleplay model
   {
     id: 'a8ba5cfe-bd86-4f81-97fa-8f68300488b7',
-    name: 'Roleplay (7B, fast)',
+    name: 'Thought (14B, distilled R1)',
     ...modelDefaults,
     // Set our apiUrl
     apiUrl:
@@ -86,7 +86,7 @@ export const defaultModels: UIModel[] = [
     // Set a slightly higher temperature
     temperature: 0.8,
     // Set custom chatML settings
-    promptFormat: promptFormatDefaults,
+    promptFormat: promptFormatPhi,
     premium: false,
   },
 
@@ -143,7 +143,7 @@ export const defaultModels: UIModel[] = [
     premium: false,
   },
 
-  // DeepSeek Coder V3 (6.7B, developer)
+  // DeepSeek V3 (6.7B, developer)
   {
     id: 'baecea75-d71a-42e6-9b3f-cb37956683e1',
     name: 'DeepSeek V3 (671B, genius MoE)',
@@ -152,7 +152,7 @@ export const defaultModels: UIModel[] = [
       'https://curated.aleph.cloud/vm/9aa80dc7f00c515a5f56b70e65fdab4c367e35f341c3b4220419adb6ca86a33f/completion',
     // Allow a larger prompt length
     maxTokens: 16384,
-    promptFormat: promptFormatDefaults,
+    promptFormat: promptFormatPhi,
     premium: false,
   },
 
