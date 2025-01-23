@@ -142,4 +142,18 @@ export const defaultModels: UIModel[] = [
     promptFormat: promptFormatDefaults,
     premium: false,
   },
+
+  // DeepSeek Coder V3 (6.7B, developer)
+  {
+    id: 'baecea75-d71a-42e6-9b3f-cb37956683e1',
+    name: 'DeepSeek V3 (671B, genius MoE)',
+    ...modelDefaults,
+    apiUrl:
+      'https://curated.aleph.cloud/vm/9aa80dc7f00c515a5f56b70e65fdab4c367e35f341c3b4220419adb6ca86a33f/completion',
+    // Allow a larger prompt length
+    maxTokens: 16384,
+    promptFormat: promptFormatDefaults,
+    premium: false,
+  },
+
 ];
