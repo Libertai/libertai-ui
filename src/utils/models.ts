@@ -18,6 +18,15 @@ export const promptFormatPhi = {
   additionalStopSequences: ['<|endoftext|>', '<|', '</|'],
 };
 
+export const promptFormatDeepSeek = {
+  userPrepend: '<|',
+  userAppend: '|>',
+  logStart: '<|begin_of_sentence|>',
+  lineSeparator: '',
+  stopSequence: '<|end_of_sentence|>',
+  additionalStopSequences: ['<|endoftext|>', '<|', '</|'],
+};
+
 export const modelDefaults = {
   maxTokens: 8192,
   maxPredict: 15,
@@ -86,7 +95,7 @@ export const defaultModels: UIModel[] = [
     // Set a slightly higher temperature
     temperature: 0.8,
     // Set custom chatML settings
-    promptFormat: promptFormatPhi,
+    promptFormat: promptFormatDeepSeek,
     premium: false,
   },
 
@@ -139,7 +148,7 @@ export const defaultModels: UIModel[] = [
       'https://curated.aleph.cloud/vm/b950fef19b109ef3770c89eb08a03b54016556c171b9a32475c085554b594c94/completion',
     // Allow a larger prompt length
     maxTokens: 16384,
-    promptFormat: promptFormatDefaults,
+    promptFormat: promptFormatDeepSeek,
     premium: false,
   },
 
@@ -152,7 +161,19 @@ export const defaultModels: UIModel[] = [
       'https://curated.aleph.cloud/vm/9aa80dc7f00c515a5f56b70e65fdab4c367e35f341c3b4220419adb6ca86a33f/completion',
     // Allow a larger prompt length
     maxTokens: 16384,
-    promptFormat: promptFormatPhi,
+    promptFormat: promptFormatDeepSeek,
+    premium: false,
+  },
+  // DeepSeek R1 671B
+  {
+    id: 'b2bc2ef7-f0bc-416b-bac2-a07c581440d5',
+    name: 'DeepSeek R1 671B',
+    ...modelDefaults,
+    apiUrl:
+      'https://curated.aleph.cloud/vm/6de52d201e6a8247a4c54d6b4f1fb7a01a1814c57b7344898b2d3257b5c46810/completion',
+    // Allow a larger prompt length
+    maxTokens: 16384,
+    promptFormat: promptFormatDeepSeek,
     premium: false,
   },
 
