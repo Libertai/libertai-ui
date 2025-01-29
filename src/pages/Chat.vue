@@ -266,10 +266,9 @@ async function generatePersonaMessage() {
       false,
     )) {
       const stopped = output.stopped || shouldStopGeneration.value;
-      let content = output.content;
 
       // Update the local state include updates
-      response.content = content;
+      response.content = output.content;
       response.stopped = stopped;
 
       if (stopped) {

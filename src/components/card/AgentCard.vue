@@ -42,11 +42,11 @@
         </q-btn>
       </div>
 
-      <div v-if="agent.vm_hash" class="tw-flex tw-justify-center">
+      <div v-if="agent.instance_ip" class="tw-flex tw-justify-center">
         <q-btn
-          :href="`https://aleph.sh/vm/${agent.vm_hash}`"
+          :href="`http://[${agent.instance_ip}]:8000/docs`"
           color="primary"
-          label="Access the VM"
+          label="View the instance"
           no-caps
           outline
           target="_blank"

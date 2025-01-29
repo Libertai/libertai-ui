@@ -176,5 +176,4 @@ export const defaultModels: UIModel[] = [
     promptFormat: promptFormatDeepSeek,
     premium: false,
   },
-
 ];
