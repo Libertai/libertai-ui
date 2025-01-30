@@ -7,7 +7,7 @@ export type KnowledgeSearchResult = {
 
 const knowledgeDocumentChunk = z.object({
   content: z.string(),
-  vector: z.array(z.number()),
+  vector: z.array(z.number()).optional(), // TODO: remove optional once issue fixed with Justin C.
 });
 
 export type KnowledgeDocumentChunk = z.infer<typeof knowledgeDocumentChunk>;

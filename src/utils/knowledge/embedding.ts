@@ -30,7 +30,7 @@ export const generateChunks = async (
     const embedding_vector = await embed(chunk.pageContent);
     result.push({
       content: chunk.pageContent,
-      vector: embedding_vector,
+      vector: embedding_vector ?? [],
     });
   }
 
@@ -68,7 +68,7 @@ export const searchDocuments = async (
   // Iterate over all embeddings
   documents.forEach((document) => {
     document.chunks.forEach((chunk) => {
-      const euclidean_distance = distance.euclidean(query_vector, chunk.vector);
+      const euclidean_distance = distance.euclidean(query_vector, chunk.vector ?? []);
 
       // If the distance is greater than the max_distance, skip it
       if (euclidean_distance > max_distance) return;
@@ -88,11 +88,16 @@ async function embed(content: string): Promise<number[]> {
   const errors = [];
   for (let i = 0; i < tries; i++) {
     try {
-      const response = await axios.post<{ embedding: number[] }>(DEFAULT_EMBEDDING_API_URL, {
+      const response = await axios.post<
+        | { embedding: number[][] }[]
+        | {
+            embedding: number[];
+          }
+      >(DEFAULT_EMBEDDING_API_URL, {
         content,
       });
 
-      return response.data.embedding;
+      return Array.isArray(response.data) ? response.data[0].embedding[0] : response.data.embedding;
     } catch (error) {
       errors.push(error);
       console.error(`Error embedding text: ${error}`);
