@@ -2,8 +2,15 @@
 
 export const AgentPythonPackageManagerSchema = {
     type: 'string',
-    enum: ['poetry', 'pip'],
+    enum: ['poetry', 'requirements', 'pyproject'],
     title: 'AgentPythonPackageManager',
+    description: 'An enumeration.'
+} as const;
+
+export const AgentUsageTypeSchema = {
+    type: 'string',
+    enum: ['fastapi', 'python'],
+    title: 'AgentUsageType',
     description: 'An enumeration.'
 } as const;
 
@@ -16,11 +23,14 @@ export const Body_update_agent__agent_id__putSchema = {
         deploy_script_url: {
             type: 'string',
             title: 'Deploy Script Url',
-            default: 'https://raw.githubusercontent.com/Libertai/libertai-agents/refs/heads/reza/deployment-instances/deployment/deploy.sh'
+            default: 'https://raw.githubusercontent.com/Libertai/libertai-agents/refs/heads/reza/instances/deployment/deploy.sh'
         },
         python_version: {
             type: 'string',
             title: 'Python Version'
+        },
+        usage_type: {
+            '$ref': '#/components/schemas/AgentUsageType'
         },
         package_manager: {
             '$ref': '#/components/schemas/AgentPythonPackageManager'
@@ -32,7 +42,7 @@ export const Body_update_agent__agent_id__putSchema = {
         }
     },
     type: 'object',
-    required: ['secret', 'python_version', 'package_manager', 'code'],
+    required: ['secret', 'python_version', 'usage_type', 'package_manager', 'code'],
     title: 'Body_update_agent__agent_id__put'
 } as const;
 
@@ -165,13 +175,17 @@ export const SubscriptionChainSchema = {
 
 export const UpdateAgentResponseSchema = {
     properties: {
-        instance_hash: {
+        instance_ip: {
             type: 'string',
-            title: 'Instance Hash'
+            title: 'Instance Ip'
+        },
+        error_log: {
+            type: 'string',
+            title: 'Error Log'
         }
     },
     type: 'object',
-    required: ['instance_hash'],
+    required: ['instance_ip', 'error_log'],
     title: 'UpdateAgentResponse'
 } as const;
 

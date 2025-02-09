@@ -3,12 +3,18 @@
 /**
  * An enumeration.
  */
-export type AgentPythonPackageManager = 'poetry' | 'pip';
+export type AgentPythonPackageManager = 'poetry' | 'requirements' | 'pyproject';
+
+/**
+ * An enumeration.
+ */
+export type AgentUsageType = 'fastapi' | 'python';
 
 export type Body_update_agent__agent_id__put = {
     secret: string;
     deploy_script_url?: string;
     python_version: string;
+    usage_type: AgentUsageType;
     package_manager: AgentPythonPackageManager;
     code: (Blob | File);
 };
@@ -55,7 +61,8 @@ export type SubscriptionAccount = {
 export type SubscriptionChain = 'base' | 'solana';
 
 export type UpdateAgentResponse = {
-    instance_hash: string;
+    instance_ip: string;
+    error_log: string;
 };
 
 export type ValidationError = {
