@@ -173,7 +173,7 @@ export const defaultModels: UIModel[] = [
       'https://curated.aleph.cloud/vm/6de52d201e6a8247a4c54d6b4f1fb7a01a1814c57b7344898b2d3257b5c46810/completion',
     // Allow a larger prompt length
     maxTokens: 16384,
-    promptFormat: promptFormatDeepSeek,
+    promptFormat: promptFormatPhi,
     premium: false,
   },
 ];

@@ -24,7 +24,8 @@
     "build": "quasar build",
     "generate-clients": "npm run generate-subscriptions-client; npm run generate-agents-client",
     "generate-subscriptions-client": "openapi-ts --input http://localhost:8000/openapi.json --output ./src/apis/subscriptions --client @hey-api/client-axios",
-    "generate-agents-client": "openapi-ts --input http://localhost:8001/openapi.json --output ./src/apis/agents --client @hey-api/client-axios"
+    "generate-agents-client": "openapi-ts --input http://localhost:8001/openapi.json --output ./src/apis/agents --client @hey-api/client-axios",
+    "generate-api-tokens": "openapi-ts --input http://localhost:8000/openapi.json --output ./src/apis/tokens --client @hey-api/client-axios"
   },
   "dependencies": {
     "@aleph-sdk/base": "^1.2.0",
