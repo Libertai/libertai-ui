@@ -1,14 +1,11 @@
 import { defineStore } from 'pinia';
-import {
-  TokenAccount,
-  accountListAccountAddressListGet
-} from 'src/apis/tokens'
+import { TokenAccount, accountListAccountAddressListGet } from 'src/apis/tokens';
 import { useAccountStore } from 'stores/account';
 
 type ApiKeyState = {
   accounts: TokenAccount[];
-  revealMessage: string|undefined;
-  revealMessageSignature: string|undefined;
+  revealMessage: string | undefined;
+  revealMessageSignature: string | undefined;
   isLoaded: boolean;
   showKeys: boolean;
 };
@@ -23,7 +20,7 @@ export const useApiKeyStore = defineStore('api_keys', {
   }),
   actions: {
     async load() {
-      console.log("Loaded here");
+      console.log('Loaded here');
       const { account } = useAccountStore();
 
       if (account === null) {
@@ -36,8 +33,8 @@ export const useApiKeyStore = defineStore('api_keys', {
         },
         query: {
           chain: account.chain,
-          reveal_message_signature: this.revealMessageSignature
-        }
+          reveal_message_signature: this.revealMessageSignature,
+        },
       });
 
       this.accounts = response.data?.accounts ?? [];
@@ -46,7 +43,7 @@ export const useApiKeyStore = defineStore('api_keys', {
     },
 
     async revealKeys() {
-      console.log("reveal keys", this.accounts, "n", this.revealMessage);
+      console.log('reveal keys', this.accounts, 'n', this.revealMessage);
       if (this.revealMessageSignature) {
         this.load();
         this.showKeys = true;
@@ -55,26 +52,26 @@ export const useApiKeyStore = defineStore('api_keys', {
 
       const { account, signMessage } = useAccountStore();
 
-      console.log("has account", account);
+      console.log('has account', account);
       if (account === null || !this.revealMessage) {
         return;
       }
 
       if (this.revealMessage != undefined) {
-        console.log("Signing...");
+        console.log('Signing...');
         const messageToSign = this.revealMessage;
         const hash = await signMessage(messageToSign);
         this.revealMessageSignature = hash;
-        console.log("signed message", hash);
+        console.log('signed message', hash);
         this.showKeys = true;
       }
     },
 
     async hideKeys() {
       for (let account of this.accounts) {
-        account.token = "**hidden**";
+        account.token = '**hidden**';
       }
       this.showKeys = false;
-    }
-  }
+    },
+  },
 });

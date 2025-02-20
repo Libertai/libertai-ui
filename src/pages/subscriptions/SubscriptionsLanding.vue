@@ -52,10 +52,13 @@
     <div class="q-pa-md">
       <h3>Current subscription</h3>
       <q-card class="q-pa-md row">
-      <p v-if="subscriptionsStore.subscriptions.length === 0">No subscriptions</p>
-      <div v-for="subscription of subscriptionsStore.subscriptions" v-else :key="subscription.id">
-        <p>type: {{ subscription.type }} <br /> Provider: {{ subscription.provider }}</p>
-      </div>
+        <p v-if="subscriptionsStore.subscriptions.length === 0">No subscriptions</p>
+        <div v-for="subscription of subscriptionsStore.subscriptions" v-else :key="subscription.id">
+          <p>
+            type: {{ subscription.type }} <br />
+            Provider: {{ subscription.provider }}
+          </p>
+        </div>
       </q-card>
     </div>
     <div class="q-pa-md">
@@ -64,8 +67,10 @@
       <q-card class="q-pa-md">
         <p v-if="apiKeysStore.accounts.length === 0">No api keys</p>
         <p v-else>
-          <q-btn v-if="!apiKeysStore.showKeys" color="primary" @click="apiKeysStore.revealKeys()" >Reveal api keys</q-btn>
-          <q-btn v-if="apiKeysStore.showKeys" color="primary"  @click="apiKeysStore.hideKeys()">Hide api keys</q-btn>
+          <q-btn v-if="!apiKeysStore.showKeys" color="primary" @click="apiKeysStore.revealKeys()"
+            >Reveal api keys
+          </q-btn>
+          <q-btn v-if="apiKeysStore.showKeys" color="primary" @click="apiKeysStore.hideKeys()">Hide api keys</q-btn>
           <br /><br />
           <q-markup-table>
             <thead>
@@ -77,7 +82,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="api_account of apiKeysStore.accounts">
+              <tr v-for="api_account of apiKeysStore.accounts" :key="api_account.sha1_token">
                 <td class="text-left">{{ api_account.name }}</td>
                 <td class="text-left">{{ api_account.sha1_token }}</td>
                 <td class="text-left">
@@ -87,10 +92,9 @@
               </tr>
             </tbody>
           </q-markup-table>
-      </p>
+        </p>
       </q-card>
     </div>
-
   </q-page>
 </template>
 
