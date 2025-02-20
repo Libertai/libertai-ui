@@ -16,9 +16,8 @@ const accountStore = useAccountStore();
 
 onMounted(async () => {
   if (accountStore.account === null) {
-    $q.notify({ message: 'Account not connected', color: 'negative' });
+    $q.notify({ message: 'You must connect your wallet to access this page', color: 'negative' });
     await router.push({ path: '/' });
-    return;
   }
 });
 </script>
