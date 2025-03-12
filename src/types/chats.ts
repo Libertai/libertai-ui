@@ -18,6 +18,7 @@ export type UIMessage = Message & {
   stopped?: boolean;
   error?: any;
   searchResults?: any;
+  isLoading: boolean;
 };
 
 export type Chat = {

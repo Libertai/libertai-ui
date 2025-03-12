@@ -105,10 +105,12 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
         author: 'user',
         role: chat.username,
         content,
+        thought: '',
         timestamp: new Date().toISOString(),
         attachments,
         stopped: true,
         error: null,
+        isLoading: true,
       };
 
       this.chats = this.chats.map((chat) => {
@@ -121,7 +123,7 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
       return userMessage;
     },
 
-    appendModelResponse(chatId: string, response: string, searchResults: any): UIMessage {
+    appendModelResponse(chatId: string, response: string, thought: string, searchResults: any): UIMessage {
       const chat = this.chats.find((chat) => chat.id === chatId);
       if (chat === undefined) {
         throw Error('Chat not found');
@@ -130,10 +132,12 @@ export const useChatsStore = defineStore(CHATS_STORE_PINIA_KEY, {
         author: 'ai',
         role: chat.persona.role,
         content: response,
+        thought: thought,
         timestamp: new Date().toISOString(),
         searchResults,
         stopped: true,
         error: null,
+        isLoading: true,
       };
 
       this.chats = this.chats.map((chat) => {
