@@ -181,8 +181,7 @@ export const defaultModels: UIModel[] = [
     id: 'd0afaa7f-fa9c-4f5f-9840-e4ff035bcf83',
     name: 'QWQ (32B, reasoning, dev)',
     ...modelDefaults,
-    apiUrl:
-      'https://code-res.model.libertai.io/completion',
+    apiUrl: 'https://code-res.model.libertai.io/completion',
     // Allow a larger prompt length
     maxTokens: 16384,
     promptFormat: promptFormatDefaults,

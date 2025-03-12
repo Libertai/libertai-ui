@@ -54,16 +54,43 @@
               </q-chip>
             </q-item-label>
             <!-- Display the content of the message -->
+            <q-item-label v-if="message.thought && message.thought.length > 1" class="tw-block">
+              <q-card
+                :ref="'thought-' + message_index"
+                :class="
+                  'thought flat bordered ' +
+                  ((!message.isLoading || message.stopped) && message_index !== chatRef.messages.length - 1
+                    ? 'minimize_thought'
+                    : '')
+                "
+              >
+                <q-card-section class="header">
+                  <div class="row items-center no-wrap">
+                    <div class="col">
+                      <h4>Thought Process...</h4>
+                    </div>
+                    <div class="col-auto">
+                      <q-btn flat @click="showHideThought(($refs['thought-' + message_index] as any)[0])">
+                        <q-icon name="remove" />
+                      </q-btn>
+                    </div>
+                  </div>
+                </q-card-section>
+                <q-card-section class="content">
+                  {{ message.thought }}
+                </q-card-section>
+              </q-card>
+            </q-item-label>
             <q-item-label class="tw-block">
               <MarkdownRenderer
                 :class="message.author === 'user' ? '' : 'message-content'"
                 :content="
                   message.content +
-                  (!message.stopped && isLoadingRef && message.content !== '' ? ' *[writing ...]*' : '')
+                  (!message.stopped && message.isLoading && message.content !== '' ? ' *[writing ...]*' : '')
                 "
               />
               <!-- Display the loading spinner if the message is still loading -->
-              <q-spinner-bars v-if="!message.stopped && isLoadingRef" color="white" size="2em" />
+              <q-spinner-bars v-if="!message.stopped && message.isLoading" color="white" size="2em" />
               <!-- Display the error message if the message errored  on generate -->
               <span v-if="!!message.error" class="text-warning">
                 <q-tooltip>Error: {{ message.error.message }}</q-tooltip>
@@ -75,7 +102,7 @@
           <div class="absolute dyn-container chat-toolbar">
             <!-- Allow regenerating the last message from the AI if fully completed -->
             <q-btn
-              v-if="!isLoadingRef && message.author === 'ai' && message_index === chatRef.messages.length - 1"
+              v-if="!message.isLoading && message.author === 'ai' && message_index === chatRef.messages.length - 1"
               dense
               flat
               icon="refresh"
@@ -85,7 +112,7 @@
               <q-tooltip>Regenerate</q-tooltip>
             </q-btn>
             <q-btn
-              v-if="isLoadingRef && message.author === 'ai' && message_index === chatRef.messages.length - 1"
+              v-if="message.isLoading && message.author === 'ai' && message_index === chatRef.messages.length - 1"
               dense
               flat
               size="sm"
@@ -93,6 +120,16 @@
             >
               <ltai-icon name="stop" />
               <q-tooltip>Stop</q-tooltip>
+            </q-btn>
+            <q-btn
+              v-if="message.thought && message.thought.length > 1"
+              dense
+              flat
+              icon="psychology"
+              size="sm"
+              @click="showHideThought(($refs['thought-' + message_index] as any)[0])"
+            >
+              <q-tooltip>Thought Process</q-tooltip>
             </q-btn>
             <!-- Allow copying the message to the clipboard -->
             <q-btn dense flat size="sm" @click="copyMessage(message)">
@@ -219,8 +256,10 @@ async function generatePersonaMessage() {
     author: 'ai',
     role: persona.role,
     content: '',
+    thought: '',
     stopped: false,
     error: null,
+    isLoading: true,
   };
 
   chatRef.value.messages = [...chatRef.value.messages, response];
@@ -269,10 +308,12 @@ async function generatePersonaMessage() {
 
       // Update the local state include updates
       response.content = output.content;
+      response.thought = output.thought;
       response.stopped = stopped;
 
       if (stopped) {
         shouldStopGeneration.value = false;
+        response.isLoading = false;
         break;
       }
 
@@ -281,13 +322,14 @@ async function generatePersonaMessage() {
       scrollBottom();
     }
     // A successful response! Append the chat to long term storage.
-    chatsStore.appendModelResponse(chatId, response.content, []);
+    chatsStore.appendModelResponse(chatId, response.content, response.thought!, []);
   } catch (error) {
     console.error('generatePersonaMessage error: ', error);
     response.error = error;
   } finally {
     // Done! update the local state to reflect the end of the process
     isLoadingRef.value = false;
+    response.isLoading = false;
     chatRef.value.messages = [...chatRef.value.messages];
   }
 }
@@ -400,6 +442,20 @@ async function clearCookies() {
     withCredentials: true,
   });
 }
+
+function showHideThought(element: any) {
+  if (!element?.$el) return;
+
+  if (isVisible(element.$el)) {
+    element.$el.classList.add('minimize_thought');
+  } else {
+    element.$el.classList.remove('minimize_thought');
+  }
+}
+
+function isVisible(element: any) {
+  return element.offsetParent;
+}
 </script>
 <style>
 /* Ensure message input expands to fill available space */
@@ -438,6 +494,28 @@ code {
   a {
     color: inherit;
   }
+}
+
+.thought {
+  background-color: #dcdcdc;
+  margin-bottom: 10px;
+  color: #464242;
+  .header {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .content {
+    padding-top: 0;
+  }
+  h4 {
+    font-weight: bold;
+  }
+  .hide {
+    display: none;
+  }
+}
+.minimize_thought {
+  display: none;
 }
 
 /* on desktop, we want to show the toolbar only on hover */
