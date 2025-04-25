@@ -61,40 +61,6 @@
         </div>
       </q-card>
     </div>
-    <div class="q-pa-md">
-      <q-linear-progress v-if="!apiKeysStore.isLoaded && apiKeysStore.accounts.length == 0" indeterminate />
-      <h3>API keys</h3>
-      <q-card class="q-pa-md">
-        <p v-if="apiKeysStore.accounts.length === 0">No api keys</p>
-        <p v-else>
-          <q-btn v-if="!apiKeysStore.showKeys" color="primary" @click="apiKeysStore.revealKeys()"
-            >Reveal api keys
-          </q-btn>
-          <q-btn v-if="apiKeysStore.showKeys" color="primary" @click="apiKeysStore.hideKeys()">Hide api keys</q-btn>
-          <br /><br />
-          <q-markup-table>
-            <thead>
-              <tr>
-                <th class="text-left">Key name</th>
-                <th class="text-left">Public Key</th>
-                <th class="text-left">Secret Key</th>
-                <th class="text-left">API Endpoint</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="api_account of apiKeysStore.accounts" :key="api_account.sha1_token">
-                <td class="text-left">{{ api_account.name }}</td>
-                <td class="text-left">{{ api_account.sha1_token }}</td>
-                <td class="text-left">
-                  {{ api_account.token }}
-                </td>
-                <td>https://llm.libertai.io</td>
-              </tr>
-            </tbody>
-          </q-markup-table>
-        </p>
-      </q-card>
-    </div>
   </q-page>
 </template>
 
@@ -103,14 +69,12 @@ import SubscriptionPlanCard from 'components/card/SubscriptionPlanCard.vue';
 import { useQuasar } from 'quasar';
 import { subscriptionPlans, UISubscriptionPlan } from 'src/types/subscriptions';
 import { useAccountStore } from 'stores/account';
-import { useApiKeyStore } from 'stores/api_key';
 import { useGeneralStore } from 'stores/general';
 import { useSubscriptionStore } from 'stores/subscription';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const subscriptionsStore = useSubscriptionStore();
-const apiKeysStore = useApiKeyStore();
 const generalStore = useGeneralStore();
 const accountStore = useAccountStore();
 const router = useRouter();
@@ -118,7 +82,6 @@ const $q = useQuasar();
 
 onMounted(() => {
   generalStore.isSidebarOpen = false;
-  apiKeysStore.load();
 });
 
 const slide = ref('free');
