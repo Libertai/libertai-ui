@@ -66,7 +66,7 @@
         <q-card-section class="text-bold">{{ persona.name }}</q-card-section>
 
         <p class="persona-description">
-          {{ persona.description }}
+          {{ replaceGenericWordsInPersonaDescription(persona) }}
         </p>
 
         <div class="tw-grid tw-grid-cols-5 tw-gap-x-4 tw-w-40 tw-mx-auto">
@@ -109,6 +109,7 @@
 import PersonaDialog from 'components/dialog/PersonaDialog.vue';
 import LtaiIcon from 'components/libertai/LtaiIcon.vue';
 import { exportFile } from 'quasar';
+import { useSettingsStore } from 'src/stores/settings';
 import { BasePersonaEdition, UIPersona } from 'src/types/personas';
 import { getTokenGatingMessage } from 'src/utils/messages';
 import { getPersonaAvatarUrl } from 'src/utils/personas';
@@ -129,6 +130,8 @@ const selectedPersona = ref<UIPersona | undefined>(undefined);
 const basePersonaCreate = ref<BasePersonaEdition | undefined>(undefined);
 
 const tokenGatingMessage = computed(() => getTokenGatingMessage(accountStore.ltaiBalance, 100));
+const settingsStore = useSettingsStore();
+const username = settingsStore.username;
 
 const startChatWithPersona = (persona: UIPersona) => {
   router.push(`/new?persona=${persona.id}`);
@@ -147,6 +150,13 @@ const duplicatePersona = (persona: UIPersona) => {
 const deletePersona = (persona: UIPersona) => {
   personasStore.personas = personasStore.personas.filter((userPersona) => userPersona.id !== persona.id);
 };
+
+const replaceGenericWordsInPersonaDescription = (persona: UIPersona) => {
+  const personaNameToReplace = "{{char}}";
+  const userNameToReplace = "{{user}}";
+
+  return persona.description.replaceAll(personaNameToReplace, persona.name).replaceAll(userNameToReplace, username);
+}
 
 const reversePersonaVisibility = (persona: UIPersona) => {
   personasStore.personas = personasStore.personas.map((userPersona) => {
