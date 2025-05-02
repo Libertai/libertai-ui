@@ -152,11 +152,11 @@ const deletePersona = (persona: UIPersona) => {
 };
 
 const replaceGenericWordsInPersonaDescription = (persona: UIPersona) => {
-  const personaNameToReplace = "{{char}}";
-  const userNameToReplace = "{{user}}";
+  const personaNameToReplace = '{{char}}';
+  const userNameToReplace = '{{user}}';
 
   return persona.description.replaceAll(personaNameToReplace, persona.name).replaceAll(userNameToReplace, username);
-}
+};
 
 const reversePersonaVisibility = (persona: UIPersona) => {
   personasStore.personas = personasStore.personas.map((userPersona) => {
