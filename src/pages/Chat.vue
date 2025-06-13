@@ -145,6 +145,16 @@
       </q-list>
     </div>
 
+    <div v-if="!autoScrollEnabled" class="tw-mx-4 tw-mb-2 tw-flex tw-justify-center">
+      <q-btn
+        color="primary"
+        round
+        size="sm"
+        icon="keyboard_arrow_down"
+        @click="scrollToBottomAndEnable"
+      />
+    </div>
+
     <div class="tw-mx-4">
       <message-input :is-loading="isLoadingRef" class="col" @send-message="sendMessage" />
     </div>
@@ -169,7 +179,7 @@ import { useChatsStore } from 'stores/chats';
 import { useKnowledgeStore } from 'stores/knowledge';
 import { useModelsStore } from 'stores/models';
 import { useSettingsStore } from 'stores/settings';
-import { nextTick, onMounted, ref, watch } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const $q = useQuasar();
@@ -187,6 +197,7 @@ const isLoadingRef = ref(false);
 const scrollAreaRef = ref<HTMLDivElement>();
 const enableEditRef = ref(false);
 const shouldStopGeneration = ref(false);
+const autoScrollEnabled = ref(true);
 
 const chatRef = ref<Chat>();
 
@@ -196,6 +207,18 @@ const inferenceEngine = new LlamaCppApiEngine();
 // Clear the chat as soon as we mount
 onMounted(() => {
   nextTick(clearCookies);
+  
+  nextTick(() => {
+    if (scrollAreaRef.value) {
+      scrollAreaRef.value.addEventListener('scroll', checkScrollPosition);
+    }
+  });
+});
+
+onUnmounted(() => {
+  if (scrollAreaRef.value) {
+    scrollAreaRef.value.removeEventListener('scroll', checkScrollPosition);
+  }
 });
 
 // Update the chat when the route changes
@@ -223,8 +246,31 @@ async function setChatName(first_sentence: string) {
   }
 }
 
+const checkScrollPosition = () => {
+  if (!scrollAreaRef.value) return;
+  
+  const { scrollTop, scrollHeight, clientHeight } = scrollAreaRef.value;
+  const isAtBottom = scrollTop + clientHeight >= scrollHeight - 50;
+  
+  if (!isAtBottom && autoScrollEnabled.value) {
+    autoScrollEnabled.value = false;
+  } else if (isAtBottom && !autoScrollEnabled.value) {
+    autoScrollEnabled.value = true;
+  }
+};
+
 // Scroll to the bottom of the chat when new messages are added
 const scrollBottom = () => {
+  if (!autoScrollEnabled.value) return;
+  
+  scrollAreaRef.value?.lastElementChild?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'end',
+  });
+};
+
+const scrollToBottomAndEnable = () => {
+  autoScrollEnabled.value = true;
   scrollAreaRef.value?.lastElementChild?.scrollIntoView({
     behavior: 'smooth',
     block: 'end',
