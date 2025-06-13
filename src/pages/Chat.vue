@@ -146,13 +146,7 @@
     </div>
 
     <div v-if="!autoScrollEnabled" class="tw-mx-4 tw-mb-2 tw-flex tw-justify-center">
-      <q-btn
-        color="primary"
-        round
-        size="sm"
-        icon="keyboard_arrow_down"
-        @click="scrollToBottomAndEnable"
-      />
+      <q-btn color="primary" round size="sm" icon="keyboard_arrow_down" @click="scrollToBottomAndEnable" />
     </div>
 
     <div class="tw-mx-4">
@@ -207,7 +201,7 @@ const inferenceEngine = new LlamaCppApiEngine();
 // Clear the chat as soon as we mount
 onMounted(() => {
   nextTick(clearCookies);
-  
+
   nextTick(() => {
     if (scrollAreaRef.value) {
       scrollAreaRef.value.addEventListener('scroll', checkScrollPosition);
@@ -248,10 +242,10 @@ async function setChatName(first_sentence: string) {
 
 const checkScrollPosition = () => {
   if (!scrollAreaRef.value) return;
-  
+
   const { scrollTop, scrollHeight, clientHeight } = scrollAreaRef.value;
   const isAtBottom = scrollTop + clientHeight >= scrollHeight - 50;
-  
+
   if (!isAtBottom && autoScrollEnabled.value) {
     autoScrollEnabled.value = false;
   } else if (isAtBottom && !autoScrollEnabled.value) {
@@ -262,7 +256,7 @@ const checkScrollPosition = () => {
 // Scroll to the bottom of the chat when new messages are added
 const scrollBottom = () => {
   if (!autoScrollEnabled.value) return;
-  
+
   scrollAreaRef.value?.lastElementChild?.scrollIntoView({
     behavior: 'smooth',
     block: 'end',
