@@ -21,17 +21,13 @@
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\"",
     "format:check": "prettier --check \"**/*.{js,ts,vue,scss,html,md,json}\"",
     "dev": "quasar dev",
-    "build": "quasar build",
-    "generate-clients": "npm run generate-subscriptions-client; npm run generate-agents-client",
-    "generate-subscriptions-client": "openapi-ts --input http://localhost:8000/openapi.json --output ./src/apis/subscriptions --client @hey-api/client-axios",
-    "generate-agents-client": "openapi-ts --input http://localhost:8001/openapi.json --output ./src/apis/agents --client @hey-api/client-axios"
+    "build": "quasar build"
   },
   "dependencies": {
     "@aleph-sdk/base": "^1.2.0",
     "@aleph-sdk/client": "^1.2.0",
     "@aleph-sdk/message": "^1.2.0",
     "@aleph-sdk/solana": "^1.2.1",
-    "@hey-api/client-axios": "^0.2.9",
     "@libertai/libertai-js": "0.0.11",
     "@quasar/extras": "^1.16.12",
     "@solana/web3.js": "^1.95.4",
@@ -63,7 +59,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "^0.53.12",
     "@quasar/app-vite": "^1.9.4",
     "@types/dompurify": "^3.0.5",
     "@types/node": "^20.17.1",

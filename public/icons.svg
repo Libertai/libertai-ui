@@ -237,11 +237,6 @@
           d="M333.1,120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8,0-8.7,7-4.6,11.1l62.7,62.7c2.4,2.4,5.7,3.8,9.2,3.8h317.4  c5.8,0,8.7-7,4.6-11.1L333.1,120.1z"/>
   </symbol>
 
-  <symbol id="subscription-star" viewBox="0 0 24 25">
-    <path
-      d="M13.73 4.10145L15.49 7.62145C15.73 8.11145 16.37 8.58145 16.91 8.67145L20.1 9.20145C22.14 9.54145 22.62 11.0214 21.15 12.4814L18.67 14.9614C18.25 15.3814 18.02 16.1914 18.15 16.7714L18.86 19.8414C19.42 22.2714 18.13 23.2114 15.98 21.9414L12.99 20.1714C12.45 19.8514 11.56 19.8514 11.01 20.1714L8.02 21.9414C5.88 23.2114 4.58 22.2614 5.14 19.8414L5.85 16.7714C5.98 16.1914 5.75 15.3814 5.33 14.9614L2.85 12.4814C1.39 11.0214 1.86 9.54145 3.9 9.20145L7.09 8.67145C7.62 8.58145 8.26 8.11145 8.5 7.62145L10.26 4.10145C11.22 2.19145 12.78 2.19145 13.73 4.10145Z"
-      stroke="#BAB0FC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  </symbol>
   <symbol id="account" viewBox="0 0 36 37">
     <g clip-path="url(#clip0_2577_2213)">
       <path
@@ -259,31 +254,5 @@
         <rect width="36" height="36" fill="white" transform="translate(0 0.591553)"/>
       </clipPath>
     </defs>
-  </symbol>
-  <symbol id="agents" viewBox="0 0 24 25">
-    <g>
-      <path
-        d="M20 9.90615C20 5.90615 18.4 4.30615 14.4 4.30615H9.6C5.6 4.30615 4 5.90615 4 9.90615V14.7062C4 18.7062 5.6 20.3062 9.6 20.3062"
-        stroke="#9B8CFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path
-        d="M16.35 8.30615C15.8 7.60615 14.88 7.30615 13.5 7.30615H10.5C8 7.30615 7 8.30615 7 10.8062V13.8062C7 15.1862 7.3 16.1062 7.99 16.6562"
-        stroke="#9B8CFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M8.01001 4.30615V2.30615" stroke="#9B8CFF" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round"/>
-      <path d="M12 4.30615V2.30615" stroke="#9B8CFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M16 4.30615V2.30615" stroke="#9B8CFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M20 8.30615H22" stroke="#9B8CFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M8.01001 20.3062V22.3062" stroke="#9B8CFF" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round"/>
-      <path d="M2 8.30615H4" stroke="#9B8CFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M2 12.3062H4" stroke="#9B8CFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M2 16.3062H4" stroke="#9B8CFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path
-        d="M16.7101 18.8961C17.5882 18.8961 18.3001 18.1842 18.3001 17.3061C18.3001 16.4279 17.5882 15.7161 16.7101 15.7161C15.832 15.7161 15.1201 16.4279 15.1201 17.3061C15.1201 18.1842 15.832 18.8961 16.7101 18.8961Z"
-        stroke="#9B8CFF" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-      <path
-        d="M11.4099 17.7662V16.8362C11.4099 16.2862 11.8599 15.8362 12.4099 15.8362C13.3699 15.8362 13.7599 15.1562 13.2799 14.3262C12.9999 13.8462 13.1699 13.2262 13.6499 12.9562L14.5599 12.4262C14.9799 12.1762 15.5199 12.3262 15.7699 12.7462L15.8299 12.8462C16.3099 13.6762 17.0899 13.6762 17.5699 12.8462L17.6299 12.7462C17.8799 12.3262 18.4199 12.1862 18.8399 12.4262L19.7499 12.9562C20.2299 13.2362 20.3999 13.8462 20.1199 14.3262C19.6399 15.1562 20.0299 15.8362 20.9899 15.8362C21.5399 15.8362 21.9899 16.2862 21.9899 16.8362V17.7662C21.9899 18.3162 21.5399 18.7662 20.9899 18.7662C20.0299 18.7662 19.6399 19.4462 20.1199 20.2762C20.3999 20.7562 20.2299 21.3762 19.7499 21.6462L18.8399 22.1762C18.4199 22.4262 17.8799 22.2762 17.6299 21.8562L17.5699 21.7562C17.0899 20.9262 16.3099 20.9262 15.8299 21.7562L15.7699 21.8562C15.5199 22.2762 14.9799 22.4162 14.5599 22.1762L13.6499 21.6462C13.1699 21.3662 12.9999 20.7562 13.2799 20.2762C13.7599 19.4462 13.3699 18.7662 12.4099 18.7662C11.8599 18.7762 11.4099 18.3262 11.4099 17.7662Z"
-        stroke="#9B8CFF" stroke-width="2" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-    </g>
   </symbol>
 </svg>
