@@ -95,16 +95,6 @@ const generalStore = useGeneralStore();
 
 const sidebarItems = [
   {
-    link: '/agents',
-    icon: 'svguse:icons.svg#agents',
-    title: 'Agents (private beta)',
-  },
-  // {
-  //   link: '/subscriptions',
-  //   icon: 'svguse:icons.svg#subscription-star',
-  //   title: 'Subscriptions',
-  // },
-  {
     link: '/knowledge-base',
     icon: 'svguse:icons.svg#book',
     title: 'Knowledge base',

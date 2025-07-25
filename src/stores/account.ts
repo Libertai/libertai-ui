@@ -7,7 +7,6 @@ import { config } from 'src/config/wagmi';
 import { AlephPersistentStorage, LIBERTAI_MESSAGE } from 'src/utils/aleph-persistent-storage';
 import { useKnowledgeStore } from 'stores/knowledge';
 import { useSettingsStore } from 'stores/settings';
-import { useSubscriptionStore } from 'stores/subscription';
 import { useTokensStore } from 'stores/tokens';
 
 const LTAI_BASE_ADDRESS = env.LTAI_BASE_ADDRESS as `0x${string}`;
@@ -41,13 +40,12 @@ export const useAccountStore = defineStore('account', {
       this.account = newAccount;
       const tokensStore = useTokensStore();
       const knowledgeStore = useKnowledgeStore();
-      const subscriptionsStore = useSubscriptionStore();
 
       this.ltaiBalance = await this.getLTAIBalance();
 
       await this.initAlephStorage();
 
-      await Promise.all([tokensStore.update(), knowledgeStore.load(), subscriptionsStore.load()]);
+      await Promise.all([tokensStore.update(), knowledgeStore.load()]);
     },
 
     async signMessage(message: string): Promise<`0x${string}` | string> {
